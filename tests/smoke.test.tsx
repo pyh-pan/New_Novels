@@ -209,3 +209,41 @@ test("investigation submit is locked during routing and non-ok API errors use fa
 
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
+
+test("investigation state persists across reloads and reset requires confirmation", async () => {
+  window.localStorage.clear();
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ targetId: "general", label: "调查助手" })
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ content: "锤柄上没有明显血迹。" })
+    });
+  vi.stubGlobal("fetch", fetchMock);
+
+  const { unmount } = render(<InvestigationDesk storySlot={<section>Story</section>} />);
+
+  const input = screen.getByLabelText("新的调查问题");
+  fireEvent.change(input, { target: { value: "看看锤柄" } });
+  fireEvent.submit(input.closest("form") as HTMLFormElement);
+
+  await waitFor(() => {
+    expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
+  });
+
+  unmount();
+  render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
+  expect(screen.getByRole("dialog", { name: "重新开始调查？" })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "取消" }));
+  expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
+  fireEvent.click(screen.getByRole("button", { name: "确认重置" }));
+  expect(screen.queryByText("锤柄上没有明显血迹。")).not.toBeInTheDocument();
+});

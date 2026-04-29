@@ -1,35 +1,26 @@
 "use client";
 
-import { FormEvent, ReactNode, useMemo, useRef, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 import ConversationModule, { type ConversationMessage } from "./ConversationModule";
 import NotebookDrawer, {
   type NotebookNote,
-  type NoteFilter,
   type NoteTag
 } from "./NotebookDrawer";
 import type { PlayerKnowledgeState } from "../lib/case/schema";
 import { makeId } from "../lib/game/ids";
-
-type ConversationTarget =
-  | "general"
-  | "wilfred"
-  | "simeon"
-  | "elizabeth"
-  | "joe"
-  | "unsupported";
+import {
+  createInitialPlayState,
+  normalizePlayState,
+  PLAY_STATE_STORAGE_KEY,
+  serializePlayState,
+  type ConversationTarget,
+  type LocalPlayState
+} from "../lib/game/play-state";
 
 type RoutedMessage = {
   targetId: ConversationTarget;
   label: string;
-};
-
-type Conversation = {
-  id: string;
-  targetId: ConversationTarget;
-  title: string;
-  subtitle?: string;
-  messages: ConversationMessage[];
-  isExpanded: boolean;
 };
 
 interface InvestigationDeskProps {
@@ -38,63 +29,6 @@ interface InvestigationDeskProps {
 
 const unsupportedTargetMessage =
   "这个对象还没有配置为可询问角色。";
-
-const initialConversations: Conversation[] = [
-  {
-    id: "general",
-    targetId: "general",
-    title: "通用调查助手",
-    subtitle: "理解问题、整理已知线索，并自动转交给相关 NPC",
-    isExpanded: true,
-    messages: [
-      {
-        id: "general-opening",
-        role: "assistant",
-        content: "我会基于你已掌握的信息协助调查；如果问题更适合某位人物，我会把对话转到对应 NPC。"
-      }
-    ]
-  },
-  {
-    id: "wilfred",
-    targetId: "wilfred",
-    title: "威尔弗里德牧师",
-    subtitle: "死者的弟弟，村中牧师",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "simeon",
-    targetId: "simeon",
-    title: "铁匠西米恩",
-    subtitle: "村中铁匠，表面嫌疑人",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "elizabeth",
-    targetId: "elizabeth",
-    title: "伊丽莎白",
-    subtitle: "铁匠妻子",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "joe",
-    targetId: "joe",
-    title: "疯乔",
-    subtitle: "村中边缘人",
-    isExpanded: false,
-    messages: []
-  }
-];
-
-const initialPlayerState: PlayerKnowledgeState = {
-  discoveredClueIds: [],
-  heardTestimonyIds: [],
-  knownContradictionIds: [],
-  confrontedAgentIds: [],
-  askedTopics: []
-};
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const response = await fetch(url, {
@@ -118,29 +52,100 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export default function InvestigationDesk({ storySlot }: InvestigationDeskProps) {
-  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
-  const [notes, setNotes] = useState<NotebookNote[]>([]);
-  const [notebookOpen, setNotebookOpen] = useState(false);
-  const [activeTag, setActiveTag] = useState<NoteFilter>("all");
+  const [playState, setPlayState] = useState<LocalPlayState>(() => {
+    if (typeof window === "undefined") {
+      return createInitialPlayState();
+    }
+
+    return normalizePlayState(window.localStorage.getItem(PLAY_STATE_STORAGE_KEY));
+  });
   const [draft, setDraft] = useState("");
   const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
-  const [playerState, setPlayerState] = useState<PlayerKnowledgeState>(initialPlayerState);
+  const [resetOpen, setResetOpen] = useState(false);
   const submitInFlightRef = useRef(false);
+  const conversations = playState.conversations;
+  const notes = playState.notes;
+  const playerState = playState.playerState;
+  const activeTag = playState.ui.activeNotebookFilter;
+  const notebookOpen = Boolean(playState.ui.notebookOpen);
 
   const openClass = notebookOpen ? "notebook-open" : "notebook-closed";
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(PLAY_STATE_STORAGE_KEY, serializePlayState(playState));
+  }, [playState]);
 
   const conversationByTarget = useMemo(() => {
     return new Map(conversations.map((conversation) => [conversation.targetId, conversation]));
   }, [conversations]);
 
   const toggleConversation = (id: string) => {
-    setConversations((current) =>
-      current.map((conversation) =>
+    setPlayState((current) => ({
+      ...current,
+      conversations: current.conversations.map((conversation) =>
         conversation.id === id
           ? { ...conversation, isExpanded: !conversation.isExpanded }
           : conversation
-      )
-    );
+      ),
+      ui: { ...current.ui, activeConversationId: id }
+    }));
+  };
+
+  const setActiveTag = (activeNotebookFilter: LocalPlayState["ui"]["activeNotebookFilter"]) => {
+    setPlayState((current) => ({
+      ...current,
+      ui: { ...current.ui, activeNotebookFilter }
+    }));
+  };
+
+  const setNotebookOpen = (notebookOpen: boolean | ((current: boolean) => boolean)) => {
+    setPlayState((current) => ({
+      ...current,
+      ui: {
+        ...current.ui,
+        notebookOpen:
+          typeof notebookOpen === "function"
+            ? notebookOpen(Boolean(current.ui.notebookOpen))
+            : notebookOpen
+      }
+    }));
+  };
+
+  const setNotes = (updater: (current: NotebookNote[]) => NotebookNote[]) => {
+    setPlayState((current) => ({
+      ...current,
+      notes: updater(current.notes)
+    }));
+  };
+
+  const setPlayerState = (playerState: PlayerKnowledgeState) => {
+    setPlayState((current) => ({
+      ...current,
+      playerState
+    }));
+  };
+
+  const setConversations = (
+    updater: (current: LocalPlayState["conversations"]) => LocalPlayState["conversations"]
+  ) => {
+    setPlayState((current) => ({
+      ...current,
+      conversations: updater(current.conversations)
+    }));
+  };
+
+  const resetPlayState = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(PLAY_STATE_STORAGE_KEY);
+    }
+
+    setPlayState(createInitialPlayState());
+    setDraft("");
+    setResetOpen(false);
   };
 
   const saveExcerpt = (content: string, source: string) => {
@@ -317,6 +322,15 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   return (
     <main className={`case-shell ${openClass}`}>
       <h2 className="sr-only">New Novels</h2>
+      <div className="utility-actions">
+        <button
+          type="button"
+          className="utility-button"
+          onClick={() => setResetOpen(true)}
+        >
+          重新开始
+        </button>
+      </div>
       {storySlot}
 
       <section className="investigation-desk" aria-labelledby="desk-title">
@@ -370,6 +384,15 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
         onCreateNote={createNote}
         onDeleteNote={deleteNote}
       />
+      {resetOpen ? (
+        <ConfirmDialog
+          title="重新开始调查？"
+          description="这会清空当前浏览器里的章节进度、对话记录和侦探笔记。"
+          confirmLabel="确认重置"
+          onCancel={() => setResetOpen(false)}
+          onConfirm={resetPlayState}
+        />
+      ) : null}
     </main>
   );
 }
