@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getChapterById,
   getNextChapter,
@@ -21,10 +21,14 @@ export default function StoryReader({
   const previous = chapter ? getPreviousChapter(chapter.id) : undefined;
   const next = chapter ? getNextChapter(chapter.id) : undefined;
   const [navVisible, setNavVisible] = useState(false);
+  const [layoutMeta, setLayoutMeta] = useState(() => ({
+    lineCount: chapter?.body.length ?? 0,
+    failed: true
+  }));
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const layoutMeta = useMemo(() => {
-    return prepareChapterLayout(chapter?.body ?? [], 680, 34);
+  useEffect(() => {
+    setLayoutMeta(prepareChapterLayout(chapter?.body ?? [], 680, 34));
   }, [chapter]);
 
   useEffect(() => {
