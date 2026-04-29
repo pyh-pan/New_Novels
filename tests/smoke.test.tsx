@@ -127,7 +127,7 @@ test("general investigation questions stay in the general module", async () => {
     });
   vi.stubGlobal("fetch", fetchMock);
 
-  render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
   const input = screen.getByLabelText("新的调查问题");
   fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
@@ -158,7 +158,7 @@ test("unsupported routed targets stay in the general module and do not call inve
   });
   vi.stubGlobal("fetch", fetchMock);
 
-  render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
   const input = screen.getByLabelText("新的调查问题");
   fireEvent.change(input, { target: { value: "问问村长" } });
@@ -190,7 +190,7 @@ test("investigation submit is locked during routing and non-ok API errors use fa
     });
   vi.stubGlobal("fetch", fetchMock);
 
-  render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
   const input = screen.getByLabelText("新的调查问题");
   fireEvent.change(input, { target: { value: "询问威尔弗里德在哪里" } });
@@ -224,7 +224,7 @@ test("investigation state persists across reloads and reset requires confirmatio
     });
   vi.stubGlobal("fetch", fetchMock);
 
-  const { unmount } = render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  const { unmount } = render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
   const input = screen.getByLabelText("新的调查问题");
   fireEvent.change(input, { target: { value: "看看锤柄" } });
@@ -235,7 +235,7 @@ test("investigation state persists across reloads and reset requires confirmatio
   });
 
   unmount();
-  render(<InvestigationDesk storySlot={<section>Story</section>} />);
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
   expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole("button", { name: "重新开始" }));

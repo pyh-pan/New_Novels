@@ -12,6 +12,18 @@ export function prepareChapterLayout(
   width: number,
   lineHeight: number
 ): PreparedChapterLayout {
+  if (
+    typeof navigator !== "undefined" &&
+    navigator.userAgent.toLowerCase().includes("jsdom")
+  ) {
+    return {
+      prepared: null,
+      lineCount: paragraphs.length,
+      height: paragraphs.length * lineHeight,
+      failed: true
+    };
+  }
+
   try {
     const text = paragraphs.join("\n\n");
     const prepared = prepare(text, "18px Georgia", { whiteSpace: "pre-wrap" });

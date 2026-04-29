@@ -76,6 +76,10 @@ a {
   padding: 42px 48px;
 }
 
+.story-reader {
+  position: relative;
+}
+
 .story-header {
   max-width: 720px;
   margin: 0 auto 32px;
@@ -111,6 +115,36 @@ a {
 .story-text p {
   margin: 0 0 1.25em;
   text-indent: 2em;
+}
+
+.floating-chapter-nav {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: -18px auto 18px;
+  pointer-events: auto;
+}
+
+.floating-chapter-nav button,
+.chapter-nav button {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 8px 12px;
+  box-shadow: 0 8px 18px var(--shadow);
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 720px;
+  margin: 36px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
 }
 
 .investigation-desk {

@@ -24,7 +24,10 @@ type RoutedMessage = {
 };
 
 interface InvestigationDeskProps {
-  storySlot: ReactNode;
+  storySlot: (props: {
+    currentChapterId: string;
+    onChapterChange: (chapterId: string) => void;
+  }) => ReactNode;
 }
 
 const unsupportedTargetMessage =
@@ -331,7 +334,11 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
           重新开始
         </button>
       </div>
-      {storySlot}
+      {storySlot({
+        currentChapterId: playState.currentChapterId,
+        onChapterChange: (currentChapterId) =>
+          setPlayState((current) => ({ ...current, currentChapterId }))
+      })}
 
       <section className="investigation-desk" aria-labelledby="desk-title">
         <div className="desk-header">

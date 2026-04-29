@@ -1,6 +1,10 @@
 import InvestigationDesk from "../components/InvestigationDesk";
-import StoryPane from "../components/StoryPane";
+import StoryReader from "../components/StoryReader";
 
 export default function Page() {
-  return <InvestigationDesk storySlot={<StoryPane />} />;
+  return (
+    <InvestigationDesk
+      storySlot={(storyProps) => <StoryReader {...storyProps} />}
+    />
+  );
 }
