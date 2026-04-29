@@ -71,6 +71,15 @@ Completed:
   - In-memory player knowledge state
 - Implemented basic output guardrails against direct truth spoilers.
 - Implemented editable, taggable detective notes.
+- Implemented manual note creation, newest-first notes, and delete confirmation.
+- Implemented local browser persistence for play state.
+- Implemented a confirmation-protected reset flow.
+- Implemented a Pretext-backed chapter reader:
+  - One chapter is one scrollable reading page.
+  - Chapter navigation appears at the bottom of the chapter.
+  - Clicking the reading area reveals temporary previous/next chapter controls.
+- Implemented mobile Story / Investigation / Notebook bottom tabs with shared
+  state.
 - Implemented deterministic final accusation answer checking.
 - Captured visual direction in `design.md`.
 - Created project documentation scaffolding:
@@ -84,8 +93,7 @@ Not yet built:
 - Multi-act story progression.
 - Per-scene NPC context changes.
 - Rich personality modeling based on the source text.
-- Pretext-powered text layout and interaction refinements.
-- Persistent save/resume.
+- Server-side save/resume.
 - Creator-facing case authoring tools.
 - Full story-to-case conversion workflow.
 
@@ -258,19 +266,17 @@ Goal: Make the prototype feel polished, readable, and replayable.
 Planned work:
 
 - Refine typography and spacing.
-- Explore `chenglou/pretext` as a text layout layer for richer frontend interactions:
-  - Story pane pagination that feels closer to reading a novella.
+- Continue using `chenglou/pretext` as a text layout layer for richer frontend interactions:
+  - Chapter reading measurement and future reading-progress refinements.
   - Stable AI message bubble sizing during long or streaming NPC replies.
   - Virtualized long conversation histories with fewer layout jumps.
   - Notebook card height prediction for dense note browsing.
   - Development-time overflow checks for text-heavy controls.
 - Use Pretext selectively for measurement and layout calculation, while keeping
   rendered text accessible through normal DOM wherever possible.
-- Improve notebook interactions.
+- Continue improving notebook interactions.
 - Add smoother notebook open/close behavior.
-- Improve mobile layout.
-- Add persistent progress.
-- Add save/resume.
+- Add server-side save/resume.
 - Add clearer end-game truth reveal.
 - Run playtests with detective fiction readers.
 
@@ -319,15 +325,18 @@ Open questions:
 
 ## Next Immediate Step
 
-Build the Phase 1 playable prototype with one case and real AI NPCs.
+Run playtests on the current single-case prototype and use the results to decide
+whether the next iteration should focus on fair-play guardrails, richer NPC
+personality, or multi-act story progression.
 
-The first implementation should stay narrow:
+The next implementation should stay narrow:
 
 - One story
 - One case schema
-- One scene investigation agent
-- A small number of NPCs
+- One chapter reader
+- One investigation desk
 - One notebook
 - One final accusation flow
 
-Do not build a general creator platform until the single-case experience works.
+Do not build a general creator platform until the single-case experience feels
+compelling to detective fiction readers.
