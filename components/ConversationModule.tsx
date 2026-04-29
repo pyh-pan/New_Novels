@@ -63,6 +63,7 @@ export default function ConversationModule({
                     <button
                       type="button"
                       className="excerpt-button"
+                      aria-label="摘录这条回复"
                       onClick={() => onSaveExcerpt(message.content)}
                     >
                       摘录

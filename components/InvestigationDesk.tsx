@@ -1,6 +1,14 @@
 "use client";
 
-import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FormEvent,
+  KeyboardEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import ConfirmDialog from "./ConfirmDialog";
 import ConversationModule, { type ConversationMessage } from "./ConversationModule";
 import NotebookDrawer, {
@@ -65,6 +73,8 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   const [draft, setDraft] = useState("");
   const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
+  const [excerptNotice, setExcerptNotice] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const submitInFlightRef = useRef(false);
   const conversations = playState.conversations;
   const notes = playState.notes;
@@ -167,6 +177,8 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
     ]);
     setActiveTag("clue");
     setNotebookOpen(true);
+    setExcerptNotice("已加入侦探笔记。");
+    window.setTimeout(() => setExcerptNotice(null), 1800);
   };
 
   const updateNote = (
@@ -322,6 +334,13 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
     }
   };
 
+  const submitOnShortcut = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      formRef.current?.requestSubmit();
+    }
+  };
+
   return (
     <main className={`case-shell ${openClass}`}>
       <h2 className="sr-only">New Novels</h2>
@@ -364,13 +383,16 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
           ))}
         </div>
 
-        <form className="global-input" onSubmit={submitMessage}>
+        {excerptNotice ? <p className="excerpt-notice">{excerptNotice}</p> : null}
+
+        <form ref={formRef} className="global-input" onSubmit={submitMessage}>
           <label htmlFor="investigation-message">新的调查问题</label>
           <div className="input-row">
             <textarea
               id="investigation-message"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={submitOnShortcut}
               placeholder="询问现场、威尔弗里德、铁匠西米恩、伊丽莎白或疯乔..."
               rows={3}
             />

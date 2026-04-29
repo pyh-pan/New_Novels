@@ -247,3 +247,32 @@ test("investigation state persists across reloads and reset requires confirmatio
   fireEvent.click(screen.getByRole("button", { name: "确认重置" }));
   expect(screen.queryByText("锤柄上没有明显血迹。")).not.toBeInTheDocument();
 });
+
+test("conversation input supports keyboard submit and excerpt feedback", async () => {
+  window.localStorage.clear();
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ targetId: "general", label: "调查助手" })
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ content: "现场没有明显拖拽痕迹。" })
+    });
+  vi.stubGlobal("fetch", fetchMock);
+
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  const input = screen.getByLabelText("新的调查问题");
+  fireEvent.change(input, { target: { value: "现场有没有拖拽痕迹" } });
+  fireEvent.keyDown(input, { key: "Enter", metaKey: true });
+
+  await waitFor(() => {
+    expect(screen.getByText("现场没有明显拖拽痕迹。")).toBeInTheDocument();
+  });
+
+  const excerptButtons = screen.getAllByRole("button", { name: "摘录这条回复" });
+  fireEvent.click(excerptButtons[excerptButtons.length - 1]);
+  expect(screen.getByText("已加入侦探笔记。")).toBeInTheDocument();
+});

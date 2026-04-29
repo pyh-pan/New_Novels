@@ -273,6 +273,15 @@ a {
   font-size: 13px;
 }
 
+.excerpt-notice {
+  margin: 0 14px 10px;
+  border: 1px solid rgba(65, 92, 68, 0.28);
+  background: #f3fbf1;
+  color: #315a35;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
 .global-input {
   border-top: 1px solid var(--line);
   background: var(--paper);
