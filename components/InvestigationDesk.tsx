@@ -354,15 +354,17 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   return (
     <main className={`case-shell ${openClass}`}>
       <h2 className="sr-only">New Novels</h2>
-      <div className="utility-actions">
-        <button
-          type="button"
-          className="utility-button"
-          onClick={() => setResetOpen(true)}
-        >
-          重新开始
-        </button>
-      </div>
+      {!notebookVisible ? (
+        <div className="utility-actions">
+          <button
+            type="button"
+            className="utility-button"
+            onClick={() => setResetOpen(true)}
+          >
+            重新开始
+          </button>
+        </div>
+      ) : null}
       <div
         className={`workspace workspace-story ${
           mobileTab === "story" ? "is-mobile-active" : ""

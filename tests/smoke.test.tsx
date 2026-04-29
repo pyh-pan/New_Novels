@@ -248,6 +248,18 @@ test("investigation state persists across reloads and reset requires confirmatio
   expect(screen.queryByText("锤柄上没有明显血迹。")).not.toBeInTheDocument();
 });
 
+test("reset utility does not render over the open notebook drawer", () => {
+  window.localStorage.clear();
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  expect(screen.getByRole("button", { name: "重新开始" })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "打开侦探笔记" }));
+
+  expect(screen.getByRole("button", { name: "新建笔记" })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "重新开始" })).not.toBeInTheDocument();
+});
+
 test("conversation input supports keyboard submit and excerpt feedback", async () => {
   window.localStorage.clear();
   const fetchMock = vi
