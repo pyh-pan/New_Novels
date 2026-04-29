@@ -26,7 +26,9 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       title: "Initial title",
       text: "Initial note text",
       tag: "clue",
-      source: "现场调查"
+      source: "现场调查",
+      createdAt: "2026-04-29T00:00:00.000Z",
+      updatedAt: "2026-04-29T00:00:00.000Z"
     }
   ];
   let activeTag: NoteFilter = "all";
@@ -44,6 +46,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
         onUpdateNote={(id, updates) => {
           notes = notes.map((note) => (note.id === id ? { ...note, ...updates } : note));
         }}
+        onCreateNote={() => undefined}
+        onDeleteNote={() => undefined}
       />
     );
 
@@ -76,6 +80,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       onUpdateNote={(id, updates) => {
         notes = notes.map((note) => (note.id === id ? { ...note, ...updates } : note));
       }}
+      onCreateNote={() => undefined}
+      onDeleteNote={() => undefined}
     />
   );
 
@@ -96,6 +102,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       onUpdateNote={(id, updates) => {
         notes = notes.map((note) => (note.id === id ? { ...note, ...updates } : note));
       }}
+      onCreateNote={() => undefined}
+      onDeleteNote={() => undefined}
     />
   );
 

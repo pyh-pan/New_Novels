@@ -8,6 +8,7 @@ import NotebookDrawer, {
   type NoteTag
 } from "./NotebookDrawer";
 import type { PlayerKnowledgeState } from "../lib/case/schema";
+import { makeId } from "../lib/game/ids";
 
 type ConversationTarget =
   | "general"
@@ -95,10 +96,6 @@ const initialPlayerState: PlayerKnowledgeState = {
   askedTopics: []
 };
 
-function makeId(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const response = await fetch(url, {
     method: "POST",
@@ -147,13 +144,16 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   };
 
   const saveExcerpt = (content: string, source: string) => {
+    const now = new Date().toISOString();
     setNotes((current) => [
       {
         id: makeId("note"),
         title: `摘录 ${current.length + 1}`,
         text: content,
         tag: "clue" satisfies NoteTag,
-        source
+        source,
+        createdAt: now,
+        updatedAt: now
       },
       ...current
     ]);
@@ -166,8 +166,34 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
     updates: Partial<Pick<NotebookNote, "title" | "text" | "tag">>
   ) => {
     setNotes((current) =>
-      current.map((note) => (note.id === id ? { ...note, ...updates } : note))
+      current.map((note) =>
+        note.id === id
+          ? { ...note, ...updates, updatedAt: new Date().toISOString() }
+          : note
+      )
     );
+  };
+
+  const createNote = () => {
+    const now = new Date().toISOString();
+    setNotes((current) => [
+      {
+        id: makeId("note"),
+        title: "新笔记",
+        text: "",
+        tag: "clue",
+        source: "手动记录",
+        createdAt: now,
+        updatedAt: now
+      },
+      ...current
+    ]);
+    setActiveTag("all");
+    setNotebookOpen(true);
+  };
+
+  const deleteNote = (id: string) => {
+    setNotes((current) => current.filter((note) => note.id !== id));
   };
 
   const appendMessages = (conversationId: string, messages: ConversationMessage[]) => {
@@ -341,6 +367,8 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
         onToggle={() => setNotebookOpen((current) => !current)}
         onFilterChange={setActiveTag}
         onUpdateNote={updateNote}
+        onCreateNote={createNote}
+        onDeleteNote={deleteNote}
       />
     </main>
   );

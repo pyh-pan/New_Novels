@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import ConfirmDialog from "./ConfirmDialog";
 
 export type NoteTag = "clue" | "testimony" | "doubt" | "contradiction";
 export type NoteFilter = "all" | NoteTag;
@@ -11,6 +13,8 @@ export type NotebookNote = {
   text: string;
   tag: NoteTag;
   source: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 interface NotebookDrawerProps {
@@ -23,6 +27,8 @@ interface NotebookDrawerProps {
     id: string,
     updates: Partial<Pick<NotebookNote, "title" | "text" | "tag">>
   ) => void;
+  onCreateNote: () => void;
+  onDeleteNote: (id: string) => void;
 }
 
 const tagLabels: Record<NoteFilter, string> = {
@@ -39,12 +45,16 @@ export default function NotebookDrawer({
   activeTag,
   onToggle,
   onFilterChange,
-  onUpdateNote
+  onUpdateNote,
+  onCreateNote,
+  onDeleteNote
 }: NotebookDrawerProps) {
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const visibleNotes =
     activeTag === "all" ? notes : notes.filter((note) => note.tag === activeTag);
   const filters = Object.keys(tagLabels) as NoteFilter[];
   const editableTags = filters.filter((tag): tag is NoteTag => tag !== "all");
+  const pendingDeleteNote = notes.find((note) => note.id === pendingDeleteId);
 
   if (!isOpen) {
     return (
@@ -66,14 +76,19 @@ export default function NotebookDrawer({
           <p className="notebook-kicker">Detective notebook</p>
           <h2 id="notebook-title">侦探笔记</h2>
         </div>
-        <button
-          type="button"
-          className="notebook-close"
-          aria-label="收起侦探笔记"
-          onClick={onToggle}
-        >
-          ×
-        </button>
+        <div className="notebook-header-actions">
+          <button type="button" className="notebook-create" onClick={onCreateNote}>
+            新建笔记
+          </button>
+          <button
+            type="button"
+            className="notebook-close"
+            aria-label="收起侦探笔记"
+            onClick={onToggle}
+          >
+            ×
+          </button>
+        </div>
       </div>
 
       <div className="notebook-filters" aria-label="笔记标签筛选">
@@ -134,6 +149,14 @@ export default function NotebookDrawer({
                 />
               </label>
               <small>{note.source}</small>
+              <button
+                type="button"
+                className="note-delete"
+                aria-label={`删除笔记：${note.title}`}
+                onClick={() => setPendingDeleteId(note.id)}
+              >
+                删除
+              </button>
             </article>
           ))
         )}
@@ -142,6 +165,19 @@ export default function NotebookDrawer({
       <Link className="accusation-link" href="/accuse">
         提出最终指控
       </Link>
+
+      {pendingDeleteNote ? (
+        <ConfirmDialog
+          title="删除这条笔记？"
+          description="删除后无法从当前原型中恢复。"
+          confirmLabel="确认删除"
+          onCancel={() => setPendingDeleteId(null)}
+          onConfirm={() => {
+            onDeleteNote(pendingDeleteNote.id);
+            setPendingDeleteId(null);
+          }}
+        />
+      ) : null}
     </aside>
   );
 }
