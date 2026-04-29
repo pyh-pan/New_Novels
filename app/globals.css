@@ -62,6 +62,15 @@ a {
   grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1fr) minmax(260px, 0.58fr);
 }
 
+.workspace-story,
+.workspace-notebook {
+  display: contents;
+}
+
+.mobile-tabbar {
+  display: none;
+}
+
 .story-pane,
 .investigation-desk,
 .notebook-drawer {
@@ -739,12 +748,30 @@ a:focus-visible {
 @media (max-width: 640px) {
   .case-shell,
   .case-shell.notebook-open {
-    gap: 12px;
-    padding: 12px;
+    display: block;
+    min-height: 100vh;
+    padding: 12px 12px 74px;
+  }
+
+  .workspace,
+  .workspace-story,
+  .workspace-notebook {
+    display: none;
+  }
+
+  .workspace.is-mobile-active {
+    display: block;
   }
 
   .story-pane {
     padding: 26px 18px;
+  }
+
+  .workspace-story .story-pane,
+  .workspace-investigation,
+  .workspace-notebook .notebook-drawer {
+    min-height: calc(100vh - 98px);
+    max-height: none;
   }
 
   .story-pane h1 {
@@ -761,6 +788,36 @@ a:focus-visible {
 
   .input-row button {
     min-height: 46px;
+  }
+
+  .mobile-tabbar {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--line);
+    background: var(--paper);
+    box-shadow: 0 12px 30px var(--shadow);
+  }
+
+  .mobile-tabbar button {
+    border: 0;
+    border-right: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+    padding: 12px 8px;
+  }
+
+  .mobile-tabbar button:last-child {
+    border-right: 0;
+  }
+
+  .mobile-tabbar button[aria-selected="true"] {
+    background: var(--primary);
+    color: var(--paper);
   }
 
   .accusation-shell {

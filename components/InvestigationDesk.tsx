@@ -23,7 +23,8 @@ import {
   PLAY_STATE_STORAGE_KEY,
   serializePlayState,
   type ConversationTarget,
-  type LocalPlayState
+  type LocalPlayState,
+  type MobileTab
 } from "../lib/game/play-state";
 
 type RoutedMessage = {
@@ -81,8 +82,10 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   const playerState = playState.playerState;
   const activeTag = playState.ui.activeNotebookFilter;
   const notebookOpen = Boolean(playState.ui.notebookOpen);
+  const mobileTab = playState.ui.mobileTab ?? "story";
+  const notebookVisible = notebookOpen || mobileTab === "notebook";
 
-  const openClass = notebookOpen ? "notebook-open" : "notebook-closed";
+  const openClass = notebookVisible ? "notebook-open" : "notebook-closed";
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -125,6 +128,13 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
             ? notebookOpen(Boolean(current.ui.notebookOpen))
             : notebookOpen
       }
+    }));
+  };
+
+  const setMobileTab = (mobileTab: MobileTab) => {
+    setPlayState((current) => ({
+      ...current,
+      ui: { ...current.ui, mobileTab }
     }));
   };
 
@@ -353,13 +363,24 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
           重新开始
         </button>
       </div>
-      {storySlot({
-        currentChapterId: playState.currentChapterId,
-        onChapterChange: (currentChapterId) =>
-          setPlayState((current) => ({ ...current, currentChapterId }))
-      })}
+      <div
+        className={`workspace workspace-story ${
+          mobileTab === "story" ? "is-mobile-active" : ""
+        }`}
+      >
+        {storySlot({
+          currentChapterId: playState.currentChapterId,
+          onChapterChange: (currentChapterId) =>
+            setPlayState((current) => ({ ...current, currentChapterId }))
+        })}
+      </div>
 
-      <section className="investigation-desk" aria-labelledby="desk-title">
+      <section
+        className={`investigation-desk workspace workspace-investigation ${
+          mobileTab === "investigation" ? "is-mobile-active" : ""
+        }`}
+        aria-labelledby="desk-title"
+      >
         <div className="desk-header">
           <div>
             <p className="desk-kicker">Investigation desk</p>
@@ -403,16 +424,22 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
         </form>
       </section>
 
-      <NotebookDrawer
-        isOpen={notebookOpen}
-        notes={notes}
-        activeTag={activeTag}
-        onToggle={() => setNotebookOpen((current) => !current)}
-        onFilterChange={setActiveTag}
-        onUpdateNote={updateNote}
-        onCreateNote={createNote}
-        onDeleteNote={deleteNote}
-      />
+      <div
+        className={`workspace workspace-notebook ${
+          mobileTab === "notebook" ? "is-mobile-active" : ""
+        }`}
+      >
+        <NotebookDrawer
+          isOpen={notebookVisible}
+          notes={notes}
+          activeTag={activeTag}
+          onToggle={() => setNotebookOpen((current) => !current)}
+          onFilterChange={setActiveTag}
+          onUpdateNote={updateNote}
+          onCreateNote={createNote}
+          onDeleteNote={deleteNote}
+        />
+      </div>
       {resetOpen ? (
         <ConfirmDialog
           title="重新开始调查？"
@@ -422,6 +449,32 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
           onConfirm={resetPlayState}
         />
       ) : null}
+      <nav className="mobile-tabbar" role="tablist" aria-label="移动端工作区">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === "story"}
+          onClick={() => setMobileTab("story")}
+        >
+          故事
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === "investigation"}
+          onClick={() => setMobileTab("investigation")}
+        >
+          调查
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === "notebook"}
+          onClick={() => setMobileTab("notebook")}
+        >
+          笔记
+        </button>
+      </nav>
     </main>
   );
 }
