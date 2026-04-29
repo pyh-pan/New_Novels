@@ -1,10 +1,5 @@
-import InvestigationDesk from "../components/InvestigationDesk";
-import StoryReader from "../components/StoryReader";
+import CaseExperience from "../components/CaseExperience";
 
 export default function Page() {
-  return (
-    <InvestigationDesk
-      storySlot={(storyProps) => <StoryReader {...storyProps} />}
-    />
-  );
+  return <CaseExperience />;
 }
