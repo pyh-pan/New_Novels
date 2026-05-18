@@ -4,11 +4,14 @@ import { buildAgentPrompt } from "../lib/ai/prompts";
 import { hammerOfGodCase } from "../lib/case/hammer-of-god";
 
 const emptyPlayerState = {
+  currentActId: "act-opening",
   discoveredClueIds: [],
+  discoveredFactIds: [],
   heardTestimonyIds: [],
   knownContradictionIds: [],
   confrontedAgentIds: [],
-  askedTopics: []
+  askedTopics: [],
+  hypotheses: []
 };
 
 describe("buildAgentPrompt", () => {

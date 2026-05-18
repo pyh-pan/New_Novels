@@ -72,6 +72,7 @@ export default function StoryReader({
           >
             前一章
           </button>
+          <span>{chapter.subtitle ?? "当前章节"}</span>
           <button
             type="button"
             disabled={!next}

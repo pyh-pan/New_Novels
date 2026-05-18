@@ -42,8 +42,9 @@ export default function ConversationModule({
           <strong>{title}</strong>
           {subtitle ? <small>{subtitle}</small> : null}
         </span>
-        <span className="module-toggle" aria-hidden="true">
-          {isExpanded ? "−" : "+"}
+        <span className="module-meta" aria-hidden="true">
+          {messages.length} 条
+          <span className="module-toggle">{isExpanded ? "⌄" : "›"}</span>
         </span>
       </button>
 
@@ -66,7 +67,7 @@ export default function ConversationModule({
                       aria-label="摘录这条回复"
                       onClick={() => onSaveExcerpt(message.content)}
                     >
-                      摘录
+                      摘录到笔记
                     </button>
                   ) : null}
                 </div>

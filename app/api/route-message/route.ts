@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
 import { getModelName, getOpenAIClient } from "../../../lib/ai/openai";
+import { createAgentRuntime } from "../../../lib/agent-runtime";
+import { hammerOfGodCase } from "../../../lib/case/hammer-of-god";
 import {
   labelForTarget,
   routeMessage,
@@ -21,6 +23,7 @@ const semanticRouteSchema = z.object({
 });
 
 const semanticConfidenceThreshold = 0.65;
+const runtime = createAgentRuntime(hammerOfGodCase);
 
 function routingPrompt(message: string) {
   return [
@@ -86,7 +89,10 @@ async function semanticRouteMessage(message: string): Promise<RoutedMessage | un
       return undefined;
     }
 
-    if (!routeableTargets.includes(parsed.data.targetId)) {
+    if (
+      !routeableTargets.includes(parsed.data.targetId) ||
+      (parsed.data.targetId !== "unsupported" && !runtime.getAgent(parsed.data.targetId))
+    ) {
       return undefined;
     }
 

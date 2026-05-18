@@ -1,206 +1,231 @@
-# Web Design Direction
+# Personal Workspace Design
 
-This document records the current visual and interaction direction for the AI NPC fair-play detective prototype. It is intentionally focused on product shape, layout, and UX style. Implementation details should live in a separate technical plan.
+## 1. Design Direction
 
-## Product Feel
+Personal Workspace should still feel quiet, personal, and precise. The next version shifts from queue-based operation to agent-first operation without becoming a heavy chat product. The left side is a calm assistant surface; the right side remains an elegant visual workspace.
 
-The product should feel like an interactive detective novella, not a chat app and not a conventional game dashboard.
+The most important design principle is: every design and interaction must meet modern web product standards and feel elegant, simple, and intentional. The product must not stop at a logically correct prototype. Simplicity means removing friction and visual noise while preserving craft, alignment, affordance, hierarchy, and interaction quality; it must never become crude, under-designed, or ambiguous.
 
-The first impression should be:
+The interface is backed by platform services, but the UI should not expose platform complexity. SSO, database persistence, and LLM routing are invisible infrastructure. Users should only perceive a calm personal workspace and a capable agent.
 
-- I am reading a mystery story.
-- I can interrupt the story world by investigating freely.
-- My notes and deductions matter.
-- The final accusation is earned through reasoning, not guessing.
+Visual language:
 
-The interface should stay quiet, literary, and focused. Avoid decorative game UI, oversized visual effects, and heavy dashboards. The strongest visual signal should be text, structure, and evidence.
+- Warm off-white background.
+- Near-black text.
+- Soft gray lines.
+- Muted quadrant colors.
+- Red only for avatar or destructive emphasis.
+- No marketing hero, heavy nav, or explanatory clutter.
 
-## Page Structure
+## 2. Page Structure
 
-The main page uses a two-column layout.
+### Owner Page
 
-### Left Column: Story
+Two-column layout:
 
-The left column is only for story text.
+- Left: agent chat panel.
+- Right: planning surface.
 
-It should contain:
+The left panel replaces the old request queue entirely. The right side switches between quadrant map and calendar.
 
-- Case title
-- Chapter or scene label
-- Novel-style narrative text
-- Scrollable story history so the user can reread context
+The boundary between the agent panel and planning surface is resizable. The resize handle should be visually subtle but discoverable, constrained to sensible widths, and saved as a local preference.
 
-It should not contain:
+### Submit Page
 
-- Action buttons
-- Investigation prompts
-- Location/status chips
-- System hints
-- Suggested next steps
+Centered agent conversation:
 
-The player should infer information from the prose and choose what to ask in the investigation panel.
+- Brand at top.
+- Conversation panel.
+- Input and `生成需求卡片` action.
+- Preview card before final submit.
+- Success state with submitted card summary and `新建另一个需求`.
 
-### Right Column: Investigation Desk
+Reopening `/submit` starts a new temporary conversation.
 
-The right column is the active investigation space.
+## 3. Owner Agent Panel
 
-It contains collapsible conversation modules:
+Top:
 
-- General scene investigation agent
-- Individual NPC conversations
-- Any newly created conversation module routed from user input
+- `Personal Workspace` brand.
+- New session icon/button.
+- Session drawer icon/button.
 
-The bottom of the investigation desk has one global input area for starting a new question. The system routes the input:
+Middle:
 
-- If the question concerns observable scene facts, it goes to the scene investigation agent.
-- If the question addresses an existing NPC, it is appended to that NPC module.
-- If the question starts a new topic or target, a new module can be created.
+- Current session messages.
+- Agent messages can include embedded request cards.
+- Agent messages may be produced by the platform LLM or deterministic fallback, but both use the same visual language.
+- User messages are compact and right-aligned.
+- Agent messages are left-aligned and can include actions.
 
-The user should not need to manually choose the correct agent every time. The routing should feel natural.
+Bottom:
 
-## Detective Notebook
+- Input box.
+- Send button.
+- Contextual action buttons such as `生成需求卡片`.
+- Owner avatar row.
 
-The detective notebook is hidden by default.
+Session drawer:
 
-When collapsed:
+- Opens over or beside the left panel.
+- Shows session title, updated time, optional related request.
+- Selecting a session switches the current conversation.
 
-- Do not show a full vertical sidebar.
-- Do not show a large "open notebook" button.
-- Show only a small button in the top-right corner, similar to a browser sidebar control.
+Avatar menu:
 
-When expanded:
+- Settings.
+- Agent config.
+- Clear local data.
 
-- The notebook compresses the story and investigation columns.
-- It does not overlay the content.
-- It becomes a third column on the right.
+## 4. Embedded Request Cards
 
-The notebook has tag filters at the top:
+Agent messages may include compact request cards.
 
-- All
-- Clue
-- Testimony
-- Doubt
-- Contradiction
+Card content:
 
-Each note has a visible tag and a distinct background color. Initial color direction:
+- Title.
+- Status label.
+- Due date.
+- Quadrant color dot.
+- Short background/source summary.
 
-- Clue: pale yellow
-- Testimony: pale blue
-- Doubt: pale violet
-- Contradiction: pale red
+Actions:
 
-Users can save text from investigation replies into the notebook. Notes should be editable and taggable.
+- View details.
+- Approve.
+- Reject.
+- Change date.
 
-The final accusation button lives at the bottom of the expanded notebook. It should adapt to the notebook width and feel like the next natural step after reviewing evidence.
+Approval from the card executes immediately. Rejection opens an explicit reason/confirmation flow.
 
-## Final Accusation Page
+## 5. Quadrant Map
 
-The final accusation page should be simple.
+The map is an open coordinate space, not four boxes.
 
-It contains one centered conversation box.
+Elements:
 
-Flow:
+- Horizontal urgency axis with right arrow and `紧急程度`.
+- Vertical importance axis with upward arrow and `重要程度`.
+- Top-right elegant arrow to calendar view.
 
-1. The AI asks the first question.
-2. The user answers.
-3. The AI asks the next question only if the answer is correct.
-4. If any answer is wrong, the system shows an error dialog.
-5. The error dialog has a "continue investigation" button that returns to the main page.
-6. When the user returns later, the accusation page starts fresh with no prior accusation history.
-7. If all answers are correct, the system shows a "truth revealed" state and ends the game.
+Capsules:
 
-The accusation page should not show a large dashboard, progress panel, or multiple side sections. It should feel like a final cross-examination.
+- Title-only.
+- Pill shape.
+- Background uses quadrant color.
+- Border uses quadrant color.
+- `unreviewed` uses dashed border.
+- `archived` uses solid border.
+- Dragging updates position and derived quadrant.
+- Axis collision is avoided by automatic push-away behavior.
 
-Correctness should be decided by structured case data, not by free-form AI judgment. The AI asks questions naturally, but the system owns the answer key.
+## 6. Calendar Month View
 
-## Visual Style
+Header:
 
-The current style direction:
+- Left top elegant arrow returns to quadrant map.
+- Center shows year/month as an interactive control.
+- Small left/right controls switch months.
+- Clicking the year/month opens a compact month picker for quick navigation.
+- Right side stays visually quiet.
 
-- Quiet literary interface
-- Warm paper-like background
-- Clear borders instead of heavy cards
-- Dense but readable text
-- Minimal color except notebook tags and primary actions
-- No decorative gradients, orbs, or game-like chrome
+Grid:
 
-The story column should feel closest to a well-typeset reading surface.
+- Conventional 7-column month calendar.
+- Muted leading/trailing dates.
+- Today can have a subtle mark.
+- Each date cell shows up to 3 capsules.
+- Extra items collapse into `+N`.
+- `+N` opens a day popover/list.
 
-The investigation column should feel like a restrained workbench.
+Calendar capsules:
 
-The notebook should feel like a working detective notebook, not a sidebar menu.
+- More compact than map capsules.
+- Same quadrant color.
+- Dashed for `unreviewed`.
+- Solid for `archived`.
+- Dragging to another date updates due date.
 
-## Typography
+## 7. Settings Modal
 
-Typography should prioritize long-form reading and fast scanning.
+Settings are opened from the avatar menu.
 
-Initial direction:
+Tabs or sections:
 
-- Story text: readable serif or high-quality system serif
-- Interface text: system sans-serif
-- Avoid oversized headings inside tool panels
-- Keep letter spacing normal
-- Use line height generously in story text
+- Quadrant colors.
+- Agent config.
+- Data reset.
 
-## Interaction Principles
+Quadrant colors:
 
-- The user should always know where to type next.
-- The story should never tell the user what to click.
-- Investigation happens through natural language.
-- Notebook capture should be one click from any useful agent response.
-- Tags should help the user think, not replace thinking.
-- Wrong final accusations should not reveal the answer.
-- The interface should support rereading, comparing, and revising assumptions.
+- Four swatches with labels.
+- Native color inputs or refined color controls.
+- Changes apply immediately after saving.
 
-## Current Prototype Layout Summary
+Agent config:
 
-Main page collapsed state:
+- Markdown textarea for `agents.md`.
+- Save button.
+- Text also editable via agent conversation with owner confirmation.
 
-```text
-┌───────────────────────────────┬───────────────────────────────┐
-│ Story text                    │ Investigation desk             │
-│                               │ ┌ Scene investigation module ┐ │
-│ Novel-style context only      │ └────────────────────────────┘ │
-│ No action buttons             │ ┌ NPC module, collapsed       │ │
-│ No hints                      │ └────────────────────────────┘ │
-│                               │ New conversation input         │
-│                         ✎ notebook button in top-right         │
-└───────────────────────────────┴───────────────────────────────┘
-```
+Data reset:
 
-Main page expanded notebook state:
+- Clear button.
+- Confirmation prompt.
+- Reset to default colors, default `agents.md`, no requests, default session.
 
-```text
-┌─────────────────────┬─────────────────────┬───────────────────┐
-│ Story text          │ Investigation desk   │ Detective notebook │
-│ compressed          │ compressed           │ tag filters        │
-│                     │ conversation modules │ colored notes      │
-│                     │ global input         │ final accusation   │
-└─────────────────────┴─────────────────────┴───────────────────┘
-```
+## 8. Details Modal
 
-Final accusation page:
+The details modal remains the precise editing fallback.
 
-```text
-┌─────────────────────────────────────────────┐
-│                                             │
-│              Final accusation               │
-│         centered AI/user dialogue box        │
-│                                             │
-│     wrong -> continue investigation          │
-│     all correct -> truth revealed            │
-│                                             │
-└─────────────────────────────────────────────┘
-```
+Fields:
 
-## Open Design Questions
+- Title.
+- Requester.
+- Due date.
+- Background.
+- Related docs.
+- Deliverable.
+- Status.
+- Rejection reason.
+- Source summary.
 
-These can be refined later:
+Actions:
 
-- Exact typography pair
-- Final color palette
-- Notebook open/close icon
-- Mobile layout behavior
-- Whether multiple investigation modules can stay expanded at once
-- How much animation the notebook drawer should use
-- Whether story text updates after discoveries or remains chapter-based
+- Save.
+- Approve if unreviewed.
+- Reject.
+- Delete.
+- Open related session if available.
+
+If status is changed from rejected to visible status and coordinates are missing, the UI should either infer position or ask for a quadrant shortcut.
+
+## 9. Interaction Principles
+
+- Agent-first does not mean agent-only; direct visual manipulation remains available.
+- Querying is conversational.
+- Reviewing can be conversational, card-based, modal-based, or visual.
+- High-risk actions like rejection, deletion, reset, and `agents.md` changes need explicit confirmation.
+- Approval from an already visible agent card does not need a second confirmation.
+- Calendar is a time planning view, not a complete backlog.
+- The quadrant map is the complete visible workspace for non-rejected requests.
+- LLM latency should be handled with subtle pending states, not heavy loading screens.
+- Fallback agent responses should not visually look broken or apologetic; they should remain concise and useful.
+
+## 10. Platform Integration Design
+
+Platform identity and agent routing stay below the surface:
+
+- No login chrome is shown inside the app; the platform provides identity.
+- The avatar/settings area can display the current user name when available.
+- Model errors should degrade to fallback agent behavior instead of interrupting the workspace.
+- Destructive actions remain user-confirmed even when suggested by the agent.
+
+## 11. Responsive Behavior
+
+Desktop is primary.
+
+- Owner page keeps the two-column layout on desktop.
+- On narrow screens, agent panel and planning surface can stack.
+- Calendar and submit chat remain usable on smaller screens.
+- Advanced dragging is optimized for desktop pointer use.

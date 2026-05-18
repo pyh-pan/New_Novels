@@ -1,10 +1,21 @@
-import { caseSchema, type CaseFile } from "./schema";
+import { caseSchema, type AgentPermission, type CaseFileInput } from "./schema";
 
 const commonForbiddenClaims = [
   "不得直接说威尔弗里德是真凶。",
   "不得主动解释完整作案方式。",
   "不得创造新的证物、脚印、目击者、书信或时间线事实。"
 ];
+
+const noNewFactsPermission: AgentPermission = {
+  canSeeTruth: false,
+  canSeeOtherAgentsPrivateFacts: false,
+  canRevealUnsolvedClues: false,
+  canCreateNewFacts: false,
+  canReferencePlayerNotes: false
+};
+
+const hammerOpeningText =
+  "海泽尔村的午后被一声尖叫撕开。铁匠铺门前的石路上躺着一具尸体，头部的伤势重得不合常理。尸体旁边有一把小锤。它看起来太轻，太普通，甚至像是从铁匠铺里随手拿出来的工具。可伤口不像普通人能用它造成。教堂钟楼投下长长的影子。威尔弗里德牧师从那边走来，脸色苍白。他说自己一直在祈祷，没有听见争吵，也没有上过钟楼。铁匠西米恩站在人群外，粗壮的双手垂在身侧。他没有为自己辩解，只盯着那把锤子，像盯着一件突然变得陌生的东西。";
 
 const hammerOfGodCaseData = {
   id: "hammer-of-god",
@@ -42,8 +53,185 @@ const hammerOfGodCaseData = {
     publicDomainNote:
       "Selected from The Innocence of Father Brown, public domain in the United States."
   },
-  storyText:
-    "海泽尔村的午后被一声尖叫撕开。铁匠铺门前的石路上躺着一具尸体，头部的伤势重得不合常理。尸体旁边有一把小锤。它看起来太轻，太普通，甚至像是从铁匠铺里随手拿出来的工具。可伤口不像普通人能用它造成。教堂钟楼投下长长的影子。威尔弗里德牧师从那边走来，脸色苍白。他说自己一直在祈祷，没有听见争吵，也没有上过钟楼。铁匠西米恩站在人群外，粗壮的双手垂在身侧。他没有为自己辩解，只盯着那把锤子，像盯着一件突然变得陌生的东西。",
+  storyText: hammerOpeningText,
+  chapters: [
+    {
+      id: "chapter-1",
+      title: "钟楼下的锤击案",
+      subtitle: "第一章 案发现场",
+      body: hammerOpeningText,
+      availableFromStart: true,
+      nextChapterId: "chapter-2"
+    },
+    {
+      id: "chapter-2",
+      title: "钟楼下的锤击案",
+      subtitle: "第二章 证词的阴影",
+      body:
+        "威尔弗里德坚持自己从未登上钟楼。铁匠西米恩沉默得像一块铁，只在被问及那把小锤时说，它太轻了。\n\n伊丽莎白提到诺曼时明显迟疑。疯乔则在教堂附近看见过高处的人影，却不愿承认自己当时为什么在那里。",
+      availableFromStart: true,
+      previousChapterId: "chapter-1"
+    }
+  ],
+  acts: [
+    {
+      id: "act-opening",
+      title: "案发现场",
+      availableAgentIds: ["general", "wilfred", "simeon", "elizabeth", "joe"],
+      visibleClueIds: ["small-hammer", "wilfred-denial", "tower-height"],
+      lockedFactIds: ["truth-wilfred-method", "truth-wilfred-motive"]
+    }
+  ],
+  scenes: [
+    {
+      id: "scene-smithy-road",
+      actId: "act-opening",
+      location: "铁匠铺外的石路",
+      observableFactIds: [
+        "fact-body-on-road",
+        "fact-small-hammer-weight",
+        "fact-blood-near-head",
+        "fact-tower-overlooks-scene"
+      ],
+      interactableObjects: ["小锤", "尸体", "石路", "钟楼"],
+      ambientText: ["钟楼的阴影落在铁匠铺前。", "人群围住尸体，却没有人愿意先开口。"]
+    }
+  ],
+  facts: [
+    {
+      id: "fact-body-on-road",
+      text: "尸体位于铁匠铺外的石路上。",
+      visibility: "public",
+      ownerAgentIds: ["general"],
+      relatedClueIds: [],
+      actId: "act-opening",
+      keywords: ["尸体", "石路", "现场"]
+    },
+    {
+      id: "fact-small-hammer-weight",
+      text: "小锤很轻，和尸体头部的严重伤势不相称。",
+      visibility: "unlocked",
+      ownerAgentIds: ["general", "simeon"],
+      relatedClueIds: ["small-hammer"],
+      actId: "act-opening",
+      keywords: ["小锤", "伤口", "重量"]
+    },
+    {
+      id: "fact-blood-near-head",
+      text: "血迹集中在尸体头部附近，现场没有明显拖拽痕迹。",
+      visibility: "public",
+      ownerAgentIds: ["general"],
+      relatedClueIds: [],
+      actId: "act-opening",
+      keywords: ["血迹", "拖拽", "尸体"]
+    },
+    {
+      id: "fact-tower-overlooks-scene",
+      text: "教堂钟楼可以俯视铁匠铺外的位置。",
+      visibility: "unlocked",
+      ownerAgentIds: ["general", "wilfred", "joe"],
+      relatedClueIds: ["tower-height"],
+      actId: "act-opening",
+      keywords: ["钟楼", "高度", "位置"]
+    },
+    {
+      id: "fact-wilfred-denies-tower",
+      text: "威尔弗里德说自己没有上钟楼，只在下面祈祷。",
+      visibility: "public",
+      ownerAgentIds: ["wilfred", "general"],
+      relatedClueIds: ["wilfred-denial"],
+      actId: "act-opening",
+      keywords: ["威尔弗里德", "牧师", "钟楼", "祈祷"]
+    },
+    {
+      id: "fact-wilfred-nervous-about-tower",
+      text: "威尔弗里德对钟楼话题会明显紧张，但仍不会直接承认上过钟楼。",
+      visibility: "private",
+      ownerAgentIds: ["wilfred"],
+      relatedClueIds: ["tower-height", "wilfred-denial"],
+      actId: "act-opening",
+      keywords: ["威尔弗里德", "钟楼", "紧张"]
+    },
+    {
+      id: "fact-simeon-jealous",
+      text: "诺曼曾纠缠伊丽莎白，这让西米恩愤怒。",
+      visibility: "private",
+      ownerAgentIds: ["simeon", "elizabeth"],
+      relatedClueIds: [],
+      actId: "act-opening",
+      keywords: ["诺曼", "伊丽莎白", "西米恩", "嫉妒"]
+    },
+    {
+      id: "fact-joe-saw-tower-shadow",
+      text: "疯乔看到钟楼方向有人影，那个人影像牧师。",
+      visibility: "private",
+      ownerAgentIds: ["joe"],
+      relatedClueIds: ["tower-height"],
+      actId: "act-opening",
+      keywords: ["疯乔", "钟楼", "人影", "牧师"]
+    },
+    {
+      id: "truth-wilfred-method",
+      text: "威尔弗里德从钟楼高处让小锤坠落，利用高度和重力制造重击。",
+      visibility: "truth",
+      ownerAgentIds: ["wilfred"],
+      relatedClueIds: ["small-hammer", "tower-height", "wilfred-denial"],
+      actId: "act-opening",
+      keywords: ["威尔弗里德", "钟楼", "小锤", "高处坠落"]
+    },
+    {
+      id: "truth-wilfred-motive",
+      text: "威尔弗里德以宗教狂热和道德审判感为自己开脱。",
+      visibility: "truth",
+      ownerAgentIds: ["wilfred"],
+      relatedClueIds: [],
+      actId: "act-opening",
+      keywords: ["威尔弗里德", "宗教", "动机", "审判"]
+    }
+  ],
+  relationships: [
+    {
+      from: "elizabeth",
+      to: "simeon",
+      attitude: "protective",
+      knownFactsAboutOther: ["fact-simeon-jealous"]
+    },
+    {
+      from: "simeon",
+      to: "elizabeth",
+      attitude: "protective",
+      knownFactsAboutOther: ["fact-simeon-jealous"]
+    },
+    {
+      from: "wilfred",
+      to: "simeon",
+      attitude: "hostile",
+      knownFactsAboutOther: ["fact-wilfred-denies-tower"]
+    }
+  ],
+  propagationRules: [
+    {
+      fromAgentId: "simeon",
+      toAgentId: "elizabeth",
+      factId: "fact-simeon-jealous",
+      condition: {
+        requiresAnyClues: ["small-hammer"],
+        requiresAllClues: [],
+        requiresFacts: [],
+        requiresContradictions: []
+      },
+      mode: "rumor"
+    }
+  ],
+  contradictions: [
+    {
+      id: "contradiction-hammer-force",
+      title: "小锤重量与伤势力度矛盾",
+      factIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+      clueIds: ["small-hammer", "tower-height"],
+      agentIds: ["general", "simeon"]
+    }
+  ],
   truth: {
     culprit: "wilfred",
     victim: "norman",
@@ -67,8 +255,12 @@ const hammerOfGodCaseData = {
     {
       id: "general",
       type: "general",
+      aliases: ["调查助手", "通用助手", "现场调查", "助手"],
       name: "调查助手",
       role: "默认通用调查 agent",
+      promptVersion: "agent-runtime/v1",
+      permissions: { ...noNewFactsPermission, canReferencePlayerNotes: true },
+      lieStrategy: [],
       knowledgeScope: "unlocked-only",
       allowedTopics: ["现场", "物证", "人物关系", "证词矛盾", "推理方向"],
       forbiddenClaims: commonForbiddenClaims,
@@ -97,11 +289,15 @@ const hammerOfGodCaseData = {
       },
       revealRules: [
         {
+          id: "general-small-hammer",
+          factId: "fact-small-hammer-weight",
           fact: "小锤很轻，和尸体头部的严重伤势不相称。",
           requiresClues: ["small-hammer"],
           revealMode: "direct"
         },
         {
+          id: "general-tower-force",
+          factId: "fact-tower-overlooks-scene",
           fact: "钟楼高度可能解释小锤造成巨大伤势的力量来源。",
           requiresClues: ["small-hammer", "tower-height"],
           revealMode: "partial"
@@ -111,8 +307,12 @@ const hammerOfGodCaseData = {
     {
       id: "wilfred",
       type: "npc",
+      aliases: ["威尔弗里德", "牧师", "神职人员", "死者弟弟"],
       name: "威尔弗里德牧师",
       role: "死者的弟弟，村中牧师",
+      promptVersion: "agent-runtime/v1",
+      permissions: noNewFactsPermission,
+      lieStrategy: ["moralize", "partial_truth", "deflect"],
       personality: {
         speechStyle: "克制、宗教化、带审判意味。",
         emotionalBaseline: "表面镇定，内里紧绷。",
@@ -140,15 +340,21 @@ const hammerOfGodCaseData = {
       },
       revealRules: [
         {
+          id: "wilfred-deflects-to-smith",
+          factId: "fact-wilfred-denies-tower",
           fact: "他对铁匠的怀疑并不完全来自证据，也来自转移视线的需要。",
           requiresClues: ["small-hammer", "wilfred-denial"],
           requiresTopics: ["铁匠", "怀疑"],
           revealMode: "evasive"
         },
         {
+          id: "wilfred-pressure-bell-tower",
+          factId: "fact-wilfred-nervous-about-tower",
           fact: "他对钟楼话题会明显紧张，但仍不会直接承认上过钟楼。",
           requiresClues: ["tower-height", "wilfred-denial"],
           requiresTopics: ["钟楼"],
+          requiresPressureAtLeast: 2,
+          requiresAct: "act-opening",
           revealMode: "reluctant"
         }
       ]
@@ -156,8 +362,12 @@ const hammerOfGodCaseData = {
     {
       id: "simeon",
       type: "npc",
+      aliases: ["西米恩", "铁匠"],
       name: "铁匠西米恩",
       role: "村中铁匠，表面嫌疑人",
+      promptVersion: "agent-runtime/v1",
+      permissions: noNewFactsPermission,
+      lieStrategy: ["deny", "deflect", "minimize"],
       personality: {
         speechStyle: "短促、低沉、带着被误解后的压抑。",
         emotionalBaseline: "沉默，防御性强。",
@@ -181,12 +391,15 @@ const hammerOfGodCaseData = {
       },
       revealRules: [
         {
+          id: "simeon-elizabeth",
+          factId: "fact-simeon-jealous",
           fact: "诺曼曾纠缠伊丽莎白，这让西米恩愤怒。",
-          requiresClues: [],
           requiresTopics: ["伊丽莎白"],
           revealMode: "reluctant"
         },
         {
+          id: "simeon-small-hammer",
+          factId: "fact-small-hammer-weight",
           fact: "小锤不像手持凶器时能造成那样的巨大伤害。",
           requiresClues: ["small-hammer"],
           revealMode: "direct"
@@ -196,8 +409,12 @@ const hammerOfGodCaseData = {
     {
       id: "elizabeth",
       type: "npc",
+      aliases: ["伊丽莎白", "铁匠妻子", "西米恩妻子"],
       name: "伊丽莎白",
       role: "铁匠妻子",
+      promptVersion: "agent-runtime/v1",
+      permissions: noNewFactsPermission,
+      lieStrategy: ["deny", "minimize", "partial_truth"],
       personality: {
         speechStyle: "紧张、含糊，常用短句保护自己。",
         emotionalBaseline: "焦虑，害怕名声受损。",
@@ -220,8 +437,9 @@ const hammerOfGodCaseData = {
       },
       revealRules: [
         {
+          id: "elizabeth-norman",
+          factId: "fact-simeon-jealous",
           fact: "诺曼曾试图接近她。",
-          requiresClues: [],
           requiresTopics: ["诺曼", "西米恩"],
           revealMode: "reluctant"
         }
@@ -230,8 +448,12 @@ const hammerOfGodCaseData = {
     {
       id: "joe",
       type: "npc",
+      aliases: ["疯乔"],
       name: "疯乔",
       role: "村中边缘人",
+      promptVersion: "agent-runtime/v1",
+      permissions: noNewFactsPermission,
+      lieStrategy: ["deflect", "partial_truth"],
       personality: {
         speechStyle: "跳跃、破碎，像把看到的画面拼成谜语。",
         emotionalBaseline: "不安，害怕被嘲笑。",
@@ -255,8 +477,9 @@ const hammerOfGodCaseData = {
       },
       revealRules: [
         {
+          id: "joe-tower-shadow",
+          factId: "fact-joe-saw-tower-shadow",
           fact: "他看到钟楼方向有人影，那个人影像牧师。",
-          requiresClues: [],
           requiresTopics: ["钟楼", "异常"],
           revealMode: "partial"
         }
@@ -270,7 +493,13 @@ const hammerOfGodCaseData = {
       text: "小锤很轻，和尸体头部的严重伤势不相称。",
       tag: "clue",
       source: "通用调查助手",
-      unlockHints: ["检查锤子", "询问伤口和锤子的关系"]
+      unlockHints: ["检查锤子", "询问伤口和锤子的关系"],
+      unlock: {
+        type: "agent-response",
+        agentId: "general",
+        topics: ["锤子", "伤口"],
+        factIds: ["fact-small-hammer-weight"]
+      }
     },
     {
       id: "wilfred-denial",
@@ -278,7 +507,13 @@ const hammerOfGodCaseData = {
       text: "威尔弗里德说自己没有上钟楼，只在下面祈祷。",
       tag: "testimony",
       source: "威尔弗里德牧师",
-      unlockHints: ["询问威尔弗里德案发时在哪里"]
+      unlockHints: ["询问威尔弗里德案发时在哪里"],
+      unlock: {
+        type: "agent-response",
+        agentId: "wilfred",
+        topics: ["案发时", "钟楼", "祈祷"],
+        factIds: ["fact-wilfred-denies-tower"]
+      }
     },
     {
       id: "tower-height",
@@ -286,7 +521,13 @@ const hammerOfGodCaseData = {
       text: "钟楼可以俯视尸体所在位置，高度足以让小锤坠落产生巨大力量。",
       tag: "contradiction",
       source: "通用调查助手",
-      unlockHints: ["询问钟楼是否能看到尸体位置"]
+      unlockHints: ["询问钟楼是否能看到尸体位置"],
+      unlock: {
+        type: "agent-response",
+        agentId: "general",
+        topics: ["钟楼", "高度", "尸体位置"],
+        factIds: ["fact-tower-overlooks-scene"]
+      }
     }
   ],
   accusation: {
@@ -322,6 +563,6 @@ const hammerOfGodCaseData = {
       }
     ]
   }
-} satisfies CaseFile;
+} satisfies CaseFileInput;
 
 export const hammerOfGodCase = caseSchema.parse(hammerOfGodCaseData);

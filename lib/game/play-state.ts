@@ -40,11 +40,14 @@ export type LocalPlayState = {
 };
 
 export const initialPlayerState: PlayerKnowledgeState = {
+  currentActId: "act-opening",
   discoveredClueIds: [],
+  discoveredFactIds: [],
   heardTestimonyIds: [],
   knownContradictionIds: [],
   confrontedAgentIds: [],
-  askedTopics: []
+  askedTopics: [],
+  hypotheses: []
 };
 
 export const initialConversations: Conversation[] = [

@@ -64,7 +64,8 @@ export default function NotebookDrawer({
         aria-label="打开侦探笔记"
         onClick={onToggle}
       >
-        笔记
+        <span aria-hidden="true">□</span>
+        <span>笔记</span>
       </button>
     );
   }
@@ -78,6 +79,7 @@ export default function NotebookDrawer({
         </div>
         <div className="notebook-header-actions">
           <button type="button" className="notebook-create" onClick={onCreateNote}>
+            <span aria-hidden="true">＋</span>
             新建笔记
           </button>
           <button
@@ -86,7 +88,7 @@ export default function NotebookDrawer({
             aria-label="收起侦探笔记"
             onClick={onToggle}
           >
-            ×
+            ‹
           </button>
         </div>
       </div>
@@ -113,7 +115,7 @@ export default function NotebookDrawer({
             <article className={`note-card note-${note.tag}`} key={note.id}>
               <div className="note-card-header">
                 <label className="note-field note-title-field">
-                  <span>笔记标题</span>
+                  <span className="sr-only">笔记标题</span>
                   <input
                     value={note.title}
                     aria-label="笔记标题"
@@ -123,7 +125,7 @@ export default function NotebookDrawer({
                   />
                 </label>
                 <label className="note-field note-tag-field">
-                  <span>笔记标签</span>
+                  <span className="sr-only">笔记标签</span>
                   <select
                     value={note.tag}
                     aria-label="笔记标签"
@@ -140,7 +142,7 @@ export default function NotebookDrawer({
                 </label>
               </div>
               <label className="note-field note-text-field">
-                <span>笔记正文</span>
+                <span className="sr-only">笔记正文</span>
                 <textarea
                   value={note.text}
                   aria-label="笔记正文"
@@ -148,15 +150,17 @@ export default function NotebookDrawer({
                   onChange={(event) => onUpdateNote(note.id, { text: event.target.value })}
                 />
               </label>
-              <small>{note.source}</small>
-              <button
-                type="button"
-                className="note-delete"
-                aria-label={`删除笔记：${note.title}`}
-                onClick={() => setPendingDeleteId(note.id)}
-              >
-                删除
-              </button>
+              <div className="note-card-footer">
+                <small>{note.source}</small>
+                <button
+                  type="button"
+                  className="note-delete"
+                  aria-label={`删除笔记：${note.title}`}
+                  onClick={() => setPendingDeleteId(note.id)}
+                >
+                  删除
+                </button>
+              </div>
             </article>
           ))
         )}

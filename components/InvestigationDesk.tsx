@@ -64,13 +64,8 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export default function InvestigationDesk({ storySlot }: InvestigationDeskProps) {
-  const [playState, setPlayState] = useState<LocalPlayState>(() => {
-    if (typeof window === "undefined") {
-      return createInitialPlayState();
-    }
-
-    return normalizePlayState(window.localStorage.getItem(PLAY_STATE_STORAGE_KEY));
-  });
+  const [playState, setPlayState] = useState<LocalPlayState>(() => createInitialPlayState());
+  const [hasHydratedStorage, setHasHydratedStorage] = useState(false);
   const [draft, setDraft] = useState("");
   const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
@@ -92,8 +87,17 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
       return;
     }
 
+    setPlayState(normalizePlayState(window.localStorage.getItem(PLAY_STATE_STORAGE_KEY)));
+    setHasHydratedStorage(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !hasHydratedStorage) {
+      return;
+    }
+
     window.localStorage.setItem(PLAY_STATE_STORAGE_KEY, serializePlayState(playState));
-  }, [playState]);
+  }, [hasHydratedStorage, playState]);
 
   const conversationByTarget = useMemo(() => {
     return new Map(conversations.map((conversation) => [conversation.targetId, conversation]));
@@ -354,17 +358,23 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   return (
     <main className={`case-shell ${openClass}`}>
       <h2 className="sr-only">New Novels</h2>
-      {!notebookVisible ? (
-        <div className="utility-actions">
-          <button
-            type="button"
-            className="utility-button"
-            onClick={() => setResetOpen(true)}
-          >
-            重新开始
-          </button>
+      <header className="case-topbar">
+        <div>
+          <p className="case-eyebrow">New Novels</p>
+          <h1>钟楼下的锤击案</h1>
         </div>
-      ) : null}
+        <div className="case-actions" aria-label="案件操作">
+          {!notebookVisible ? (
+            <button
+              type="button"
+              className="utility-button"
+              onClick={() => setResetOpen(true)}
+            >
+              重新开始
+            </button>
+          ) : null}
+        </div>
+      </header>
       <div
         className={`workspace workspace-story ${
           mobileTab === "story" ? "is-mobile-active" : ""
@@ -385,9 +395,12 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
       >
         <div className="desk-header">
           <div>
-            <p className="desk-kicker">Investigation desk</p>
+            <p className="desk-kicker">Agent investigation</p>
             <h2 id="desk-title">调查台</h2>
           </div>
+          <p className="desk-status" aria-live="polite">
+            {loadingConversationId ? "思考中" : "待提问"}
+          </p>
         </div>
 
         <div className="conversation-stack">
@@ -409,14 +422,17 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
         {excerptNotice ? <p className="excerpt-notice">{excerptNotice}</p> : null}
 
         <form ref={formRef} className="global-input" onSubmit={submitMessage}>
-          <label htmlFor="investigation-message">新的调查问题</label>
+          <div className="composer-heading">
+            <label htmlFor="investigation-message">新的调查问题</label>
+            <span>⌘ Enter 发送</span>
+          </div>
           <div className="input-row">
             <textarea
               id="investigation-message"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={submitOnShortcut}
-              placeholder="询问现场、威尔弗里德、铁匠西米恩、伊丽莎白或疯乔..."
+              placeholder="直接问：锤子和伤口有什么矛盾？威尔弗里德当时在哪里？"
               rows={3}
             />
             <button type="submit" disabled={!draft.trim() || Boolean(loadingConversationId)}>

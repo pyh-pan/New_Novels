@@ -175,7 +175,10 @@ export default function AccusationChat() {
 
         {state === "answering" ? (
           <form className="accusation-form" onSubmit={submitAnswer}>
-            <label htmlFor="accusation-answer">回答当前问题</label>
+            <div className="composer-heading">
+              <label htmlFor="accusation-answer">回答当前问题</label>
+              <span>只提交你能证明的答案</span>
+            </div>
             <div className="accusation-input-row">
               <textarea
                 id="accusation-answer"
