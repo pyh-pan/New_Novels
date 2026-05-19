@@ -1,0 +1,7 @@
+interface:
+  display_name: "New Novels Case Adapter"
+  short_description: "Turn mystery fiction into playable case packages"
+  default_prompt: "Use $new-novels-case-adapter to transform this detective story into a validated New Novels case package."
+
+policy:
+  allow_implicit_invocation: true
