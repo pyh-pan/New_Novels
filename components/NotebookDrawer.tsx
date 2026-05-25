@@ -20,6 +20,8 @@ export type NotebookNote = {
 interface NotebookDrawerProps {
   isOpen: boolean;
   notes: NotebookNote[];
+  hypotheses: string[];
+  knownContradictions: string[];
   activeTag: NoteFilter;
   onToggle: () => void;
   onFilterChange: (tag: NoteFilter) => void;
@@ -29,6 +31,8 @@ interface NotebookDrawerProps {
   ) => void;
   onCreateNote: () => void;
   onDeleteNote: (id: string) => void;
+  onCreateHypothesis: (hypothesis: string) => void;
+  onDeleteHypothesis: (hypothesis: string) => void;
 }
 
 const tagLabels: Record<NoteFilter, string> = {
@@ -42,14 +46,19 @@ const tagLabels: Record<NoteFilter, string> = {
 export default function NotebookDrawer({
   isOpen,
   notes,
+  hypotheses = [],
+  knownContradictions = [],
   activeTag,
   onToggle,
   onFilterChange,
   onUpdateNote,
   onCreateNote,
-  onDeleteNote
+  onDeleteNote,
+  onCreateHypothesis,
+  onDeleteHypothesis
 }: NotebookDrawerProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [hypothesisDraft, setHypothesisDraft] = useState("");
   const visibleNotes =
     activeTag === "all" ? notes : notes.filter((note) => note.tag === activeTag);
   const filters = Object.keys(tagLabels) as NoteFilter[];
@@ -165,6 +174,69 @@ export default function NotebookDrawer({
           ))
         )}
       </div>
+
+      <section className="notebook-hypotheses" aria-labelledby="hypothesis-title">
+        <div className="notebook-section-heading">
+          <h3 id="hypothesis-title">推理假设</h3>
+          <span>{hypotheses.length}</span>
+        </div>
+        <form
+          className="hypothesis-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const nextHypothesis = hypothesisDraft.trim();
+            if (!nextHypothesis) {
+              return;
+            }
+            onCreateHypothesis(nextHypothesis);
+            setHypothesisDraft("");
+          }}
+        >
+          <input
+            value={hypothesisDraft}
+            aria-label="新增推理假设"
+            onChange={(event) => setHypothesisDraft(event.target.value)}
+            placeholder="例如：小锤可能来自高处"
+          />
+          <button type="submit" disabled={hypothesisDraft.trim().length === 0}>
+            记录假设
+          </button>
+        </form>
+        <div className="hypothesis-list">
+          {hypotheses.length === 0 ? (
+            <p>把你的临时推理留在这里，系统不会替你判断对错。</p>
+          ) : (
+            hypotheses.map((hypothesis) => (
+              <article key={hypothesis}>
+                <span>{hypothesis}</span>
+                <button
+                  type="button"
+                  aria-label={`删除假设：${hypothesis}`}
+                  onClick={() => onDeleteHypothesis(hypothesis)}
+                >
+                  ×
+                </button>
+              </article>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="notebook-contradictions" aria-labelledby="contradiction-title">
+        <div className="notebook-section-heading">
+          <h3 id="contradiction-title">已识别矛盾</h3>
+          <span>{knownContradictions.length}</span>
+        </div>
+        {knownContradictions.length === 0 ? (
+          <p>调查回复识别出的矛盾会在这里汇总。</p>
+        ) : (
+          <ul>
+            {knownContradictions.map((contradiction) => (
+              <li key={contradiction}>{contradiction}</li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <Link className="accusation-link" href="/accuse">
         提出最终指控

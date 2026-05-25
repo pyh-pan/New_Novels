@@ -1,0 +1,66 @@
+[
+  {
+    "id": "act-opening",
+    "title": "案发现场",
+    "availableAgentIds": [
+      "general",
+      "simeon",
+      "wilfred"
+    ],
+    "visibleClueIds": [
+      "small-hammer",
+      "tower-height"
+    ],
+    "lockedFactIds": [
+      "fact-joe-saw-tower-shadow",
+      "truth-wilfred-method",
+      "truth-wilfred-motive"
+    ],
+    "entryConditions": [],
+    "exitConditions": []
+  },
+  {
+    "id": "act-testimony",
+    "title": "证词的阴影",
+    "availableAgentIds": [
+      "general",
+      "wilfred",
+      "simeon",
+      "elizabeth",
+      "joe"
+    ],
+    "visibleClueIds": [
+      "small-hammer",
+      "wilfred-denial",
+      "tower-height"
+    ],
+    "lockedFactIds": [
+      "truth-wilfred-method",
+      "truth-wilfred-motive"
+    ],
+    "entryConditions": [],
+    "exitConditions": []
+  },
+  {
+    "id": "act-confrontation",
+    "title": "钟楼对质",
+    "availableAgentIds": [
+      "general",
+      "wilfred",
+      "simeon",
+      "elizabeth",
+      "joe"
+    ],
+    "visibleClueIds": [
+      "small-hammer",
+      "wilfred-denial",
+      "tower-height"
+    ],
+    "lockedFactIds": [
+      "truth-wilfred-method",
+      "truth-wilfred-motive"
+    ],
+    "entryConditions": [],
+    "exitConditions": []
+  }
+]

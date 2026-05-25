@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { POST as accusePost } from "../app/api/accuse/route";
+import { GET as healthGet } from "../app/health/route";
 import { POST as investigatePost } from "../app/api/investigate/route";
 import { POST as routeMessagePost } from "../app/api/route-message/route";
 
@@ -31,5 +32,12 @@ describe("API request parsing", () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({ error: "Invalid request body." });
+  });
+
+  it("exposes a Guard-compatible health endpoint", async () => {
+    const response = await healthGet();
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ status: "ok" });
   });
 });

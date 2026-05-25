@@ -5,23 +5,34 @@ import {
   getChapterById,
   getNextChapter,
   getPreviousChapter,
-  storyChapters
+  toStoryChapters
 } from "../lib/game/story";
+import { getDefaultCase } from "../lib/case/default-case";
+
+const caseFile = getDefaultCase();
+const storyChapters = toStoryChapters(caseFile.chapters);
 
 test("story chapters expose ordered navigation", () => {
   expect(storyChapters.length).toBeGreaterThanOrEqual(1);
 
-  const first = getChapterById("chapter-1");
+  const first = getChapterById(storyChapters, "chapter-1");
 
   expect(first?.title).toBe("钟楼下的锤击案");
-  expect(getPreviousChapter("chapter-1")).toBeUndefined();
-  expect(getNextChapter("chapter-1")?.id).toBe("chapter-2");
+  expect(getPreviousChapter(storyChapters, "chapter-1")).toBeUndefined();
+  expect(getNextChapter(storyChapters, "chapter-1")?.id).toBe("chapter-2");
 });
 
 test("story reader renders a scrollable chapter with bottom navigation", () => {
   const onChapterChange = vi.fn();
 
-  render(<StoryReader currentChapterId="chapter-1" onChapterChange={onChapterChange} />);
+  render(
+    <StoryReader
+      sourceTitle={caseFile.source.title}
+      chapters={storyChapters}
+      currentChapterId="chapter-1"
+      onChapterChange={onChapterChange}
+    />
+  );
 
   expect(screen.getByRole("heading", { name: "钟楼下的锤击案" })).toBeInTheDocument();
   expect(screen.getByText("第一章 案发现场")).toBeInTheDocument();
@@ -32,7 +43,14 @@ test("story reader renders a scrollable chapter with bottom navigation", () => {
 });
 
 test("clicking the story reader reveals floating chapter controls", () => {
-  render(<StoryReader currentChapterId="chapter-1" onChapterChange={vi.fn()} />);
+  render(
+    <StoryReader
+      sourceTitle={caseFile.source.title}
+      chapters={storyChapters}
+      currentChapterId="chapter-1"
+      onChapterChange={vi.fn()}
+    />
+  );
 
   expect(screen.queryByLabelText("章节快捷导航")).not.toBeInTheDocument();
 

@@ -1,4 +1,3 @@
-import { hammerOfGodCase } from "../case/hammer-of-god";
 import type {
   CaseAgent,
   GlobalContext,
@@ -18,6 +17,7 @@ export interface PromptMessage {
 }
 
 interface BuildAgentPromptInput {
+  caseTitle: string;
   globalContext: GlobalContext;
   agent: CaseAgent;
   playerState: PlayerKnowledgeState;
@@ -32,6 +32,7 @@ export const defaultPlayerKnowledgeState: PlayerKnowledgeState = {
   discoveredFactIds: [],
   heardTestimonyIds: [],
   knownContradictionIds: [],
+  sceneInteractionIds: [],
   confrontedAgentIds: [],
   askedTopics: [],
   hypotheses: []
@@ -171,6 +172,7 @@ ${formatList(runtimeContext.revealedRules.map((rule) => `${rule.id}: ${rule.fact
 }
 
 export function buildAgentPrompt({
+  caseTitle,
   globalContext,
   agent,
   playerState,
@@ -194,7 +196,7 @@ export function buildAgentPrompt({
   return [
     {
       role: "system",
-      content: `你正在参与《${hammerOfGodCase.title}》的互动推理调查。
+      content: `你正在参与《${caseTitle}》的互动推理调查。
 
 ${globalContextBlock(globalContext)}
 
@@ -216,33 +218,4 @@ ${agentSpecificRules}
     },
     ...conversationMessages(history, message)
   ];
-}
-
-export function buildScenePrompt(history: ChatMessage[], message: string): PromptMessage[] {
-  const general = hammerOfGodCase.agents.find((agent) => agent.id === "general");
-  if (!general) {
-    throw new Error("General agent is required.");
-  }
-
-  return buildAgentPrompt({
-    globalContext: hammerOfGodCase.globalContext,
-    agent: general,
-    playerState: defaultPlayerKnowledgeState,
-    history,
-    message
-  });
-}
-
-export function buildNpcPrompt(
-  agent: CaseAgent,
-  history: ChatMessage[],
-  message: string
-): PromptMessage[] {
-  return buildAgentPrompt({
-    globalContext: hammerOfGodCase.globalContext,
-    agent,
-    playerState: defaultPlayerKnowledgeState,
-    history,
-    message
-  });
 }

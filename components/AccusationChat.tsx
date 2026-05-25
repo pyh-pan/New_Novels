@@ -18,7 +18,15 @@ type AccuseGetResponse = {
 
 type AccusePostResponse =
   | { status: "wrong" }
-  | { status: "solved" }
+  | {
+      status: "solved";
+      truth?: {
+        culpritName: string;
+        method: string;
+        motive: string;
+        decisiveEvidence: string[];
+      };
+    }
   | { status: "next"; questionIndex: number; prompt: string };
 
 function createMessage(role: AccusationMessage["role"], content: string): AccusationMessage {
@@ -34,6 +42,9 @@ export default function AccusationChat() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [state, setState] = useState<AccusationState>("answering");
+  const [truth, setTruth] = useState<
+    Extract<AccusePostResponse, { status: "solved" }>["truth"] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const submitInFlightRef = useRef(false);
@@ -107,6 +118,7 @@ export default function AccusationChat() {
 
       if (result.status === "solved") {
         setMessages((current) => [...current, createMessage("user", trimmedAnswer)]);
+        setTruth(result.truth ?? null);
         setState("solved");
         return;
       }
@@ -167,6 +179,29 @@ export default function AccusationChat() {
           <div className="accusation-result accusation-result-solved">
             <h2>真相大白</h2>
             <p>所有关键问题都已答对，最后的推理成立。</p>
+            {truth ? (
+              <div className="truth-summary" aria-label="案件真相摘要">
+                <dl>
+                  <div>
+                    <dt>真凶</dt>
+                    <dd>{truth.culpritName}</dd>
+                  </div>
+                  <div>
+                    <dt>手法</dt>
+                    <dd>{truth.method}</dd>
+                  </div>
+                  <div>
+                    <dt>动机</dt>
+                    <dd>{truth.motive}</dd>
+                  </div>
+                </dl>
+                <ul>
+                  {truth.decisiveEvidence.map((evidence) => (
+                    <li key={evidence}>{evidence}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <Link className="accusation-action" href="/">
               结束游戏
             </Link>

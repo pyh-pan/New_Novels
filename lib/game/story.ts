@@ -1,4 +1,4 @@
-import { hammerOfGodCase } from "../case/hammer-of-god";
+import type { StoryChapter as CaseStoryChapter } from "../case/schema";
 
 export type StoryChapter = {
   id: string;
@@ -9,30 +9,32 @@ export type StoryChapter = {
   nextChapterId?: string;
 };
 
-export const storyChapters: StoryChapter[] = hammerOfGodCase.chapters.map((chapter) => ({
-  id: chapter.id,
-  title: chapter.title,
-  subtitle: chapter.subtitle,
-  body: chapter.body
-    .split(/\n\s*\n/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean),
-  previousChapterId: chapter.previousChapterId,
-  nextChapterId: chapter.nextChapterId
-}));
-
-export function getChapterById(id: string) {
-  return storyChapters.find((chapter) => chapter.id === id);
+export function toStoryChapters(chapters: CaseStoryChapter[]): StoryChapter[] {
+  return chapters.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+    subtitle: chapter.subtitle,
+    body: chapter.body
+      .split(/\n\s*\n/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean),
+    previousChapterId: chapter.previousChapterId,
+    nextChapterId: chapter.nextChapterId
+  }));
 }
 
-export function getPreviousChapter(id: string) {
-  const chapter = getChapterById(id);
+export function getChapterById(chapters: StoryChapter[], id: string) {
+  return chapters.find((chapter) => chapter.id === id);
+}
+
+export function getPreviousChapter(chapters: StoryChapter[], id: string) {
+  const chapter = getChapterById(chapters, id);
   return chapter?.previousChapterId
-    ? getChapterById(chapter.previousChapterId)
+    ? getChapterById(chapters, chapter.previousChapterId)
     : undefined;
 }
 
-export function getNextChapter(id: string) {
-  const chapter = getChapterById(id);
-  return chapter?.nextChapterId ? getChapterById(chapter.nextChapterId) : undefined;
+export function getNextChapter(chapters: StoryChapter[], id: string) {
+  const chapter = getChapterById(chapters, id);
+  return chapter?.nextChapterId ? getChapterById(chapters, chapter.nextChapterId) : undefined;
 }

@@ -46,6 +46,29 @@ Recommended chapter ids:
 - `chapter-2`
 - `chapter-solution` only if a post-solve reveal chapter is needed
 
+## 3.5 设计剧本杀式多幕结构
+
+不要把多幕剧情理解成普通章节分页。Act 是玩家的信息状态和调查阶段。
+
+为每一幕定义：
+
+- 玩家当前知道什么。
+- 这一幕能问哪些 NPC。
+- 这一幕能调查哪些 scene 和 object。
+- 这一幕必须发现哪些 facts、clues、contradictions。
+- 这一幕必须完成哪些 NPC interactions 或 scene interactions。
+- 进入下一幕的 ActGate。
+- 解锁下一幕时给玩家看的 non-spoiler unlockNarrative。
+
+常见结构：
+
+1. `act-opening`: 案发现场，发现表层物证和 false solution。
+2. `act-testimony`: 证词阶段，发现人物关系和前后矛盾。
+3. `act-confrontation`: 对质阶段，用已发现矛盾逼问关键 NPC。
+4. `act-accusation`: 指认或真相阶段。
+
+每一幕都要有 required discoveries。玩家进入下一幕时应该感觉自己完成了一个阶段性谜题，而不是只是翻到下一章。
+
 ## 4. Build Facts Before Agents
 
 Write all facts before writing NPCs. This prevents agents from inventing details.
@@ -78,6 +101,16 @@ For each NPC, write:
 - What they must never claim.
 - How they speak when calm.
 - How they respond under pressure.
+
+Then generate runtime behavior:
+
+- `pressureProfile`: baseline, guarded/cornered thresholds, and increase rules from source-specific triggers.
+- `emotionalArc`: how the NPC changes from calm to guarded to cornered.
+- `confrontationTriggers`: source-derived topics, clues, facts, or contradictions that make this NPC defensive.
+- `confessionBoundary`: what the NPC cannot directly admit even when cornered.
+- `styleAnchors`: short in-character lines that guide tone.
+
+Do not use one fixed pressure model for every NPC. A proud suspect, frightened witness, protective spouse, and culprit should have different thresholds and pressure deltas.
 
 Do not let an NPC know the narrator's full solution unless they are the culprit or a character who canonically knows it. Even the culprit should be blocked from confessing through ordinary reveal rules.
 
@@ -143,3 +176,22 @@ Before handoff:
 - Are false clues misleading but not unfair?
 - Are chapters readable as prose?
 - Are final accepted answers broad enough for natural human input?
+
+## 10. Package Assembly
+
+Assemble both the aggregate snapshot and the split import package:
+
+- `case.json` contains the full `CaseFile` for review and diffing.
+- `story/chapters.json` contains chapter metadata; each `body` points to a markdown file in `story/`.
+- `agents/global-context.json` contains shared behavior rules.
+- `agents/<agent-id>.json` contains exactly one configured agent, including runtime behavior fields.
+- `acts/gates.json` contains ActGates with concrete required discoveries.
+- `truth/`, `victims/`, `relationships/`, `propagation/`, and `contradictions/` are separate directories even when their arrays are small or empty.
+
+Run the skill checker against the directory:
+
+```bash
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/<case-id>
+```
+
+Then run the repository loader tests if the package is added to the app.

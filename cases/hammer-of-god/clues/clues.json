@@ -1,0 +1,68 @@
+[
+  {
+    "id": "small-hammer",
+    "title": "过轻的小锤",
+    "text": "小锤很轻，和尸体头部的严重伤势不相称。",
+    "tag": "clue",
+    "source": "通用调查助手",
+    "unlockHints": [
+      "检查锤子",
+      "询问伤口和锤子的关系"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "general",
+      "topics": [
+        "锤子",
+        "伤口"
+      ],
+      "factIds": [
+        "fact-small-hammer-weight"
+      ]
+    }
+  },
+  {
+    "id": "wilfred-denial",
+    "title": "牧师否认上钟楼",
+    "text": "威尔弗里德说自己没有上钟楼，只在下面祈祷。",
+    "tag": "testimony",
+    "source": "威尔弗里德牧师",
+    "unlockHints": [
+      "询问威尔弗里德案发时在哪里"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "wilfred",
+      "topics": [
+        "案发时",
+        "钟楼",
+        "祈祷"
+      ],
+      "factIds": [
+        "fact-wilfred-denies-tower"
+      ]
+    }
+  },
+  {
+    "id": "tower-height",
+    "title": "钟楼高度",
+    "text": "钟楼可以俯视尸体所在位置，高度足以让小锤坠落产生巨大力量。",
+    "tag": "contradiction",
+    "source": "通用调查助手",
+    "unlockHints": [
+      "询问钟楼是否能看到尸体位置"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "general",
+      "topics": [
+        "钟楼",
+        "高度",
+        "尸体位置"
+      ],
+      "factIds": [
+        "fact-tower-overlooks-scene"
+      ]
+    }
+  }
+]

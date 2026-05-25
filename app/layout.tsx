@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "An interactive fair-play detective novella prototype."
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

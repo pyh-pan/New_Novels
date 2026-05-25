@@ -10,6 +10,7 @@ interface ConversationModuleProps {
   id: string;
   title: string;
   subtitle?: string;
+  stateLabel?: string;
   isExpanded: boolean;
   isLoading?: boolean;
   messages: ConversationMessage[];
@@ -21,6 +22,7 @@ export default function ConversationModule({
   id,
   title,
   subtitle,
+  stateLabel,
   isExpanded,
   isLoading = false,
   messages,
@@ -41,6 +43,7 @@ export default function ConversationModule({
         <span>
           <strong>{title}</strong>
           {subtitle ? <small>{subtitle}</small> : null}
+          {stateLabel ? <small>{stateLabel}</small> : null}
         </span>
         <span className="module-meta" aria-hidden="true">
           {messages.length} 条

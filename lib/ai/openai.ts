@@ -1,13 +1,28 @@
-import OpenAI from "openai";
+import { createChatCompletion, getModelName } from "./provider";
 
-export function getOpenAIClient(): OpenAI {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is required for AI NPC responses.");
-  }
+export { getModelName };
 
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-}
-
-export function getModelName(): string {
-  return process.env.OPENAI_MODEL || "gpt-4.1-mini";
+export function getOpenAIClient() {
+  return {
+    chat: {
+      completions: {
+        create: async ({
+          messages,
+          temperature
+        }: {
+          model?: string;
+          messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
+          temperature?: number;
+        }) => ({
+          choices: [
+            {
+              message: {
+                content: await createChatCompletion({ messages, temperature })
+              }
+            }
+          ]
+        })
+      }
+    }
+  };
 }

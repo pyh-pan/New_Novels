@@ -19,6 +19,67 @@ test("renders the scaffolded home page", () => {
   );
 });
 
+test("case package zip can be previewed from the case toolbar", async () => {
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({
+      ok: true,
+      manifest: {
+        schemaVersion: "case-package/v1",
+        caseId: "custom-case",
+        title: "自定义案件"
+      },
+      caseSummary: {
+        id: "custom-case",
+        title: "自定义案件",
+        chapters: 4,
+        agents: 6,
+        acts: 3,
+        clues: 12,
+        accusationQuestions: 4
+      },
+      issues: []
+    })
+  });
+  vi.stubGlobal("fetch", fetchMock);
+
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  fireEvent.click(screen.getByRole("button", { name: "导入案件包" }));
+  const fileInput = screen.getByLabelText("选择案件包 zip");
+  const file = new File(["zip"], "custom-case.zip", { type: "application/zip" });
+
+  fireEvent.change(fileInput, { target: { files: [file] } });
+
+  expect(await screen.findByText("自定义案件")).toBeInTheDocument();
+  expect(screen.getByText("章节 4 · Agent 6 · 幕 3 · 线索 12")).toBeInTheDocument();
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/cases/preview",
+    expect.objectContaining({
+      method: "POST",
+      body: expect.any(FormData)
+    })
+  );
+});
+
+test("player hypotheses are saved in the notebook workspace", () => {
+  window.localStorage.clear();
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  fireEvent.click(screen.getByRole("button", { name: "打开侦探笔记" }));
+  const hypothesisInput = screen.getByLabelText("新增推理假设");
+  fireEvent.change(hypothesisInput, {
+    target: { value: "小锤可能是从高处落下的" }
+  });
+  fireEvent.click(screen.getByRole("button", { name: "记录假设" }));
+
+  expect(screen.getByText("小锤可能是从高处落下的")).toBeInTheDocument();
+  expect(
+    JSON.parse(window.localStorage.getItem("new-novels.play-state.v1") ?? "{}").playerState
+      .hypotheses
+  ).toContain("小锤可能是从高处落下的");
+});
+
 test("notebook notes can be edited, retagged, and filtered with selected semantics", () => {
   let notes: NotebookNote[] = [
     {
@@ -38,6 +99,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       <NotebookDrawer
         isOpen
         notes={notes}
+        hypotheses={[]}
+        knownContradictions={[]}
         activeTag={activeTag}
         onToggle={() => undefined}
         onFilterChange={(tag) => {
@@ -48,6 +111,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
         }}
         onCreateNote={() => undefined}
         onDeleteNote={() => undefined}
+        onCreateHypothesis={() => undefined}
+        onDeleteHypothesis={() => undefined}
       />
     );
 
@@ -72,6 +137,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
     <NotebookDrawer
       isOpen
       notes={notes}
+      hypotheses={[]}
+      knownContradictions={[]}
       activeTag="all"
       onToggle={() => undefined}
       onFilterChange={(tag) => {
@@ -82,6 +149,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       }}
       onCreateNote={() => undefined}
       onDeleteNote={() => undefined}
+      onCreateHypothesis={() => undefined}
+      onDeleteHypothesis={() => undefined}
     />
   );
 
@@ -94,6 +163,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
     <NotebookDrawer
       isOpen
       notes={notes}
+      hypotheses={[]}
+      knownContradictions={[]}
       activeTag={activeTag}
       onToggle={() => undefined}
       onFilterChange={(tag) => {
@@ -104,6 +175,8 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       }}
       onCreateNote={() => undefined}
       onDeleteNote={() => undefined}
+      onCreateHypothesis={() => undefined}
+      onDeleteHypothesis={() => undefined}
     />
   );
 
@@ -149,6 +222,124 @@ test("general investigation questions stay in the general module", async () => {
       body: expect.stringContaining('"targetId":"general"')
     })
   );
+});
+
+test("investigation patches player state, agent session, and unlocked act narrative", async () => {
+  window.localStorage.clear();
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ targetId: "general", label: "调查助手" })
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        content: "小锤很轻，钟楼高度让这个矛盾变得重要。",
+        agentSession: {
+          caseId: "hammer-of-god",
+          agentId: "general",
+          conversationId: "general",
+          pressureLevel: 0,
+          revealedFactIds: ["fact-small-hammer-weight"],
+          lastTopics: ["小锤"],
+          triggeredPressureRules: [],
+          currentActAgentState: "calm",
+          mood: "calm"
+        },
+        playerState: {
+          currentActId: "act-testimony",
+          discoveredClueIds: ["small-hammer", "tower-height"],
+          discoveredFactIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+          heardTestimonyIds: [],
+          knownContradictionIds: ["contradiction-hammer-force"],
+          sceneInteractionIds: ["scene-smithy-road:small-hammer"],
+          confrontedAgentIds: [],
+          askedTopics: ["我想看看锤子和伤口的关系"],
+          hypotheses: []
+        },
+        actGate: {
+          nextActId: "act-testimony",
+          nextChapterId: "chapter-2",
+          unlockNarratives: [
+            "你已经发现小锤重量与伤势力度的矛盾，可以开始追问各人的证词。"
+          ]
+        }
+      })
+    });
+  vi.stubGlobal("fetch", fetchMock);
+
+  render(<InvestigationDesk storySlot={({ currentChapterId }) => <section>{currentChapterId}</section>} />);
+
+  const input = screen.getByLabelText("新的调查问题");
+  fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
+  fireEvent.submit(input.closest("form") as HTMLFormElement);
+
+  await waitFor(() => {
+    expect(screen.getByText("小锤很轻，钟楼高度让这个矛盾变得重要。")).toBeInTheDocument();
+  });
+
+  expect(
+    screen.getByText("你已经发现小锤重量与伤势力度的矛盾，可以开始追问各人的证词。")
+  ).toBeInTheDocument();
+  expect(screen.getByText("chapter-2")).toBeInTheDocument();
+
+  await waitFor(() => {
+    const saved = JSON.parse(window.localStorage.getItem("new-novels.play-state.v1") ?? "{}");
+    expect(saved.playerState.currentActId).toBe("act-testimony");
+    expect(saved.agentSessions.general.revealedFactIds).toContain("fact-small-hammer-weight");
+  });
+});
+
+test("npc session mood appears as player-facing state without exposing rules", async () => {
+  window.localStorage.clear();
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ targetId: "wilfred", label: "威尔弗里德牧师" })
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        content: "我只是在下面祈祷。",
+        agentSession: {
+          caseId: "hammer-of-god",
+          agentId: "wilfred",
+          conversationId: "wilfred",
+          pressureLevel: 3,
+          revealedFactIds: [],
+          lastTopics: ["钟楼"],
+          triggeredPressureRules: ["wilfred-tower-contradiction"],
+          currentActAgentState: "guarded",
+          mood: "guarded"
+        },
+        playerState: {
+          currentActId: "act-opening",
+          discoveredClueIds: [],
+          discoveredFactIds: [],
+          heardTestimonyIds: [],
+          knownContradictionIds: [],
+          sceneInteractionIds: [],
+          confrontedAgentIds: ["wilfred"],
+          askedTopics: ["问威尔弗里德他在哪里"],
+          hypotheses: []
+        }
+      })
+    });
+  vi.stubGlobal("fetch", fetchMock);
+
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  const input = screen.getByLabelText("新的调查问题");
+  fireEvent.change(input, { target: { value: "问威尔弗里德他在哪里" } });
+  fireEvent.submit(input.closest("form") as HTMLFormElement);
+
+  await waitFor(() => {
+    expect(screen.getByText("状态：谨慎")).toBeInTheDocument();
+  });
+
+  expect(screen.queryByText(/wilfred-tower-contradiction/)).not.toBeInTheDocument();
 });
 
 test("unsupported routed targets stay in the general module and do not call investigate", async () => {

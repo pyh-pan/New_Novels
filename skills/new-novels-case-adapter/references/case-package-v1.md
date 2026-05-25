@@ -11,6 +11,30 @@ This reference summarizes the current New Novels schema as of this repository st
 }
 ```
 
+The importable filesystem package must include:
+
+```text
+manifest.json
+case.json
+story/chapters.json
+story/*.md
+agents/global-context.json
+agents/<agent-id>.json
+facts/facts.json
+acts/acts.json
+acts/gates.json
+scenes/scenes.json
+clues/clues.json
+relationships/relationships.json
+propagation/rules.json
+contradictions/contradictions.json
+truth/truth.json
+victims/victims.json
+accusation/questions.json
+```
+
+`case.json` is the aggregate review snapshot. The directory loader reads the split files and uses `story/*.md` as the chapter body source, so copied or uploaded packages must keep these files in sync.
+
 `manifest` must satisfy:
 
 - `schemaVersion`: exactly `case-package/v1`
@@ -33,6 +57,7 @@ This reference summarizes the current New Novels schema as of this repository st
 - `storyText`
 - `chapters`
 - `acts`
+- `actGates`
 - `scenes`
 - `facts`
 - `relationships`
@@ -81,6 +106,22 @@ Each act:
 - optional `exitConditions`
 
 Use acts to gate information. Opening acts should expose suspects and obvious evidence, while later acts can unlock contradictions or deeper testimony.
+
+## ActGates
+
+Each act gate:
+
+- `id`
+- `fromActId`
+- `toActId`
+- `requiredClueIds`
+- `requiredFactIds`
+- `requiredContradictionIds`
+- `requiredNpcInteractions`
+- `requiredSceneInteractions`
+- `unlockNarrative`
+
+Use actGates to create 剧本杀式 progression. A gate should prove the player has completed a phase of reasoning before the next act opens. Do not unlock acts from vague topics alone.
 
 ## Scenes
 
@@ -145,6 +186,11 @@ All agents share:
 - `promptVersion`
 - `permissions`
 - `lieStrategy`
+- `pressureProfile`
+- `emotionalArc`
+- `confrontationTriggers`
+- `confessionBoundary`
+- `styleAnchors`
 - `personality`
 - `knowledge`
 - `revealRules`
@@ -180,6 +226,30 @@ Permissions usually keep agents bounded:
 ```
 
 Only the general agent commonly sets `canReferencePlayerNotes` to true.
+
+## Runtime Behavior Fields
+
+Each NPC should have a source-specific `pressureProfile`:
+
+```json
+{
+  "baseline": 0,
+  "thresholds": { "guarded": 2, "cornered": 5 },
+  "increaseRules": [
+    {
+      "id": "wilfred-tower-contradiction",
+      "topics": ["钟楼", "小锤", "伤口"],
+      "clueIds": ["small-hammer", "tower-height"],
+      "factIds": ["fact-small-hammer-weight"],
+      "contradictionIds": ["contradiction-hammer-force"],
+      "delta": 3,
+      "reason": "玩家把钟楼高度、小锤重量和伤口力度放在一起逼问。"
+    }
+  ]
+}
+```
+
+`emotionalArc` must define `calm`, `guarded`, and `cornered`. `confrontationTriggers` lists the topics that should increase pressure. `confessionBoundary` names what the NPC still cannot directly admit. `styleAnchors` gives short in-character examples for tone.
 
 ## Reveal Rules
 

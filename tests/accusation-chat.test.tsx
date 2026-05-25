@@ -172,7 +172,15 @@ describe("AccusationChat", () => {
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ status: "solved" })
+        json: async () => ({
+          status: "solved",
+          truth: {
+            culpritName: "威尔弗里德牧师",
+            method: "从钟楼高处让小锤坠落。",
+            motive: "宗教狂热与道德审判感。",
+            decisiveEvidence: ["小锤很轻", "钟楼高度解释力度"]
+          }
+        })
       });
     vi.stubGlobal("fetch", fetchMock);
 
@@ -184,6 +192,9 @@ describe("AccusationChat", () => {
     fireEvent.click(screen.getByRole("button", { name: "提交回答" }));
 
     expect(await screen.findByText("真相大白")).toBeInTheDocument();
+    expect(screen.getByText("威尔弗里德牧师")).toBeInTheDocument();
+    expect(screen.getByText("从钟楼高处让小锤坠落。")).toBeInTheDocument();
+    expect(screen.getByText("小锤很轻")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "结束游戏" })).toHaveAttribute("href", "/");
   });
 });

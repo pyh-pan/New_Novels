@@ -72,6 +72,31 @@ export const agentPersonalitySchema = z.object({
   evasiveHabits: z.array(nonEmptyString).min(1)
 });
 
+export const pressureRuleSchema = z.object({
+  id: nonEmptyString,
+  topics: z.array(nonEmptyString).default([]),
+  clueIds: z.array(nonEmptyString).default([]),
+  factIds: z.array(nonEmptyString).default([]),
+  contradictionIds: z.array(nonEmptyString).default([]),
+  delta: z.number().int().min(1),
+  reason: nonEmptyString
+});
+
+export const pressureProfileSchema = z.object({
+  baseline: z.number().int().min(0).default(0),
+  thresholds: z.object({
+    guarded: z.number().int().min(0),
+    cornered: z.number().int().min(0)
+  }),
+  increaseRules: z.array(pressureRuleSchema).default([])
+});
+
+export const emotionalArcSchema = z.object({
+  calm: nonEmptyString,
+  guarded: nonEmptyString,
+  cornered: nonEmptyString
+});
+
 export const agentKnowledgeSchema = z.object({
   publicFacts: z.array(nonEmptyString).min(1),
   privateFacts: z.array(nonEmptyString).min(1),
@@ -106,6 +131,11 @@ const agentBaseSchema = z.object({
   promptVersion: nonEmptyString,
   permissions: agentPermissionSchema,
   lieStrategy: z.array(lieStrategySchema).default([]),
+  pressureProfile: pressureProfileSchema,
+  emotionalArc: emotionalArcSchema,
+  confrontationTriggers: z.array(nonEmptyString).default([]),
+  confessionBoundary: z.array(nonEmptyString).default([]),
+  styleAnchors: z.array(nonEmptyString).default([]),
   personality: agentPersonalitySchema,
   knowledge: agentKnowledgeSchema,
   revealRules: z.array(revealRuleSchema)
@@ -134,6 +164,7 @@ export const playerKnowledgeStateSchema = z.object({
   discoveredFactIds: z.array(nonEmptyString).default([]),
   heardTestimonyIds: z.array(nonEmptyString).default([]),
   knownContradictionIds: z.array(nonEmptyString).default([]),
+  sceneInteractionIds: z.array(nonEmptyString).default([]),
   confrontedAgentIds: z.array(nonEmptyString).default([]),
   askedTopics: z.array(nonEmptyString).default([]),
   hypotheses: z.array(nonEmptyString).default([])
@@ -169,6 +200,18 @@ export const actSchema = z.object({
   lockedFactIds: z.array(nonEmptyString).default([]),
   entryConditions: z.array(runtimeConditionSchema).default([]),
   exitConditions: z.array(runtimeConditionSchema).default([])
+});
+
+export const actGateSchema = z.object({
+  id: nonEmptyString,
+  fromActId: nonEmptyString,
+  toActId: nonEmptyString,
+  requiredClueIds: z.array(nonEmptyString).default([]),
+  requiredFactIds: z.array(nonEmptyString).default([]),
+  requiredContradictionIds: z.array(nonEmptyString).default([]),
+  requiredNpcInteractions: z.array(nonEmptyString).default([]),
+  requiredSceneInteractions: z.array(nonEmptyString).default([]),
+  unlockNarrative: nonEmptyString
 });
 
 export const sceneSchema = z.object({
@@ -210,11 +253,12 @@ const baseCaseSchema = z.object({
   source: z.object({
     title: nonEmptyString,
     author: nonEmptyString,
-      publicDomainNote: nonEmptyString
-    }),
+    publicDomainNote: nonEmptyString
+  }),
   storyText: nonEmptyString,
   chapters: z.array(storyChapterSchema).min(1),
   acts: z.array(actSchema).min(1),
+  actGates: z.array(actGateSchema).default([]),
   scenes: z.array(sceneSchema).min(1),
   facts: z.array(factSchema).min(1),
   relationships: z.array(agentRelationshipSchema).default([]),
@@ -255,6 +299,7 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
   const factIds = caseFile.facts.map((fact) => fact.id);
   const actIds = caseFile.acts.map((act) => act.id);
   const sceneIds = caseFile.scenes.map((scene) => scene.id);
+  const actGateIds = caseFile.actGates.map((gate) => gate.id);
   const chapterIds = caseFile.chapters.map((chapter) => chapter.id);
   const questionIds = caseFile.accusation.questions.map((question) => question.id);
   const victimIds = caseFile.victims.map((victim) => victim.id);
@@ -277,6 +322,10 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
 
   if (hasDuplicates(sceneIds)) {
     addDuplicateIssue(context, ["scenes"], "Scene");
+  }
+
+  if (hasDuplicates(actGateIds)) {
+    addDuplicateIssue(context, ["actGates"], "Act gate");
   }
 
   if (hasDuplicates(chapterIds)) {
@@ -398,6 +447,29 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
     });
   });
 
+  caseFile.actGates.forEach((gate, gateIndex) => {
+    checkActRef(["actGates", gateIndex, "fromActId"], gate.fromActId);
+    checkActRef(["actGates", gateIndex, "toActId"], gate.toActId);
+    gate.requiredClueIds.forEach((clueId, clueIndex) => {
+      checkClueRef(["actGates", gateIndex, "requiredClueIds", clueIndex], clueId);
+    });
+    gate.requiredFactIds.forEach((factId, factIndex) => {
+      checkFactRef(["actGates", gateIndex, "requiredFactIds", factIndex], factId);
+    });
+    gate.requiredContradictionIds.forEach((contradictionId, contradictionIndex) => {
+      if (!caseFile.contradictions.some((item) => item.id === contradictionId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["actGates", gateIndex, "requiredContradictionIds", contradictionIndex],
+          message: "Act gate contradiction references must match contradiction ids"
+        });
+      }
+    });
+    gate.requiredNpcInteractions.forEach((agentId, agentIndex) => {
+      checkAgentRef(["actGates", gateIndex, "requiredNpcInteractions", agentIndex], agentId);
+    });
+  });
+
   caseFile.scenes.forEach((scene, sceneIndex) => {
     checkActRef(["scenes", sceneIndex, "actId"], scene.actId);
     scene.observableFactIds.forEach((factId, factIndex) => {
@@ -441,6 +513,37 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
   });
 
   caseFile.agents.forEach((agent, agentIndex) => {
+    agent.pressureProfile.increaseRules.forEach((rule, ruleIndex) => {
+      rule.clueIds.forEach((clueId, clueIndex) => {
+        checkClueRef(
+          ["agents", agentIndex, "pressureProfile", "increaseRules", ruleIndex, "clueIds", clueIndex],
+          clueId
+        );
+      });
+      rule.factIds.forEach((factId, factIndex) => {
+        checkFactRef(
+          ["agents", agentIndex, "pressureProfile", "increaseRules", ruleIndex, "factIds", factIndex],
+          factId
+        );
+      });
+      rule.contradictionIds.forEach((contradictionId, contradictionIndex) => {
+        if (!caseFile.contradictions.some((item) => item.id === contradictionId)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [
+              "agents",
+              agentIndex,
+              "pressureProfile",
+              "increaseRules",
+              ruleIndex,
+              "contradictionIds",
+              contradictionIndex
+            ],
+            message: "Pressure rule contradiction references must match contradiction ids"
+          });
+        }
+      });
+    });
     agent.revealRules.forEach((rule, ruleIndex) => {
       checkFactRef(["agents", agentIndex, "revealRules", ruleIndex, "factId"], rule.factId);
       if (rule.requiresAct) {
@@ -469,11 +572,15 @@ export type CaseFileInput = z.input<typeof caseSchema>;
 export type CaseFact = z.infer<typeof factSchema>;
 export type StoryChapter = z.infer<typeof storyChapterSchema>;
 export type CaseAct = z.infer<typeof actSchema>;
+export type ActGate = z.infer<typeof actGateSchema>;
 export type CaseScene = z.infer<typeof sceneSchema>;
 export type AgentRelationship = z.infer<typeof agentRelationshipSchema>;
 export type InformationPropagationRule = z.infer<typeof informationPropagationRuleSchema>;
 export type CaseContradiction = z.infer<typeof contradictionSchema>;
 export type AgentPersonality = z.infer<typeof agentPersonalitySchema>;
+export type PressureProfile = z.infer<typeof pressureProfileSchema>;
+export type PressureRule = z.infer<typeof pressureRuleSchema>;
+export type EmotionalArc = z.infer<typeof emotionalArcSchema>;
 export type AgentKnowledge = z.infer<typeof agentKnowledgeSchema>;
 export type AgentBoundaries = z.infer<typeof agentBoundariesSchema>;
 export type AgentPermission = z.infer<typeof agentPermissionSchema>;

@@ -1,6 +1,6 @@
 ---
 name: new-novels-case-adapter
-description: "Use when transforming an uploaded detective or mystery novel into a New Novels interactive fair-play case package. Produces the project-ready case architecture: manifest, caseFile, chapters, facts, clues, scenes, NPC agents, reveal rules, contradictions, and final accusation questions."
+description: "Use when the user uploads, pastes, or points to a detective or mystery story and wants it adapted into a playable New Novels case package."
 ---
 
 # New Novels Case Adapter
@@ -24,22 +24,30 @@ For detailed field guidance, read `references/case-package-v1.md`. For the conve
 
 ## Output Contract
 
-Prefer producing both forms when the target app does not yet have a directory loader:
+Produce a complete directory package first. Keep the aggregate `case.json` as a portable snapshot, but the app loader and validation workflow should be able to read the split filesystem layout directly.
 
-1. A single canonical package object:
-   - `manifest`
-   - `caseFile`
-2. A directory-ready layout matching the roadmap:
-   - `manifest.json`
-   - `case.json`
-   - `story/chapters.json`
-   - `story/*.md`
-   - `agents/*.json`
-   - `clues/clues.json`
-   - `accusation/questions.json`
-   - `assets/` only when actual assets are needed
+Required layout:
 
-The single object is the source of truth for validation today. The split files are for creator-facing package authoring and future loader work.
+- `manifest.json`
+- `case.json`
+- `story/chapters.json`
+- `story/*.md`
+- `agents/global-context.json`
+- `agents/<agent-id>.json`
+- `facts/facts.json`
+- `acts/acts.json`
+- `acts/gates.json`
+- `scenes/scenes.json`
+- `clues/clues.json`
+- `relationships/relationships.json`
+- `propagation/rules.json`
+- `contradictions/contradictions.json`
+- `truth/truth.json`
+- `victims/victims.json`
+- `accusation/questions.json`
+- `assets/` only when actual assets are needed
+
+The split files are creator-facing and import-facing. `case.json` should contain the same aggregate data for easier review, diffing, and external validation.
 
 ## Adaptation Rules
 
@@ -50,6 +58,8 @@ The single object is the source of truth for validation today. The split files a
 - Keep spoilers gated. `truth` facts can exist in the package, but ordinary NPCs should not reveal them before the accusation stage.
 - Make every id stable, lowercase, hyphenated, and meaningful: `fact-bell-tower-shadow`, `clue-light-hammer`, `act-opening`.
 - Prefer fewer, stronger clues over many vague clues. Each clue should help a player ask a better question, notice a contradiction, or answer the final accusation.
+- Treat multi-act design as game structure, not chapter pagination. Each act needs required discoveries, scene goals, and an ActGate that proves why the next act unlocks.
+- Generate per-NPC runtime behavior. `pressureProfile`, `emotionalArc`, `confrontationTriggers`, `confessionBoundary`, and `styleAnchors` must come from the source character's role and personality, not from a fixed default template.
 
 ## Workflow
 
@@ -64,10 +74,11 @@ The single object is the source of truth for validation today. The split files a
    - Testimony that is true, false, evasive, partial, or misleading.
 
 3. **Design the playable structure**
-   - Create acts that represent investigation phases.
+   - Create acts that represent 剧本杀式 investigation phases.
    - Create scenes with observable facts and interactable objects.
    - Create chapters as prose context available to the reader.
    - Create NPC agents and one required general agent with `id: "general"`.
+   - For each act, define the player-facing goal, required discoveries, available NPCs, scene goals, and the ActGate that unlocks the next act.
 
 4. **Build the fact ledger**
    - Public facts: safe opening information.
@@ -84,16 +95,24 @@ The single object is the source of truth for validation today. The split files a
    - Each NPC needs aliases, role, personality, knowledge, boundaries, lie strategies, and reveal rules.
    - NPCs should know only what their role allows.
    - Use `forbiddenClaims` to prevent cross-NPC omniscience and premature truth leakage.
+   - Add `pressureProfile` rules from the source: identify what topics, clues, facts, or contradictions make this character defensive.
+   - Add `emotionalArc` so the Runtime can shift tone from calm to guarded to cornered.
+   - Add `confrontationTriggers`, `confessionBoundary`, and `styleAnchors` for differentiated interrogation behavior.
 
-7. **Build final accusation**
+7. **Build act gates**
+   - Every non-final act should have an ActGate with `requiredClueIds`, `requiredFactIds`, `requiredContradictionIds`, `requiredNpcInteractions`, `requiredSceneInteractions`, and `unlockNarrative`.
+   - Act gates should require real investigation progress, not arbitrary keyword guessing.
+   - The unlock narrative should tell the player what changed without spoiling the full solution.
+
+8. **Build final accusation**
    - Include questions that cover culprit, method, decisive contradiction/evidence, and motive.
    - Accepted answers should include likely variants, aliases, and concise paraphrases.
    - Explanations should reveal the canonical truth after success or failure handling.
 
-8. **Validate and repair**
+9. **Validate and repair**
    - Run the repository's tests when the package is wired into code.
-   - For standalone package JSON, run `scripts/check_case_package_refs.mjs` from this skill as a quick reference-integrity pass.
-   - Repair duplicate ids, missing references, missing general agent, uncovered truth, and spoiler leaks before handing off.
+   - For standalone package JSON or a package directory, run `scripts/check_case_package_refs.mjs` from this skill as a quick reference-integrity pass.
+   - Repair duplicate ids, missing references, missing general agent, uncovered truth, spoiler leaks, missing pressure profiles, and missing ActGates before handing off.
 
 ## Quality Bar
 
@@ -105,6 +124,8 @@ The generated case is not complete until:
 - All referenced ids exist.
 - There is exactly one general investigation agent with `id: "general"` and `type: "general"`.
 - The accusation questions cover every essential truth component.
+- Each NPC has runtime-ready pressureProfile, emotionalArc, confrontationTriggers, confessionBoundary, and styleAnchors.
+- Each non-final act has an ActGate with required discoveries and a non-spoiler unlock narrative.
 - No ordinary NPC can reveal the full solution through normal conversation.
 - The story can be read without UI instructions embedded in the prose.
 
@@ -115,3 +136,6 @@ The generated case is not complete until:
 - Giving all NPCs omniscient knowledge because the source story narrator knows the truth.
 - Making accepted answers too strict, causing a correct human answer to fail.
 - Treating atmosphere as evidence. Only structured facts and clues should drive final judgment.
+- Splitting acts by prose length rather than by investigation state.
+- Giving every NPC the same pressure thresholds and emotional behavior.
+- Creating ActGates that unlock on arbitrary topics instead of required discoveries.

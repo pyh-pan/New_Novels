@@ -15,6 +15,8 @@ export type AgentSession = {
   pressureLevel: number;
   revealedFactIds: string[];
   lastTopics: string[];
+  triggeredPressureRules: string[];
+  currentActAgentState?: string;
   mood: "calm" | "guarded" | "cornered";
 };
 
@@ -42,8 +44,16 @@ export type AgentResponseContract = {
   reply: string;
   revealedFactIds: string[];
   suggestedClueIds: string[];
+  revealedContradictionIds: string[];
+  sceneInteractionIds: string[];
   emotionalState: "calm" | "guarded" | "cornered" | "unknown";
   confidence: number;
+};
+
+export type ActGateEvaluation = {
+  unlockedGateIds: string[];
+  nextActId?: string;
+  unlockNarratives: string[];
 };
 
 export type AgentRuntime = {
@@ -128,6 +138,30 @@ function playerHasAnyTopic(playerState: PlayerKnowledgeState, topics: string[]):
   );
 }
 
+function playerHasFact(playerState: PlayerKnowledgeState, factId: string): boolean {
+  return playerState.discoveredFactIds.includes(factId);
+}
+
+function playerHasContradiction(
+  playerState: PlayerKnowledgeState,
+  contradictionId: string
+): boolean {
+  return playerState.knownContradictionIds.includes(contradictionId);
+}
+
+function moodForPressure(
+  pressureLevel: number,
+  thresholds: { guarded: number; cornered: number }
+): AgentSession["mood"] {
+  if (pressureLevel >= thresholds.cornered) {
+    return "cornered";
+  }
+  if (pressureLevel >= thresholds.guarded) {
+    return "guarded";
+  }
+  return "calm";
+}
+
 function extractTopics(caseFile: CaseFile, message: string): string[] {
   const candidates = new Set<string>([
     ...generalKeywords,
@@ -191,13 +225,16 @@ export function createAgentRuntime(caseFile: CaseFile): AgentRuntime {
       return factsById.get(factId);
     },
     getSession(agentId: string): AgentSession {
+      const agent = agentsById.get(agentId);
       return {
         caseId: caseFile.id,
         agentId,
         conversationId: agentId,
-        pressureLevel: 0,
+        pressureLevel: agent?.pressureProfile.baseline ?? 0,
         revealedFactIds: [],
         lastTopics: [],
+        triggeredPressureRules: [],
+        currentActAgentState: "calm",
         mood: "calm"
       };
     }
@@ -231,6 +268,8 @@ export function parseAgentResponseContract(content: string | null | undefined): 
       reply: fallback,
       revealedFactIds: [],
       suggestedClueIds: [],
+      revealedContradictionIds: [],
+      sceneInteractionIds: [],
       emotionalState: "unknown",
       confidence: 1
     };
@@ -246,6 +285,20 @@ export function parseAgentResponseContract(content: string | null | undefined): 
       suggestedClueIds: Array.isArray(parsed.suggestedClueIds)
         ? parsed.suggestedClueIds.filter((id): id is string => typeof id === "string")
         : [],
+      revealedContradictionIds: Array.isArray(
+        (parsed as { revealedContradictionIds?: unknown }).revealedContradictionIds
+      )
+        ? (parsed as { revealedContradictionIds: unknown[] }).revealedContradictionIds.filter(
+            (id): id is string => typeof id === "string"
+          )
+        : [],
+      sceneInteractionIds: Array.isArray(
+        (parsed as { sceneInteractionIds?: unknown }).sceneInteractionIds
+      )
+        ? (parsed as { sceneInteractionIds: unknown[] }).sceneInteractionIds.filter(
+            (id): id is string => typeof id === "string"
+          )
+        : [],
       emotionalState:
         parsed.emotionalState === "calm" ||
         parsed.emotionalState === "guarded" ||
@@ -259,6 +312,8 @@ export function parseAgentResponseContract(content: string | null | undefined): 
       reply: fallback,
       revealedFactIds: [],
       suggestedClueIds: [],
+      revealedContradictionIds: [],
+      sceneInteractionIds: [],
       emotionalState: "unknown",
       confidence: 1
     };
@@ -393,14 +448,137 @@ export function updateSessionForUserMessage({
   const confrontationTerms = ["矛盾", "撒谎", "说谎", "不匹配", "为什么", "但"];
   const mentionsConfrontation = confrontationTerms.some((term) => message.includes(term));
   const hasUsefulClue = playerState.discoveredClueIds.length > 0;
-  const pressureDelta = agent?.type === "npc" && (mentionsConfrontation || hasUsefulClue) ? 1 : 0;
+  const triggeredRules =
+    agent?.type === "npc"
+      ? agent.pressureProfile.increaseRules.filter((rule) => {
+          const hasTopic =
+            rule.topics.length === 0 ||
+            rule.topics.some((topic) => textContainsTopic(message, topic));
+          const hasClues = rule.clueIds.every((clueId) => playerHasClue(playerState, clueId));
+          const hasFacts = rule.factIds.every((factId) => playerHasFact(playerState, factId));
+          const hasContradictions = rule.contradictionIds.every((contradictionId) =>
+            playerHasContradiction(playerState, contradictionId)
+          );
+
+          return hasTopic && hasClues && hasFacts && hasContradictions;
+        })
+      : [];
+  const configuredPressureDelta = triggeredRules.reduce((sum, rule) => sum + rule.delta, 0);
+  const fallbackPressureDelta =
+    triggeredRules.length === 0 && agent?.type === "npc" && (mentionsConfrontation || hasUsefulClue)
+      ? 1
+      : 0;
+  const pressureDelta = configuredPressureDelta + fallbackPressureDelta;
   const pressureLevel = session.pressureLevel + pressureDelta;
+  const thresholds = agent?.pressureProfile.thresholds ?? { guarded: 1, cornered: 3 };
+  const mood = moodForPressure(pressureLevel, thresholds);
 
   return {
     ...session,
     pressureLevel,
     lastTopics: [...new Set([...session.lastTopics, ...topics])],
-    mood: pressureLevel >= 3 ? "cornered" : pressureLevel > 0 ? "guarded" : session.mood
+    triggeredPressureRules: [
+      ...new Set([...session.triggeredPressureRules, ...triggeredRules.map((rule) => rule.id)])
+    ],
+    currentActAgentState: mood,
+    mood
+  };
+}
+
+export function applyAgentResponseContractToState({
+  runtime,
+  agentId,
+  session,
+  playerState,
+  response
+}: {
+  runtime: AgentRuntime;
+  agentId: string;
+  session: AgentSession;
+  playerState: PlayerKnowledgeState;
+  response: AgentResponseContract;
+}): { session: AgentSession; playerState: PlayerKnowledgeState } {
+  const validFactIds = (response.revealedFactIds ?? []).filter((factId) => runtime.getFact(factId));
+  const validClueIds = (response.suggestedClueIds ?? []).filter((clueId) =>
+    runtime.caseFile.clues.some((clue) => clue.id === clueId)
+  );
+  const validContradictionIds = (response.revealedContradictionIds ?? []).filter((contradictionId) =>
+    runtime.caseFile.contradictions.some((contradiction) => contradiction.id === contradictionId)
+  );
+  const validSceneInteractionIds = (response.sceneInteractionIds ?? []).filter((interactionId) => {
+    const [sceneId, objectName] = interactionId.split(":");
+    return (
+      runtime.caseFile.actGates.some((gate) =>
+        gate.requiredSceneInteractions.includes(interactionId)
+      ) ||
+      runtime.caseFile.scenes.some(
+        (scene) =>
+          scene.id === sceneId &&
+          (!objectName || scene.interactableObjects.includes(objectName))
+      )
+    );
+  });
+  const mood =
+    response.emotionalState === "unknown" ? session.mood : response.emotionalState;
+
+  return {
+    session: {
+      ...session,
+      revealedFactIds: [...new Set([...session.revealedFactIds, ...validFactIds])],
+      mood,
+      currentActAgentState: mood
+    },
+    playerState: {
+      ...playerState,
+      discoveredFactIds: [...new Set([...playerState.discoveredFactIds, ...validFactIds])],
+      discoveredClueIds: [...new Set([...playerState.discoveredClueIds, ...validClueIds])],
+      knownContradictionIds: [
+        ...new Set([...playerState.knownContradictionIds, ...validContradictionIds])
+      ],
+      sceneInteractionIds: [
+        ...new Set([...playerState.sceneInteractionIds, ...validSceneInteractionIds])
+      ],
+      confrontedAgentIds:
+        agentId === "general"
+          ? playerState.confrontedAgentIds
+          : [...new Set([...playerState.confrontedAgentIds, agentId])]
+    }
+  };
+}
+
+export function evaluateActGates({
+  runtime,
+  playerState,
+  npcInteractionIds,
+  sceneInteractionIds
+}: {
+  runtime: AgentRuntime;
+  playerState: PlayerKnowledgeState;
+  npcInteractionIds: string[];
+  sceneInteractionIds: string[];
+}): ActGateEvaluation {
+  const unlockedGates = runtime.caseFile.actGates.filter((gate) => {
+    if (gate.fromActId !== playerState.currentActId) {
+      return false;
+    }
+
+    return (
+      gate.requiredClueIds.every((clueId) => playerHasClue(playerState, clueId)) &&
+      gate.requiredFactIds.every((factId) => playerHasFact(playerState, factId)) &&
+      gate.requiredContradictionIds.every((contradictionId) =>
+        playerHasContradiction(playerState, contradictionId)
+      ) &&
+      gate.requiredNpcInteractions.every((agentId) => npcInteractionIds.includes(agentId)) &&
+      gate.requiredSceneInteractions.every((interactionId) =>
+        sceneInteractionIds.includes(interactionId)
+      )
+    );
+  });
+
+  return {
+    unlockedGateIds: unlockedGates.map((gate) => gate.id),
+    nextActId: unlockedGates[0]?.toActId,
+    unlockNarratives: unlockedGates.map((gate) => gate.unlockNarrative)
   };
 }
 
@@ -429,9 +607,13 @@ export function validateAgentOutput({
       !allowed.has(fact.id) &&
       (fact.visibility === "truth" || fact.visibility === "private") &&
       (trimmed.includes(fact.text) ||
-        fact.keywords.filter((keyword) => keyword.length >= 3).every((keyword) =>
-          trimmed.includes(keyword)
-        ))
+        (() => {
+          const meaningfulKeywords = fact.keywords.filter((keyword) => keyword.length >= 3);
+          return (
+            meaningfulKeywords.length > 0 &&
+            meaningfulKeywords.every((keyword) => trimmed.includes(keyword))
+          );
+        })())
   );
 
   if (blockedFacts.length > 0) {

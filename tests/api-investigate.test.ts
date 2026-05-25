@@ -59,7 +59,11 @@ describe("/api/investigate", () => {
     const response = await POST(jsonRequest({ targetId: "general", message: "检查锤子" }));
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ content: "我暂时无法回答这个问题。" });
+    await expect(response.json()).resolves.toMatchObject({
+      content: "我暂时无法回答这个问题。",
+      agentSession: { agentId: "general" },
+      playerState: { currentActId: "act-opening" }
+    });
   });
 
   it("blocks forbidden or truth-sensitive model output", async () => {
@@ -70,7 +74,11 @@ describe("/api/investigate", () => {
     const response = await POST(jsonRequest({ targetId: "general", message: "谁是凶手？" }));
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ content: "我暂时无法回答这个问题。" });
+    await expect(response.json()).resolves.toMatchObject({
+      content: "我暂时无法回答这个问题。",
+      agentSession: { agentId: "general" },
+      playerState: { currentActId: "act-opening" }
+    });
   });
 
   it("blocks fabricated evidence that is outside the case schema", async () => {
@@ -81,7 +89,11 @@ describe("/api/investigate", () => {
     const response = await POST(jsonRequest({ targetId: "general", message: "还有别的证据吗？" }));
 
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ content: "我暂时无法回答这个问题。" });
+    await expect(response.json()).resolves.toMatchObject({
+      content: "我暂时无法回答这个问题。",
+      agentSession: { agentId: "general" },
+      playerState: { currentActId: "act-opening" }
+    });
   });
 
   it("sends stable instructions separately from player-controlled text", async () => {
@@ -129,5 +141,72 @@ describe("/api/investigate", () => {
 
     expect(messages[0].content).toContain("small-hammer");
     expect(messages[0].content).toContain("锤子");
+  });
+
+  it("returns updated player state, agent session, and act gate patch from structured responses", async () => {
+    createMock.mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              reply: "小锤的重量、伤口力度和钟楼高度之间有明显矛盾。",
+              revealedFactIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+              suggestedClueIds: ["small-hammer", "tower-height"],
+              revealedContradictionIds: ["contradiction-hammer-force"],
+              sceneInteractionIds: ["scene-smithy-road:small-hammer"],
+              emotionalState: "calm",
+              confidence: 0.95
+            })
+          }
+        }
+      ]
+    });
+
+    const response = await POST(
+      jsonRequest({
+        targetId: "general",
+        message: "我想看看小锤、伤口和钟楼有什么矛盾",
+        agentSession: {
+          caseId: "hammer-of-god",
+          agentId: "general",
+          conversationId: "general",
+          pressureLevel: 0,
+          revealedFactIds: [],
+          lastTopics: [],
+          triggeredPressureRules: [],
+          currentActAgentState: "calm",
+          mood: "calm"
+        },
+        playerState: {
+          currentActId: "act-opening",
+          discoveredClueIds: [],
+          discoveredFactIds: [],
+          heardTestimonyIds: [],
+          knownContradictionIds: [],
+          confrontedAgentIds: [],
+          askedTopics: []
+        }
+      })
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      content: "小锤的重量、伤口力度和钟楼高度之间有明显矛盾。",
+      agentSession: {
+        agentId: "general",
+        revealedFactIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"]
+      },
+      playerState: {
+        currentActId: "act-testimony",
+        discoveredClueIds: ["small-hammer", "tower-height"],
+        discoveredFactIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+        knownContradictionIds: ["contradiction-hammer-force"]
+      },
+      actGate: {
+        nextActId: "act-testimony",
+        nextChapterId: "chapter-2",
+        unlockNarratives: ["你已经发现小锤重量与伤势力度的矛盾，可以开始追问各人的证词。"]
+      }
+    });
   });
 });

@@ -1,91 +1,123 @@
 # New Novels
 
-New Novels is an experimental web prototype for turning detective fiction into
+New Novels is a text-first web prototype for turning detective fiction into
 interactive fair-play mystery experiences.
 
-Instead of reading passively while a detective solves the case, players investigate
-for themselves: they question AI-driven NPCs, inspect the scene through natural
-language, collect notes, identify contradictions, and make a final accusation.
+Players read a story, question AI-driven NPCs, inspect clues through natural
+language, keep their own detective notebook, and make a final accusation. The AI
+can perform characters, but it is not the source of truth: the case package and
+runtime rules decide what facts exist, what each NPC knows, and when the final
+solution is accepted.
 
-The first prototype is based on G. K. Chesterton's public-domain Father Brown
-story, **"The Hammer of God"**.
+The built-in demo case is based on G. K. Chesterton's public-domain Father Brown
+story **"The Hammer of God"**.
 
-## Why This Exists
+## Current Prototype
 
-Traditional detective fiction is immersive, but the reader usually follows a
-fixed path. The fun of deduction belongs to the detective on the page.
+Implemented:
 
-This project explores a different form:
+- Next.js web app with story reader, investigation desk, notebook drawer, and
+  final accusation page.
+- Default case loaded from `cases/hammer-of-god/` through `CaseLoader`.
+- `case-package/v1` filesystem layout for story text, agents, facts, acts,
+  act gates, clues, contradictions, truth, victims, and accusation questions.
+- Agent Runtime with semantic/keyword routing, player knowledge state, reveal
+  rules, pressure profiles, act gate evaluation, and output guardrails.
+- AI-backed investigation API using the CoWork/Guard Runway Bedrock gateway
+  contract (`ai.properties`) with structured prompt and response handling.
+- Deterministic final accusation checking with a truth summary after success.
+- Local browser persistence for chapter progress, conversations, notes, and UI
+  state, including per-agent sessions and player hypotheses.
+- Case package zip preview API and toolbar UI.
+- Guard-compatible `install.sh`, `start.sh`, `health.sh`, `/health`, and
+  standalone build configuration.
+- `new-novels-case-adapter` skill for adapting mystery stories into case
+  packages.
 
-- The story remains literary and text-first.
-- The player can freely ask questions.
-- NPCs have limited knowledge, motives, secrets, and reasons to mislead.
-- The mystery remains fair: the truth is fixed, the clues are structured, and the
-  final solution is judged by the case data rather than by model improvisation.
+Not implemented yet:
 
-## Core Experience
+- Activating an uploaded case as the current playable runtime.
+- Persistent server-side save/resume.
+- Full creator editing workspace.
+- Model retry/repair after guardrail rejection.
 
-The prototype is designed around four surfaces:
+## Quick Start
 
-- **Story column**: a quiet, novel-like reading area that contains only the story
-  context.
-- **Investigation desk**: a natural-language conversation space with a general
-  scene investigation agent and individual NPC modules.
-- **Detective notebook**: a collapsible notebook for saving and tagging clues,
-  testimony, doubts, and contradictions.
-- **Final accusation**: a simple AI-led cross-examination. The player must answer
-  every key question correctly to solve the case.
+Install dependencies:
 
-## Product Direction
+```bash
+npm install
+```
 
-New Novels has two long-term goals:
+For local AI testing, create `ai.properties` at the project root or set matching
+environment variables:
 
-1. Help creators transform detective stories into structured interactive cases.
-2. Give players AI NPCs that feel alive while still obeying the rules of a fixed,
-   fair-play mystery.
+```properties
+ai.base_url=<platform-runway-base-url>
+ai.api_key=<platform-api-key>
+```
 
-The AI is not meant to invent the truth. It is meant to perform within the truth.
+Environment variable fallback:
 
-## Current Status
+```bash
+APP_AI_BASE_URL=<platform-runway-base-url>
+APP_AI_API_KEY=<platform-api-key>
+```
 
-The project is in early prototype design.
+Run the app:
 
-Completed so far:
+```bash
+npm run dev
+```
 
-- Product concept and interaction model
-- Web design direction in `design.md`
-- Initial case choice: "The Hammer of God"
-- Main layout direction: story column, investigation desk, collapsible notebook
-- Final accusation flow: single dialogue box, wrong answer returns to
-  investigation, all correct reveals the truth
-- Development guideline document in `agents.md`
-- Product roadmap in `roadmap.md`
+Open [http://localhost:3000](http://localhost:3000).
 
-Not yet implemented:
+Useful checks:
 
-- Running web application
-- AI backend
-- Case schema
-- NPC prompt system
-- Notebook persistence
-- Final accusation answer checker
+```bash
+npm test
+npm run lint
+npm run build
+```
 
-## Design Direction
+Build a CoWork/Guard package:
 
-The interface should feel like an interactive detective novella, not a generic
-chat app or a game dashboard.
+```bash
+npm run guard:package
+```
 
-See [design.md](./design.md) for the current visual and interaction direction.
+The package is written to `dist/new-novels-guard.zip`.
 
-## Roadmap
+Validate the built-in case package:
 
-See [roadmap.md](./roadmap.md) for planned milestones and future product
-directions.
+```bash
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hammer-of-god
+```
 
-## Development Guidelines
+## Project Map
 
-See [agents.md](./agents.md) for development practices, review expectations,
-testing guidelines, and AI/LLM safety rules.
+- `app/` - Next.js pages and API routes.
+- `components/` - story reader, investigation desk, notebook, dialogs, and
+  accusation UI.
+- `lib/case/` - canonical case schema and default case service.
+- `lib/case-package/` - case package manifest schema and directory loader.
+- `lib/agent-runtime/` - routing, runtime context, reveal rules, pressure state,
+  act gates, and output validation.
+- `lib/ai/` - platform AI provider adapter and prompt builders.
+- `lib/game/` - play state, routing wrappers, story view helpers, IDs, and final
+  accusation checking.
+- `cases/hammer-of-god/` - the built-in filesystem case package.
+- `skills/new-novels-case-adapter/` - local skill for adapting mystery stories
+  into playable packages.
+- `docs/` - architecture, package, implementation, and platform notes.
+
+## Core Documentation
+
+- [Design](./design.md)
+- [Architecture](./docs/architecture.md)
+- [Case Package v1](./docs/case-package.md)
+- [Roadmap](./roadmap.md)
+- [Development Guidelines](./agents.md)
 
 ## License
 

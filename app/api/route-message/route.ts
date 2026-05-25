@@ -3,8 +3,7 @@ import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
 import { getModelName, getOpenAIClient } from "../../../lib/ai/openai";
-import { createAgentRuntime } from "../../../lib/agent-runtime";
-import { hammerOfGodCase } from "../../../lib/case/hammer-of-god";
+import { getDefaultRuntime } from "../../../lib/case/default-case";
 import {
   labelForTarget,
   routeMessage,
@@ -23,7 +22,7 @@ const semanticRouteSchema = z.object({
 });
 
 const semanticConfidenceThreshold = 0.65;
-const runtime = createAgentRuntime(hammerOfGodCase);
+const runtime = getDefaultRuntime();
 
 function routingPrompt(message: string) {
   return [

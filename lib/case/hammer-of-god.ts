@@ -14,6 +14,21 @@ const noNewFactsPermission: AgentPermission = {
   canReferencePlayerNotes: false
 };
 
+const defaultPressureProfile = {
+  baseline: 0,
+  thresholds: {
+    guarded: 2,
+    cornered: 5
+  },
+  increaseRules: []
+};
+
+const defaultEmotionalArc = {
+  calm: "保持当前角色的日常防御姿态。",
+  guarded: "回答更短，开始回避直接判断。",
+  cornered: "语气明显紧绷，但仍受事实边界和禁止声明约束。"
+};
+
 const hammerOpeningText =
   "海泽尔村的午后被一声尖叫撕开。铁匠铺门前的石路上躺着一具尸体，头部的伤势重得不合常理。尸体旁边有一把小锤。它看起来太轻，太普通，甚至像是从铁匠铺里随手拿出来的工具。可伤口不像普通人能用它造成。教堂钟楼投下长长的影子。威尔弗里德牧师从那边走来，脸色苍白。他说自己一直在祈祷，没有听见争吵，也没有上过钟楼。铁匠西米恩站在人群外，粗壮的双手垂在身侧。他没有为自己辩解，只盯着那把锤子，像盯着一件突然变得陌生的东西。";
 
@@ -70,16 +85,64 @@ const hammerOfGodCaseData = {
       body:
         "威尔弗里德坚持自己从未登上钟楼。铁匠西米恩沉默得像一块铁，只在被问及那把小锤时说，它太轻了。\n\n伊丽莎白提到诺曼时明显迟疑。疯乔则在教堂附近看见过高处的人影，却不愿承认自己当时为什么在那里。",
       availableFromStart: true,
-      previousChapterId: "chapter-1"
+      previousChapterId: "chapter-1",
+      nextChapterId: "chapter-3"
+    },
+    {
+      id: "chapter-3",
+      title: "钟楼下的锤击案",
+      subtitle: "第三章 钟楼的阴影",
+      body:
+        "当小锤的重量、钟楼的高度与威尔弗里德的否认被放在一起，原本指向铁匠的怀疑开始动摇。\n\n现在的问题不再是谁有力气挥动锤子，而是谁能利用高处让一件轻物获得可怕的力量。",
+      availableFromStart: false,
+      previousChapterId: "chapter-2"
     }
   ],
   acts: [
     {
       id: "act-opening",
       title: "案发现场",
+      availableAgentIds: ["general", "simeon", "wilfred"],
+      visibleClueIds: ["small-hammer", "tower-height"],
+      lockedFactIds: ["fact-joe-saw-tower-shadow", "truth-wilfred-method", "truth-wilfred-motive"]
+    },
+    {
+      id: "act-testimony",
+      title: "证词的阴影",
       availableAgentIds: ["general", "wilfred", "simeon", "elizabeth", "joe"],
       visibleClueIds: ["small-hammer", "wilfred-denial", "tower-height"],
       lockedFactIds: ["truth-wilfred-method", "truth-wilfred-motive"]
+    },
+    {
+      id: "act-confrontation",
+      title: "钟楼对质",
+      availableAgentIds: ["general", "wilfred", "simeon", "elizabeth", "joe"],
+      visibleClueIds: ["small-hammer", "wilfred-denial", "tower-height"],
+      lockedFactIds: ["truth-wilfred-method", "truth-wilfred-motive"]
+    }
+  ],
+  actGates: [
+    {
+      id: "gate-opening-to-testimony",
+      fromActId: "act-opening",
+      toActId: "act-testimony",
+      requiredClueIds: ["small-hammer", "tower-height"],
+      requiredFactIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+      requiredContradictionIds: ["contradiction-hammer-force"],
+      requiredNpcInteractions: ["general"],
+      requiredSceneInteractions: ["scene-smithy-road:small-hammer"],
+      unlockNarrative: "你已经发现小锤重量与伤势力度的矛盾，可以开始追问各人的证词。"
+    },
+    {
+      id: "gate-testimony-to-confrontation",
+      fromActId: "act-testimony",
+      toActId: "act-confrontation",
+      requiredClueIds: ["wilfred-denial", "tower-height"],
+      requiredFactIds: ["fact-wilfred-denies-tower", "fact-tower-overlooks-scene"],
+      requiredContradictionIds: ["contradiction-hammer-force"],
+      requiredNpcInteractions: ["wilfred", "joe"],
+      requiredSceneInteractions: [],
+      unlockNarrative: "牧师的否认、钟楼的位置和疯乔的目击开始重叠，案件进入最终对质。"
     }
   ],
   scenes: [
@@ -261,6 +324,11 @@ const hammerOfGodCaseData = {
       promptVersion: "agent-runtime/v1",
       permissions: { ...noNewFactsPermission, canReferencePlayerNotes: true },
       lieStrategy: [],
+      pressureProfile: defaultPressureProfile,
+      emotionalArc: defaultEmotionalArc,
+      confrontationTriggers: ["证词矛盾", "物证矛盾", "玩家假设"],
+      confessionBoundary: commonForbiddenClaims,
+      styleAnchors: ["目前掌握的信息还不足以确认这一点。", "这个问题更适合继续追问相关人物。"],
       knowledgeScope: "unlocked-only",
       allowedTopics: ["现场", "物证", "人物关系", "证词矛盾", "推理方向"],
       forbiddenClaims: commonForbiddenClaims,
@@ -313,6 +381,38 @@ const hammerOfGodCaseData = {
       promptVersion: "agent-runtime/v1",
       permissions: noNewFactsPermission,
       lieStrategy: ["moralize", "partial_truth", "deflect"],
+      pressureProfile: {
+        baseline: 0,
+        thresholds: { guarded: 2, cornered: 5 },
+        increaseRules: [
+          {
+            id: "wilfred-tower-contradiction",
+            topics: ["钟楼", "小锤", "伤口", "高处"],
+            clueIds: ["small-hammer", "tower-height"],
+            factIds: ["fact-small-hammer-weight", "fact-tower-overlooks-scene"],
+            contradictionIds: ["contradiction-hammer-force"],
+            delta: 3,
+            reason: "玩家把钟楼高度、小锤重量和伤口力度放在一起逼问牧师。"
+          },
+          {
+            id: "wilfred-denial-pressure",
+            topics: ["否认", "祈祷", "案发时"],
+            clueIds: ["wilfred-denial"],
+            factIds: ["fact-wilfred-denies-tower"],
+            contradictionIds: [],
+            delta: 2,
+            reason: "玩家抓住牧师案发时位置证词持续追问。"
+          }
+        ]
+      },
+      emotionalArc: {
+        calm: "克制地用宗教语言回答，主动把嫌疑引向铁匠。",
+        guarded: "句子变短，回避钟楼细节，用道德审判转移压力。",
+        cornered: "出现明显停顿和自我辩护，但仍不得承认真凶或完整手法。"
+      },
+      confrontationTriggers: ["钟楼", "小锤", "伤口", "祈祷", "高处坠落"],
+      confessionBoundary: ["不得承认自己杀死诺曼。", "不得完整解释小锤从钟楼坠落的作案方式。"],
+      styleAnchors: ["我在下面祈祷。罪恶的响声，不总是人耳听得见的。", "铁匠的手，比我的祈祷更接近那把锤子。"],
       personality: {
         speechStyle: "克制、宗教化、带审判意味。",
         emotionalBaseline: "表面镇定，内里紧绷。",
@@ -368,6 +468,29 @@ const hammerOfGodCaseData = {
       promptVersion: "agent-runtime/v1",
       permissions: noNewFactsPermission,
       lieStrategy: ["deny", "deflect", "minimize"],
+      pressureProfile: {
+        baseline: 1,
+        thresholds: { guarded: 2, cornered: 4 },
+        increaseRules: [
+          {
+            id: "simeon-elizabeth-pressure",
+            topics: ["伊丽莎白", "诺曼", "嫉妒"],
+            clueIds: [],
+            factIds: ["fact-simeon-jealous"],
+            contradictionIds: [],
+            delta: 2,
+            reason: "玩家逼问诺曼和伊丽莎白的关系。"
+          }
+        ]
+      },
+      emotionalArc: {
+        calm: "用短句回答，尽量不解释。",
+        guarded: "显得恼怒，强调自己没有杀人。",
+        cornered: "情绪外露，但会把重点放在保护伊丽莎白。"
+      },
+      confrontationTriggers: ["伊丽莎白", "诺曼", "嫉妒", "小锤"],
+      confessionBoundary: ["不得知道威尔弗里德的完整作案方式。"],
+      styleAnchors: ["那锤子是我的，可那伤不是我的手能打出来的。", "别把她扯进来。"],
       personality: {
         speechStyle: "短促、低沉、带着被误解后的压抑。",
         emotionalBaseline: "沉默，防御性强。",
@@ -415,6 +538,29 @@ const hammerOfGodCaseData = {
       promptVersion: "agent-runtime/v1",
       permissions: noNewFactsPermission,
       lieStrategy: ["deny", "minimize", "partial_truth"],
+      pressureProfile: {
+        baseline: 1,
+        thresholds: { guarded: 2, cornered: 4 },
+        increaseRules: [
+          {
+            id: "elizabeth-norman-pressure",
+            topics: ["诺曼", "西米恩", "纠缠"],
+            clueIds: [],
+            factIds: ["fact-simeon-jealous"],
+            contradictionIds: [],
+            delta: 2,
+            reason: "玩家追问她和诺曼的接触以及西米恩的反应。"
+          }
+        ]
+      },
+      emotionalArc: {
+        calm: "紧张但努力维持礼貌。",
+        guarded: "用否认和请求回避细节。",
+        cornered: "更愿意承认诺曼曾接近她，但不愿扩大到作案方式。"
+      },
+      confrontationTriggers: ["诺曼", "西米恩", "名声", "纠缠"],
+      confessionBoundary: ["不得知道作案方式。"],
+      styleAnchors: ["我不想惹事，先生。", "请别把这些话告诉西米恩。"],
       personality: {
         speechStyle: "紧张、含糊，常用短句保护自己。",
         emotionalBaseline: "焦虑，害怕名声受损。",
@@ -454,6 +600,29 @@ const hammerOfGodCaseData = {
       promptVersion: "agent-runtime/v1",
       permissions: noNewFactsPermission,
       lieStrategy: ["deflect", "partial_truth"],
+      pressureProfile: {
+        baseline: 0,
+        thresholds: { guarded: 1, cornered: 3 },
+        increaseRules: [
+          {
+            id: "joe-respect-pressure",
+            topics: ["钟楼", "人影", "牧师"],
+            clueIds: ["tower-height"],
+            factIds: ["fact-tower-overlooks-scene"],
+            contradictionIds: [],
+            delta: 2,
+            reason: "玩家认真追问他在钟楼方向看到的人影。"
+          }
+        ]
+      },
+      emotionalArc: {
+        calm: "话语破碎，先否认自己看见了重要东西。",
+        guarded: "害怕被嘲笑，会用比喻描述人影。",
+        cornered: "在被认真对待时说出更多目击片段。"
+      },
+      confrontationTriggers: ["钟楼", "人影", "牧师", "异常"],
+      confessionBoundary: ["不得准确描述完整作案过程。"],
+      styleAnchors: ["影子从高处落下来，不是人，是钟的影子。", "我没看见，不，我看见的是衣角。"],
       personality: {
         speechStyle: "跳跃、破碎，像把看到的画面拼成谜语。",
         emotionalBaseline: "不安，害怕被嘲笑。",

@@ -9,6 +9,7 @@ import {
   useRef,
   useState
 } from "react";
+import CaseImportPanel from "./CaseImportPanel";
 import ConfirmDialog from "./ConfirmDialog";
 import ConversationModule, { type ConversationMessage } from "./ConversationModule";
 import NotebookDrawer, {
@@ -32,7 +33,20 @@ type RoutedMessage = {
   label: string;
 };
 
+type InvestigationResponse = {
+  content?: string;
+  error?: string;
+  agentSession?: LocalPlayState["agentSessions"][string];
+  playerState?: PlayerKnowledgeState;
+  actGate?: {
+    nextActId: string;
+    nextChapterId?: string;
+    unlockNarratives: string[];
+  };
+};
+
 interface InvestigationDeskProps {
+  caseTitle?: string;
   storySlot: (props: {
     currentChapterId: string;
     onChapterChange: (chapterId: string) => void;
@@ -63,7 +77,20 @@ function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-export default function InvestigationDesk({ storySlot }: InvestigationDeskProps) {
+function agentStateLabel(mood?: "calm" | "guarded" | "cornered") {
+  if (mood === "guarded") {
+    return "状态：谨慎";
+  }
+  if (mood === "cornered") {
+    return "状态：紧绷";
+  }
+  return undefined;
+}
+
+export default function InvestigationDesk({
+  caseTitle = "钟楼下的锤击案",
+  storySlot
+}: InvestigationDeskProps) {
   const [playState, setPlayState] = useState<LocalPlayState>(() => createInitialPlayState());
   const [hasHydratedStorage, setHasHydratedStorage] = useState(false);
   const [draft, setDraft] = useState("");
@@ -75,6 +102,7 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
   const conversations = playState.conversations;
   const notes = playState.notes;
   const playerState = playState.playerState;
+  const agentSessions = playState.agentSessions;
   const activeTag = playState.ui.activeNotebookFilter;
   const notebookOpen = Boolean(playState.ui.notebookOpen);
   const mobileTab = playState.ui.mobileTab ?? "story";
@@ -153,6 +181,24 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
     setPlayState((current) => ({
       ...current,
       playerState
+    }));
+  };
+
+  const mergeInvestigationPatch = (
+    targetId: ConversationTarget,
+    response: InvestigationResponse
+  ) => {
+    setPlayState((current) => ({
+      ...current,
+      currentChapterId:
+        response.actGate?.nextChapterId ?? current.currentChapterId,
+      agentSessions: response.agentSession
+        ? {
+            ...current.agentSessions,
+            [targetId]: response.agentSession
+          }
+        : current.agentSessions,
+      playerState: response.playerState ?? current.playerState
     }));
   };
 
@@ -310,12 +356,15 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
       setLoadingConversationId(conversation.id);
 
       try {
-        const response = await postJson<{ content?: string; error?: string }>("/api/investigate", {
+        const response = await postJson<InvestigationResponse>("/api/investigate", {
           targetId: routed.targetId,
           message,
           history: conversation.messages,
-          playerState: nextPlayerState
+          playerState: nextPlayerState,
+          agentSession: agentSessions[routed.targetId]
         });
+
+        mergeInvestigationPatch(routed.targetId, response);
 
         appendMessages(conversation.id, [
           {
@@ -324,6 +373,15 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
             content: response.error ?? response.content ?? "没有得到有效回复。"
           }
         ]);
+        if (response.actGate?.unlockNarratives.length) {
+          appendMessages("general", [
+            {
+              id: makeId("act"),
+              role: "assistant",
+              content: response.actGate.unlockNarratives.join("\n")
+            }
+          ]);
+        }
       } catch (error) {
         appendMessages(conversation.id, [
           {
@@ -361,17 +419,20 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
       <header className="case-topbar">
         <div>
           <p className="case-eyebrow">New Novels</p>
-          <h1>钟楼下的锤击案</h1>
+          <h1>{caseTitle}</h1>
         </div>
         <div className="case-actions" aria-label="案件操作">
           {!notebookVisible ? (
-            <button
-              type="button"
-              className="utility-button"
-              onClick={() => setResetOpen(true)}
-            >
-              重新开始
-            </button>
+            <>
+              <CaseImportPanel />
+              <button
+                type="button"
+                className="utility-button"
+                onClick={() => setResetOpen(true)}
+              >
+                重新开始
+              </button>
+            </>
           ) : null}
         </div>
       </header>
@@ -410,6 +471,7 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
               key={conversation.id}
               title={conversation.title}
               subtitle={conversation.subtitle}
+              stateLabel={agentStateLabel(agentSessions[conversation.targetId]?.mood)}
               isExpanded={conversation.isExpanded}
               isLoading={loadingConversationId === conversation.id}
               messages={conversation.messages}
@@ -450,12 +512,32 @@ export default function InvestigationDesk({ storySlot }: InvestigationDeskProps)
         <NotebookDrawer
           isOpen={notebookVisible}
           notes={notes}
+          hypotheses={playerState.hypotheses}
+          knownContradictions={playerState.knownContradictionIds}
           activeTag={activeTag}
           onToggle={() => setNotebookOpen((current) => !current)}
           onFilterChange={setActiveTag}
           onUpdateNote={updateNote}
           onCreateNote={createNote}
           onDeleteNote={deleteNote}
+          onCreateHypothesis={(hypothesis) =>
+            setPlayState((current) => ({
+              ...current,
+              playerState: {
+                ...current.playerState,
+                hypotheses: [...new Set([...current.playerState.hypotheses, hypothesis])]
+              }
+            }))
+          }
+          onDeleteHypothesis={(hypothesis) =>
+            setPlayState((current) => ({
+              ...current,
+              playerState: {
+                ...current.playerState,
+                hypotheses: current.playerState.hypotheses.filter((item) => item !== hypothesis)
+              }
+            }))
+          }
         />
       </div>
       {resetOpen ? (

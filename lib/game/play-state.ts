@@ -1,5 +1,6 @@
 import type { ConversationMessage } from "../../components/ConversationModule";
 import type { NotebookNote, NoteFilter } from "../../components/NotebookDrawer";
+import type { AgentSession } from "../agent-runtime";
 import type { PlayerKnowledgeState } from "../case/schema";
 
 export const PLAY_STATE_VERSION = 1;
@@ -28,6 +29,7 @@ export type LocalPlayState = {
   version: number;
   currentChapterId: string;
   conversations: Conversation[];
+  agentSessions: Record<string, AgentSession>;
   notes: NotebookNote[];
   playerState: PlayerKnowledgeState;
   ui: {
@@ -45,6 +47,7 @@ export const initialPlayerState: PlayerKnowledgeState = {
   discoveredFactIds: [],
   heardTestimonyIds: [],
   knownContradictionIds: [],
+  sceneInteractionIds: [],
   confrontedAgentIds: [],
   askedTopics: [],
   hypotheses: []
@@ -105,6 +108,7 @@ export function createInitialPlayState(): LocalPlayState {
     version: PLAY_STATE_VERSION,
     currentChapterId: "chapter-1",
     conversations: initialConversations,
+    agentSessions: {},
     notes: [],
     playerState: initialPlayerState,
     ui: {
@@ -157,6 +161,49 @@ function normalizeNotes(value: unknown): NotebookNote[] {
   }));
 }
 
+function normalizeAgentSessions(value: unknown): Record<string, AgentSession> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const sessions: Record<string, AgentSession> = {};
+  for (const [key, session] of Object.entries(value)) {
+    if (!isRecord(session)) {
+      continue;
+    }
+
+    const mood =
+      session.mood === "guarded" || session.mood === "cornered" || session.mood === "calm"
+        ? session.mood
+        : "calm";
+
+    sessions[key] = {
+      caseId: typeof session.caseId === "string" ? session.caseId : "",
+      agentId: typeof session.agentId === "string" ? session.agentId : key,
+      conversationId:
+        typeof session.conversationId === "string" ? session.conversationId : key,
+      pressureLevel:
+        typeof session.pressureLevel === "number" ? session.pressureLevel : 0,
+      revealedFactIds: Array.isArray(session.revealedFactIds)
+        ? session.revealedFactIds.filter((id): id is string => typeof id === "string")
+        : [],
+      lastTopics: Array.isArray(session.lastTopics)
+        ? session.lastTopics.filter((topic): topic is string => typeof topic === "string")
+        : [],
+      triggeredPressureRules: Array.isArray(session.triggeredPressureRules)
+        ? session.triggeredPressureRules.filter((rule): rule is string => typeof rule === "string")
+        : [],
+      currentActAgentState:
+        typeof session.currentActAgentState === "string"
+          ? session.currentActAgentState
+          : mood,
+      mood
+    };
+  }
+
+  return sessions;
+}
+
 export function normalizePlayState(value: unknown): LocalPlayState {
   const initial = createInitialPlayState();
   const parsed = parseUnknown(value);
@@ -176,6 +223,7 @@ export function normalizePlayState(value: unknown): LocalPlayState {
     conversations: Array.isArray(parsed.conversations)
       ? (parsed.conversations as Conversation[])
       : initial.conversations,
+    agentSessions: normalizeAgentSessions(parsed.agentSessions),
     notes: normalizeNotes(parsed.notes),
     playerState: isRecord(parsed.playerState)
       ? ({ ...initial.playerState, ...parsed.playerState } as PlayerKnowledgeState)

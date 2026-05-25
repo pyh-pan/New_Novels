@@ -79,6 +79,45 @@ describe("case schema", () => {
     ).toThrow();
   });
 
+  it("rejects pressure rules that reference unknown contradictions", () => {
+    const wilfred = hammerOfGodCase.agents.find((agent) => agent.id === "wilfred");
+    if (!wilfred) {
+      throw new Error("Expected wilfred agent");
+    }
+
+    const result = caseSchema.safeParse({
+      ...hammerOfGodCase,
+      agents: hammerOfGodCase.agents.map((agent) =>
+        agent.id === "wilfred"
+          ? {
+              ...wilfred,
+              pressureProfile: {
+                ...wilfred.pressureProfile,
+                increaseRules: wilfred.pressureProfile.increaseRules.map((rule, index) =>
+                  index === 0
+                    ? { ...rule, contradictionIds: ["missing-contradiction"] }
+                    : rule
+                )
+              }
+            }
+          : agent
+      )
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return;
+    }
+
+    expect(result.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: "Pressure rule contradiction references must match contradiction ids"
+        })
+      ])
+    );
+  });
+
   it("rejects duplicate clue ids", () => {
     expect(() =>
       caseSchema.parse({

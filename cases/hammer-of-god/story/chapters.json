@@ -1,0 +1,27 @@
+[
+  {
+    "id": "chapter-1",
+    "title": "钟楼下的锤击案",
+    "subtitle": "第一章 案发现场",
+    "availableFromStart": true,
+    "nextChapterId": "chapter-2",
+    "body": "story/chapter-1.md"
+  },
+  {
+    "id": "chapter-2",
+    "title": "钟楼下的锤击案",
+    "subtitle": "第二章 证词的阴影",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-1",
+    "nextChapterId": "chapter-3",
+    "body": "story/chapter-2.md"
+  },
+  {
+    "id": "chapter-3",
+    "title": "钟楼下的锤击案",
+    "subtitle": "第三章 钟楼的阴影",
+    "availableFromStart": false,
+    "previousChapterId": "chapter-2",
+    "body": "story/chapter-3.md"
+  }
+]

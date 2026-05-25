@@ -22,6 +22,7 @@ describe("buildAgentPrompt", () => {
     }
 
     const messages = buildAgentPrompt({
+      caseTitle: hammerOfGodCase.title,
       globalContext: hammerOfGodCase.globalContext,
       agent: general,
       playerState: {
@@ -47,6 +48,7 @@ describe("buildAgentPrompt", () => {
     }
 
     const messages = buildAgentPrompt({
+      caseTitle: hammerOfGodCase.title,
       globalContext: hammerOfGodCase.globalContext,
       agent: wilfred,
       playerState: emptyPlayerState,

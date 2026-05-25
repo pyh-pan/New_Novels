@@ -1,0 +1,16 @@
+[
+  {
+    "fromAgentId": "simeon",
+    "toAgentId": "elizabeth",
+    "factId": "fact-simeon-jealous",
+    "condition": {
+      "requiresAllClues": [],
+      "requiresAnyClues": [
+        "small-hammer"
+      ],
+      "requiresFacts": [],
+      "requiresContradictions": []
+    },
+    "mode": "rumor"
+  }
+]

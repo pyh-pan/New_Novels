@@ -1,0 +1,18 @@
+[
+  {
+    "id": "contradiction-hammer-force",
+    "title": "小锤重量与伤势力度矛盾",
+    "factIds": [
+      "fact-small-hammer-weight",
+      "fact-tower-overlooks-scene"
+    ],
+    "clueIds": [
+      "small-hammer",
+      "tower-height"
+    ],
+    "agentIds": [
+      "general",
+      "simeon"
+    ]
+  }
+]

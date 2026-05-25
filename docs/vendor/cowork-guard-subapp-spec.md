@@ -509,7 +509,7 @@ new pg.Pool({ host, port, user, password, database })   // ✅
 2. **设计 PG 表**：`id` 用 `UUID`（`pgcrypto`）或 `BIGSERIAL`，**不复用** JSON 数组下标当 id；时间戳 `TIMESTAMPTZ DEFAULT now()`；嵌套复杂用 `JSONB`；多对多拆联接表
 3. **读整文件 → SQL 查询**：`users.find(u => u.id === id)` → `SELECT * FROM users WHERE id = $1`
 4. **整文件覆盖 → UPDATE / INSERT**：多步操作用事务
-5. **`localStorage` 当业务存储反模式**：业务数据改 `POST /api/...` 进 DB；前端只在 localStorage 留**端侧偏好**（主题、最近输入草稿等纯本机 UI 状态）
+5. **`localStorage` 当业务存储反模式**：业务数据改 `POST /api/...` 进 DB；前端只在 localStorage 留**端侧偏好**（主题、输入草稿等纯本机 UI 状态）
 6. **用户上传 / 下载**：Pod 文件系统临时，**严禁**写本地盘（`uploads/` / `media/` / `public/uploads/` / `/var/...` 都不行）。**走 PostgreSQL Large Object**（PG 内置功能，不是扩展），不分大小、不用 BYTEA。元数据（文件名、大小、mime、sha256、上传人、上传时间）建独立列。处理过程允许**单次请求内**用 `/tmp/upload-xxx` 临时缓冲，**响应返回前**必须落库 + 删 `/tmp`。❌ 不引入对象存储 SDK（S3 / OSS / COS / Cloudinary）—— 平台只注入 `db.properties` / `ai.properties` 两套凭据，其它必 401。❌ 不用 `BYTEA` 列，保持模式统一
 7. **删除迁移残留**：移除 `lowdb` / `tinydb` / `nedb` / `better-sqlite3` 等依赖；删原 `data/*.json` / `db.json`（但**先看是不是 seed**：业务上线后用户改的算 runtime 数据直接删，随代码发布的"开箱即用"内容算 seed 迁 PG 再删）；移除"文件不存在就创建空文件"初始化；移除自写文件锁（`proper-lockfile` / `flock`）
 8. **目录引用清理**：grep `data/` / `db/` / `storage/` / `uploads/` 路径常量

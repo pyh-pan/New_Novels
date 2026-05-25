@@ -1,0 +1,177 @@
+[
+  {
+    "id": "fact-body-on-road",
+    "text": "尸体位于铁匠铺外的石路上。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "尸体",
+      "石路",
+      "现场"
+    ]
+  },
+  {
+    "id": "fact-small-hammer-weight",
+    "text": "小锤很轻，和尸体头部的严重伤势不相称。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "simeon"
+    ],
+    "relatedClueIds": [
+      "small-hammer"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "小锤",
+      "伤口",
+      "重量"
+    ]
+  },
+  {
+    "id": "fact-blood-near-head",
+    "text": "血迹集中在尸体头部附近，现场没有明显拖拽痕迹。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "血迹",
+      "拖拽",
+      "尸体"
+    ]
+  },
+  {
+    "id": "fact-tower-overlooks-scene",
+    "text": "教堂钟楼可以俯视铁匠铺外的位置。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "wilfred",
+      "joe"
+    ],
+    "relatedClueIds": [
+      "tower-height"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "钟楼",
+      "高度",
+      "位置"
+    ]
+  },
+  {
+    "id": "fact-wilfred-denies-tower",
+    "text": "威尔弗里德说自己没有上钟楼，只在下面祈祷。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "wilfred",
+      "general"
+    ],
+    "relatedClueIds": [
+      "wilfred-denial"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "威尔弗里德",
+      "牧师",
+      "钟楼",
+      "祈祷"
+    ]
+  },
+  {
+    "id": "fact-wilfred-nervous-about-tower",
+    "text": "威尔弗里德对钟楼话题会明显紧张，但仍不会直接承认上过钟楼。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "wilfred"
+    ],
+    "relatedClueIds": [
+      "tower-height",
+      "wilfred-denial"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "威尔弗里德",
+      "钟楼",
+      "紧张"
+    ]
+  },
+  {
+    "id": "fact-simeon-jealous",
+    "text": "诺曼曾纠缠伊丽莎白，这让西米恩愤怒。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "simeon",
+      "elizabeth"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "诺曼",
+      "伊丽莎白",
+      "西米恩",
+      "嫉妒"
+    ]
+  },
+  {
+    "id": "fact-joe-saw-tower-shadow",
+    "text": "疯乔看到钟楼方向有人影，那个人影像牧师。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "joe"
+    ],
+    "relatedClueIds": [
+      "tower-height"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "疯乔",
+      "钟楼",
+      "人影",
+      "牧师"
+    ]
+  },
+  {
+    "id": "truth-wilfred-method",
+    "text": "威尔弗里德从钟楼高处让小锤坠落，利用高度和重力制造重击。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "wilfred"
+    ],
+    "relatedClueIds": [
+      "small-hammer",
+      "tower-height",
+      "wilfred-denial"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "威尔弗里德",
+      "钟楼",
+      "小锤",
+      "高处坠落"
+    ]
+  },
+  {
+    "id": "truth-wilfred-motive",
+    "text": "威尔弗里德以宗教狂热和道德审判感为自己开脱。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "wilfred"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "威尔弗里德",
+      "宗教",
+      "动机",
+      "审判"
+    ]
+  }
+]

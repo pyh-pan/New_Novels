@@ -13,6 +13,7 @@ describe("play state persistence", () => {
     expect(state.version).toBe(1);
     expect(state.currentChapterId).toBe("chapter-1");
     expect(state.conversations[0]?.targetId).toBe("general");
+    expect(state.agentSessions).toEqual({});
     expect(state.notes).toEqual([]);
     expect(state.ui.activeNotebookFilter).toBe("all");
     expect(PLAY_STATE_STORAGE_KEY).toBe("new-novels.play-state.v1");
@@ -22,6 +23,19 @@ describe("play state persistence", () => {
     const normalized = normalizePlayState({
       version: 1,
       currentChapterId: "chapter-2",
+      agentSessions: {
+        wilfred: {
+          caseId: "hammer-of-god",
+          agentId: "wilfred",
+          conversationId: "wilfred",
+          pressureLevel: 3,
+          revealedFactIds: ["fact-wilfred-denies-tower"],
+          lastTopics: ["钟楼"],
+          triggeredPressureRules: ["wilfred-tower-contradiction"],
+          currentActAgentState: "guarded",
+          mood: "guarded"
+        }
+      },
       notes: [
         {
           id: "note-1",
@@ -35,6 +49,8 @@ describe("play state persistence", () => {
     });
 
     expect(normalized.currentChapterId).toBe("chapter-2");
+    expect(normalized.agentSessions.wilfred?.pressureLevel).toBe(3);
+    expect(normalized.agentSessions.wilfred?.mood).toBe("guarded");
     expect(normalized.notes[0]).toMatchObject({
       id: "note-1",
       title: "旧笔记",

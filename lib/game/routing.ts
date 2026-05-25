@@ -1,8 +1,7 @@
-import { createAgentRuntime } from "../agent-runtime";
-import { hammerOfGodCase } from "../case/hammer-of-god";
+import { getDefaultRuntime } from "../case/default-case";
 import type { ConversationTarget, RoutedMessage } from "./types";
 
-const runtime = createAgentRuntime(hammerOfGodCase);
+const runtime = getDefaultRuntime();
 
 export const routeableTargets: ConversationTarget[] = [
   "general",

@@ -4,22 +4,28 @@ import { useEffect, useRef, useState } from "react";
 import {
   getChapterById,
   getNextChapter,
-  getPreviousChapter
+  getPreviousChapter,
+  type StoryChapter
 } from "../lib/game/story";
 import { prepareChapterLayout } from "../lib/reading/pretext-layout";
 
 type StoryReaderProps = {
+  sourceTitle: string;
+  chapters: StoryChapter[];
   currentChapterId: string;
   onChapterChange: (chapterId: string) => void;
 };
 
 export default function StoryReader({
+  sourceTitle,
+  chapters,
   currentChapterId,
   onChapterChange
 }: StoryReaderProps) {
-  const chapter = getChapterById(currentChapterId) ?? getChapterById("chapter-1");
-  const previous = chapter ? getPreviousChapter(chapter.id) : undefined;
-  const next = chapter ? getNextChapter(chapter.id) : undefined;
+  const chapter =
+    getChapterById(chapters, currentChapterId) ?? getChapterById(chapters, "chapter-1");
+  const previous = chapter ? getPreviousChapter(chapters, chapter.id) : undefined;
+  const next = chapter ? getNextChapter(chapters, chapter.id) : undefined;
   const [navVisible, setNavVisible] = useState(false);
   const [layoutMeta, setLayoutMeta] = useState(() => ({
     lineCount: chapter?.body.length ?? 0,
@@ -87,7 +93,7 @@ export default function StoryReader({
       ) : null}
 
       <div className="story-header">
-        <p className="story-source">The Hammer of God</p>
+        <p className="story-source">{sourceTitle}</p>
         <h1 id="case-title">{chapter.title}</h1>
         {chapter.subtitle ? <p className="story-chapter">{chapter.subtitle}</p> : null}
       </div>
