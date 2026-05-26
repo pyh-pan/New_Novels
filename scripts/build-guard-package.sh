@@ -2,16 +2,14 @@
 set -eu
 
 ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-OUTPUT_DIR="${OUTPUT_DIR:-$ROOT_DIR/dist}"
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/new-novels-guard.XXXXXX")"
-COPY_DIR="$WORK_DIR/New_Novels"
+PROJECT_NAME="$(basename "$ROOT_DIR")"
+PARENT_DIR="$(dirname "$ROOT_DIR")"
+OUTPUT_DIR="${OUTPUT_DIR:-$PARENT_DIR}"
+COPY_DIR="${COPY_DIR:-$OUTPUT_DIR/${PROJECT_NAME}-guard}"
 
-cleanup() {
-  rm -rf "$WORK_DIR"
-}
-trap cleanup EXIT
-
-mkdir -p "$OUTPUT_DIR" "$COPY_DIR"
+mkdir -p "$OUTPUT_DIR"
+rm -rf "$COPY_DIR"
+mkdir -p "$COPY_DIR"
 
 echo "[guard-package] copy source"
 tar \
@@ -53,6 +51,9 @@ NODE
 
 echo "[guard-package] zip"
 ZIP_PATH="$OUTPUT_DIR/new-novels-guard.zip"
+if [ "$OUTPUT_DIR" = "$PARENT_DIR" ]; then
+  ZIP_PATH="$OUTPUT_DIR/${PROJECT_NAME}-guard.zip"
+fi
 rm -f "$ZIP_PATH"
 zip -qr "$ZIP_PATH" . \
   -x "node_modules/*" \
