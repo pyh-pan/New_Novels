@@ -601,6 +601,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - `/health`
 - `/api/healthz`
 - Next standalone 配置。
+- 生产构建固定为 `next build --webpack`，避免 Turbopack 产物在 CoWork / Guard 前缀注入环境下无法完成客户端 hydration。
 - 平台 AI API 适配：
   - 读取 `ai.properties` 或 `APP_AI_*`。
   - 调用 Runway Bedrock InvokeModel。

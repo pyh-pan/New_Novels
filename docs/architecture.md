@@ -198,6 +198,8 @@ Studio 审阅工作台按原文画像、改写分段、故事章节、角色、�
 应用配置为 Next standalone 输出：
 
 - `next.config.mjs` 使用 `output: "standalone"` 和 `compress: false`。
+- 生产构建使用 `next build --webpack`。CoWork / Guard 当前的前缀注入补丁按 webpack runtime public path 机制工作；Turbopack 产物在 `/s/<app_id>` 前缀下会留下 SSR 静态壳但无法完成客户端 hydration。
+- `app/layout.tsx` 导出 `dynamic = "force-dynamic"` 和 `revalidate = 0`，避免 App Router 在平台环境里缓存静态 shell。
 - `install.sh` 只在缺少 standalone 产物时安装运行时依赖；它不执行构建。
 - `start.sh` 期待 `.next/standalone/server.js`，将生成的 `HOSTNAME` / `PORT` 引用改写为 `APP_HOSTNAME` / `APP_PORT`，并以 `exec node .next/standalone/server.js` 结束。
 - `health.sh` 检查 `http://127.0.0.1:3000/health`。
