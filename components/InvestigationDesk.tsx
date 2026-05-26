@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ChangeEvent,
   FormEvent,
   KeyboardEvent,
   ReactNode,
@@ -9,14 +10,17 @@ import {
   useRef,
   useState
 } from "react";
-import CaseImportPanel from "./CaseImportPanel";
 import ConfirmDialog from "./ConfirmDialog";
 import ConversationModule, { type ConversationMessage } from "./ConversationModule";
 import NotebookDrawer, {
   type NotebookNote,
   type NoteTag
 } from "./NotebookDrawer";
-import type { PlayerKnowledgeState } from "../lib/case/schema";
+import {
+  SelectionAnnotationPreview,
+  type SelectionCommentPayload
+} from "./SelectionCommentPopover";
+import type { CaseAgent, PlayerKnowledgeState } from "../lib/case/schema";
 import { makeId } from "../lib/game/ids";
 import {
   createInitialPlayState,
@@ -27,11 +31,6 @@ import {
   type LocalPlayState,
   type MobileTab
 } from "../lib/game/play-state";
-
-type RoutedMessage = {
-  targetId: ConversationTarget;
-  label: string;
-};
 
 type InvestigationResponse = {
   content?: string;
@@ -46,15 +45,16 @@ type InvestigationResponse = {
 };
 
 interface InvestigationDeskProps {
+  caseId?: string;
   caseTitle?: string;
+  agents?: Pick<CaseAgent, "id" | "name" | "role" | "type">[];
+  entryChapterId?: string;
   storySlot: (props: {
     currentChapterId: string;
     onChapterChange: (chapterId: string) => void;
+    onCommentSelection: (payload: SelectionCommentPayload) => void;
   }) => ReactNode;
 }
-
-const unsupportedTargetMessage =
-  "这个对象还没有配置为可询问角色。";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const response = await fetch(url, {
@@ -87,13 +87,62 @@ function agentStateLabel(mood?: "calm" | "guarded" | "cornered") {
   return undefined;
 }
 
+type MentionRange = {
+  start: number;
+  end: number;
+  query: string;
+};
+
+function getMentionRange(value: string, cursor: number): MentionRange | null {
+  const beforeCursor = value.slice(0, cursor);
+  const atIndex = beforeCursor.lastIndexOf("@");
+
+  if (atIndex < 0) {
+    return null;
+  }
+
+  const prefix = atIndex === 0 ? "" : value[atIndex - 1];
+  if (prefix && !/\s/.test(prefix)) {
+    return null;
+  }
+
+  const query = beforeCursor.slice(atIndex + 1);
+  if (/\s/.test(query)) {
+    return null;
+  }
+
+  return {
+    start: atIndex,
+    end: cursor,
+    query
+  };
+}
+
+function stripMention(message: string, agentName: string) {
+  return message
+    .replace(`@${agentName}`, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default function InvestigationDesk({
-  caseTitle = "钟楼下的锤击案",
+  caseId,
+  caseTitle = "猎人小屋疑案",
+  agents,
+  entryChapterId,
   storySlot
 }: InvestigationDeskProps) {
-  const [playState, setPlayState] = useState<LocalPlayState>(() => createInitialPlayState());
+  const initialPlayStateOptions = useMemo(
+    () => ({ caseId, entryChapterId, agents }),
+    [agents, caseId, entryChapterId]
+  );
+  const [playState, setPlayState] = useState<LocalPlayState>(() =>
+    createInitialPlayState(initialPlayStateOptions)
+  );
   const [hasHydratedStorage, setHasHydratedStorage] = useState(false);
   const [draft, setDraft] = useState("");
+  const [mentionRange, setMentionRange] = useState<MentionRange | null>(null);
+  const [mentionIndex, setMentionIndex] = useState(0);
   const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [excerptNotice, setExcerptNotice] = useState<string | null>(null);
@@ -115,9 +164,14 @@ export default function InvestigationDesk({
       return;
     }
 
-    setPlayState(normalizePlayState(window.localStorage.getItem(PLAY_STATE_STORAGE_KEY)));
+    setPlayState(
+      normalizePlayState(
+        window.localStorage.getItem(PLAY_STATE_STORAGE_KEY),
+        initialPlayStateOptions
+      )
+    );
     setHasHydratedStorage(true);
-  }, []);
+  }, [initialPlayStateOptions]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !hasHydratedStorage) {
@@ -130,6 +184,44 @@ export default function InvestigationDesk({
   const conversationByTarget = useMemo(() => {
     return new Map(conversations.map((conversation) => [conversation.targetId, conversation]));
   }, [conversations]);
+
+  const mentionOptions = useMemo(
+    () =>
+      conversations.map((conversation) => ({
+        id: conversation.targetId,
+        name: conversation.title
+      })),
+    [conversations]
+  );
+
+  const visibleMentionOptions = useMemo(() => {
+    if (!mentionRange) {
+      return [];
+    }
+
+    const query = mentionRange.query.trim().toLocaleLowerCase();
+    return mentionOptions.filter((option) =>
+      query ? option.name.toLocaleLowerCase().includes(query) : true
+    );
+  }, [mentionOptions, mentionRange]);
+
+  const resolvedDraftTarget = useMemo(() => {
+    const message = draft.trim();
+    const sortedOptions = [...mentionOptions].sort((left, right) => right.name.length - left.name.length);
+    const matched = sortedOptions.find((option) => message.includes(`@${option.name}`));
+
+    if (!matched) {
+      return {
+        targetId: "general" as ConversationTarget,
+        message
+      };
+    }
+
+    return {
+      targetId: matched.id,
+      message: stripMention(message, matched.name) || message
+    };
+  }, [draft, mentionOptions]);
 
   const toggleConversation = (id: string) => {
     setPlayState((current) => ({
@@ -216,28 +308,28 @@ export default function InvestigationDesk({
       window.localStorage.removeItem(PLAY_STATE_STORAGE_KEY);
     }
 
-    setPlayState(createInitialPlayState());
+    setPlayState(createInitialPlayState(initialPlayStateOptions));
     setDraft("");
     setResetOpen(false);
   };
 
-  const saveExcerpt = (content: string, source: string) => {
+  const saveSelectionComment = ({ quote, comment, source }: SelectionCommentPayload) => {
     const now = new Date().toISOString();
     setNotes((current) => [
       {
         id: makeId("note"),
-        title: `摘录 ${current.length + 1}`,
-        text: content,
-        tag: "clue" satisfies NoteTag,
+        title: `批注 ${current.length + 1}`,
+        text: comment,
+        tag: "comment" satisfies NoteTag,
         source,
+        quote,
         createdAt: now,
         updatedAt: now
       },
       ...current
     ]);
-    setActiveTag("clue");
-    setNotebookOpen(true);
-    setExcerptNotice("已加入侦探笔记。");
+    setActiveTag("all");
+    setExcerptNotice("批注已同步到侦探笔记。");
     window.setTimeout(() => setExcerptNotice(null), 1800);
   };
 
@@ -261,7 +353,7 @@ export default function InvestigationDesk({
         id: makeId("note"),
         title: "新笔记",
         text: "",
-        tag: "clue",
+        tag: "comment",
         source: "手动记录",
         createdAt: now,
         updatedAt: now
@@ -290,110 +382,68 @@ export default function InvestigationDesk({
     );
   };
 
-  const appendUnsupportedToGeneral = (message: string) => {
-    const userMessage: ConversationMessage = {
-      id: makeId("user"),
-      role: "user",
-      content: message
-    };
-    const assistantMessage: ConversationMessage = {
-      id: makeId("assistant"),
-      role: "assistant",
-      content: unsupportedTargetMessage
-    };
-
-    appendMessages("general", [userMessage, assistantMessage]);
-  };
-
   const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const message = draft.trim();
+    const { targetId, message } = resolvedDraftTarget;
     if (!message || loadingConversationId || submitInFlightRef.current) {
+      return;
+    }
+
+    const conversation = conversationByTarget.get(targetId) ?? conversationByTarget.get("general");
+    if (!conversation) {
       return;
     }
 
     submitInFlightRef.current = true;
     setDraft("");
-    setLoadingConversationId("routing");
+    setMentionRange(null);
+    setMentionIndex(0);
+    setLoadingConversationId(conversation.id);
     const nextPlayerState: PlayerKnowledgeState = {
       ...playerState,
       askedTopics: [...playerState.askedTopics, message]
     };
     setPlayerState(nextPlayerState);
 
+    const userMessage: ConversationMessage = {
+      id: makeId("user"),
+      role: "user",
+      content: message
+    };
+
+    appendMessages(conversation.id, [userMessage]);
+
     try {
-      const routed = await postJson<RoutedMessage | { error: string }>("/api/route-message", {
-        message
+      const response = await postJson<InvestigationResponse>("/api/investigate", {
+        caseId,
+        targetId: conversation.targetId,
+        message,
+        history: conversation.messages,
+        playerState: nextPlayerState,
+        agentSession: agentSessions[conversation.targetId]
       });
 
-      if ("error" in routed) {
-        appendMessages("general", [
-          { id: makeId("user"), role: "user", content: message },
-          { id: makeId("assistant"), role: "assistant", content: routed.error }
-        ]);
-        return;
-      }
+      mergeInvestigationPatch(conversation.targetId, response);
 
-      if (routed.targetId === "unsupported") {
-        appendUnsupportedToGeneral(message);
-        return;
-      }
-
-      const conversation = conversationByTarget.get(routed.targetId);
-      if (!conversation) {
-        appendUnsupportedToGeneral(message);
-        return;
-      }
-
-      const userMessage: ConversationMessage = {
-        id: makeId("user"),
-        role: "user",
-        content: message
-      };
-
-      appendMessages(conversation.id, [userMessage]);
-      setLoadingConversationId(conversation.id);
-
-      try {
-        const response = await postJson<InvestigationResponse>("/api/investigate", {
-          targetId: routed.targetId,
-          message,
-          history: conversation.messages,
-          playerState: nextPlayerState,
-          agentSession: agentSessions[routed.targetId]
-        });
-
-        mergeInvestigationPatch(routed.targetId, response);
-
-        appendMessages(conversation.id, [
-          {
-            id: makeId("assistant"),
-            role: "assistant",
-            content: response.error ?? response.content ?? "没有得到有效回复。"
-          }
-        ]);
-        if (response.actGate?.unlockNarratives.length) {
-          appendMessages("general", [
-            {
-              id: makeId("act"),
-              role: "assistant",
-              content: response.actGate.unlockNarratives.join("\n")
-            }
-          ]);
+      appendMessages(conversation.id, [
+        {
+          id: makeId("assistant"),
+          role: "assistant",
+          content: response.error ?? response.content ?? "没有得到有效回复。"
         }
-      } catch (error) {
-        appendMessages(conversation.id, [
+      ]);
+      if (response.actGate?.unlockNarratives.length) {
+        appendMessages("general", [
           {
-            id: makeId("assistant"),
+            id: makeId("act"),
             role: "assistant",
-            content: getErrorMessage(error, "调查线路暂时不可用，请稍后再试。")
+            content: response.actGate.unlockNarratives.join("\n")
           }
         ]);
       }
     } catch (error) {
-      appendMessages("general", [
-        { id: makeId("user"), role: "user", content: message },
+      appendMessages(conversation.id, [
         {
           id: makeId("assistant"),
           role: "assistant",
@@ -406,7 +456,52 @@ export default function InvestigationDesk({
     }
   };
 
+  const updateDraft = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const nextDraft = event.target.value;
+    const cursor = event.target.selectionStart ?? nextDraft.length;
+    const nextMentionRange = getMentionRange(nextDraft, cursor);
+    setDraft(nextDraft);
+    setMentionRange(nextMentionRange);
+    setMentionIndex(0);
+  };
+
+  const insertMention = (option: { id: ConversationTarget; name: string }) => {
+    if (!mentionRange) {
+      return;
+    }
+
+    const nextDraft = `${draft.slice(0, mentionRange.start)}@${option.name} ${draft.slice(mentionRange.end)}`;
+    setDraft(nextDraft);
+    setMentionRange(null);
+    setMentionIndex(0);
+  };
+
   const submitOnShortcut = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (mentionRange && visibleMentionOptions.length > 0) {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setMentionIndex((current) => (current + 1) % visibleMentionOptions.length);
+        return;
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setMentionIndex(
+          (current) => (current - 1 + visibleMentionOptions.length) % visibleMentionOptions.length
+        );
+        return;
+      }
+      if (event.key === "Enter" && !event.metaKey && !event.ctrlKey && !event.shiftKey) {
+        event.preventDefault();
+        insertMention(visibleMentionOptions[mentionIndex] ?? visibleMentionOptions[0]);
+        return;
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMentionRange(null);
+        return;
+      }
+    }
+
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
       formRef.current?.requestSubmit();
@@ -415,24 +510,19 @@ export default function InvestigationDesk({
 
   return (
     <main className={`case-shell ${openClass}`}>
-      <h2 className="sr-only">New Novels</h2>
       <header className="case-topbar">
         <div>
-          <p className="case-eyebrow">New Novels</p>
           <h1>{caseTitle}</h1>
         </div>
         <div className="case-actions" aria-label="案件操作">
           {!notebookVisible ? (
-            <>
-              <CaseImportPanel />
-              <button
-                type="button"
-                className="utility-button"
-                onClick={() => setResetOpen(true)}
-              >
-                重新开始
-              </button>
-            </>
+            <button
+              type="button"
+              className="utility-button"
+              onClick={() => setResetOpen(true)}
+            >
+              重新开始
+            </button>
           ) : null}
         </div>
       </header>
@@ -444,7 +534,8 @@ export default function InvestigationDesk({
         {storySlot({
           currentChapterId: playState.currentChapterId,
           onChapterChange: (currentChapterId) =>
-            setPlayState((current) => ({ ...current, currentChapterId }))
+            setPlayState((current) => ({ ...current, currentChapterId })),
+          onCommentSelection: saveSelectionComment
         })}
       </div>
 
@@ -455,13 +546,7 @@ export default function InvestigationDesk({
         aria-labelledby="desk-title"
       >
         <div className="desk-header">
-          <div>
-            <p className="desk-kicker">Agent investigation</p>
-            <h2 id="desk-title">调查台</h2>
-          </div>
-          <p className="desk-status" aria-live="polite">
-            {loadingConversationId ? "思考中" : "待提问"}
-          </p>
+          <h2 id="desk-title">调查台</h2>
         </div>
 
         <div className="conversation-stack">
@@ -476,7 +561,7 @@ export default function InvestigationDesk({
               isLoading={loadingConversationId === conversation.id}
               messages={conversation.messages}
               onToggle={() => toggleConversation(conversation.id)}
-              onSaveExcerpt={(content) => saveExcerpt(content, conversation.title)}
+              onCommentSelection={saveSelectionComment}
             />
           ))}
         </div>
@@ -484,17 +569,35 @@ export default function InvestigationDesk({
         {excerptNotice ? <p className="excerpt-notice">{excerptNotice}</p> : null}
 
         <form ref={formRef} className="global-input" onSubmit={submitMessage}>
-          <div className="composer-heading">
-            <label htmlFor="investigation-message">新的调查问题</label>
-            <span>⌘ Enter 发送</span>
-          </div>
+          <label className="sr-only" htmlFor="investigation-message">
+            调查问题
+          </label>
           <div className="input-row">
+            {mentionRange && visibleMentionOptions.length > 0 ? (
+              <div className="mention-menu" role="listbox" aria-label="选择对话角色">
+                {visibleMentionOptions.map((option, index) => (
+                  <button
+                    type="button"
+                    key={option.id}
+                    role="option"
+                    aria-selected={index === mentionIndex}
+                    className={index === mentionIndex ? "is-active" : ""}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      insertMention(option);
+                    }}
+                  >
+                    {option.name}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <textarea
               id="investigation-message"
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={updateDraft}
               onKeyDown={submitOnShortcut}
-              placeholder="直接问：锤子和伤口有什么矛盾？威尔弗里德当时在哪里？"
+              placeholder="提问，或 @角色"
               rows={3}
             />
             <button type="submit" disabled={!draft.trim() || Boolean(loadingConversationId)}>
@@ -512,32 +615,13 @@ export default function InvestigationDesk({
         <NotebookDrawer
           isOpen={notebookVisible}
           notes={notes}
-          hypotheses={playerState.hypotheses}
-          knownContradictions={playerState.knownContradictionIds}
           activeTag={activeTag}
           onToggle={() => setNotebookOpen((current) => !current)}
           onFilterChange={setActiveTag}
           onUpdateNote={updateNote}
           onCreateNote={createNote}
           onDeleteNote={deleteNote}
-          onCreateHypothesis={(hypothesis) =>
-            setPlayState((current) => ({
-              ...current,
-              playerState: {
-                ...current.playerState,
-                hypotheses: [...new Set([...current.playerState.hypotheses, hypothesis])]
-              }
-            }))
-          }
-          onDeleteHypothesis={(hypothesis) =>
-            setPlayState((current) => ({
-              ...current,
-              playerState: {
-                ...current.playerState,
-                hypotheses: current.playerState.hypotheses.filter((item) => item !== hypothesis)
-              }
-            }))
-          }
+          accusationHref={caseId ? `/cases/${caseId}/accuse` : "/accuse"}
         />
       </div>
       {resetOpen ? (
@@ -549,6 +633,7 @@ export default function InvestigationDesk({
           onConfirm={resetPlayState}
         />
       ) : null}
+      <SelectionAnnotationPreview />
       <nav className="mobile-tabbar" role="tablist" aria-label="移动端工作区">
         <button
           type="button"

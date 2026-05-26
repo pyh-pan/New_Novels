@@ -78,3 +78,22 @@ test("deletes notes only after confirmation", () => {
   fireEvent.click(screen.getByRole("button", { name: "确认删除" }));
   expect(view.handlers.onDeleteNote).toHaveBeenCalledWith("note-1");
 });
+
+test("renders quoted source text as a collapsible reference", () => {
+  renderNotebook([
+    {
+      id: "note-quote",
+      title: "阅读批注",
+      text: "这里可能是时间线的关键。",
+      tag: "comment",
+      source: "第一章",
+      quote: "黑斯廷斯在病榻上收到请托。",
+      createdAt: "2026-04-29T00:00:00.000Z",
+      updatedAt: "2026-04-29T00:00:00.000Z"
+    }
+  ]);
+
+  expect(screen.getByDisplayValue("这里可能是时间线的关键。")).toBeInTheDocument();
+  expect(screen.getByText("查看引用")).toBeInTheDocument();
+  expect(screen.getByText("黑斯廷斯在病榻上收到请托。")).toBeInTheDocument();
+});

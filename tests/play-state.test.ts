@@ -11,17 +11,56 @@ describe("play state persistence", () => {
     const state = createInitialPlayState();
 
     expect(state.version).toBe(1);
+    expect(state.caseId).toBe("hunters-lodge");
     expect(state.currentChapterId).toBe("chapter-1");
     expect(state.conversations[0]?.targetId).toBe("general");
+    expect(state.conversations[0]?.messages).toEqual([]);
     expect(state.agentSessions).toEqual({});
     expect(state.notes).toEqual([]);
     expect(state.ui.activeNotebookFilter).toBe("all");
     expect(PLAY_STATE_STORAGE_KEY).toBe("new-novels.play-state.v1");
   });
 
+  test("removes the legacy general opening message from saved conversations", () => {
+    const normalized = normalizePlayState({
+      version: 1,
+      caseId: "hunters-lodge",
+      conversations: [
+        {
+          id: "general",
+          targetId: "general",
+          title: "调查助手",
+          isExpanded: true,
+          messages: [
+            {
+              id: "general-opening",
+              role: "assistant",
+              content:
+                "我会基于你已掌握的信息协助调查；如果问题更适合某位人物，我会把对话转到对应 NPC。"
+            },
+            {
+              id: "user-1",
+              role: "user",
+              content: "现场有什么异常？"
+            }
+          ]
+        }
+      ]
+    });
+
+    expect(normalized.conversations[0]?.messages).toEqual([
+      {
+        id: "user-1",
+        role: "user",
+        content: "现场有什么异常？"
+      }
+    ]);
+  });
+
   test("normalizes partial saved state without losing valid data", () => {
     const normalized = normalizePlayState({
       version: 1,
+      caseId: "hunters-lodge",
       currentChapterId: "chapter-2",
       agentSessions: {
         wilfred: {
@@ -73,7 +112,21 @@ describe("play state persistence", () => {
 
     expect(JSON.parse(serialized)).toMatchObject({
       version: 1,
+      caseId: "hunters-lodge",
       currentChapterId: "chapter-1"
     });
+  });
+
+  test("resets saved state when switching cases", () => {
+    const normalized = normalizePlayState({
+      version: 1,
+      caseId: "hammer-of-god",
+      currentChapterId: "chapter-2",
+      notes: [{ id: "old", title: "旧案", text: "正文", tag: "clue" }]
+    });
+
+    expect(normalized.caseId).toBe("hunters-lodge");
+    expect(normalized.currentChapterId).toBe("chapter-1");
+    expect(normalized.notes).toEqual([]);
   });
 });

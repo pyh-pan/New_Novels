@@ -1,278 +1,265 @@
-# General UX Iteration Design
+# 通用 UX 迭代设计
 
-Date: 2026-04-29
+日期：2026-04-29
 
-Status: Draft for user review
+状态：用户评审草案
 
-## Goal
+## 目标
 
-This iteration improves the current playable detective-fiction prototype without
-changing the core agent architecture. The goal is to make the prototype feel
-more like a usable reading-and-investigation product:
+本次迭代在不改变核心 agent 架构的前提下，优化当前可玩的推理小说原型。目标是让原型更像一个可用的“阅读 + 调查”产品：
 
-- preserve the desktop two-column experience;
-- make detective notes useful for repeated investigation;
-- persist player progress locally;
-- introduce a reset/restart flow with explicit confirmation;
-- upgrade the story pane into a Pretext-based chapter reader;
-- improve conversation ergonomics;
-- add a mobile experience based on three focused tabs.
+- 保留桌面端双栏体验；
+- 让侦探笔记适合重复调查；
+- 在本地持久化玩家进度；
+- 引入需要明确确认的重置 / 重新开始流程；
+- 将故事栏升级为基于 Pretext 的章节阅读器；
+- 改善对话人体工程学；
+- 增加基于三个聚焦标签的移动端体验。
 
-The iteration is intentionally split into small versions so each change can be
-reviewed, tested, and committed cleanly.
+迭代有意拆成小版本，使每个变化都能被清楚评审、测试和提交。
 
-## Confirmed Product Decisions
+## 已确认产品决策
 
-### Reading Model
+### 阅读模型
 
-The story area uses a chapter-based reading model.
+故事区使用基于章节的阅读模型。
 
-- One chapter is shown as one continuous scrollable reading page.
-- The app does not use page-number pagination for this stage.
-- The bottom of each chapter includes previous-chapter and next-chapter buttons.
-- During chapter reading, clicking the story area reveals a lightweight floating
-  chapter navigation control.
-- The floating navigation fades away automatically after a short delay.
-- First chapter disables previous-chapter navigation.
-- Last chapter disables next-chapter navigation, or may later expose the next
-  product step such as final accusation.
+- 一章显示为一个连续可滚动阅读页。
+- 本阶段不使用页码式分页。
+- 每章底部包含前一章和后一章按钮。
+- 阅读章节时，点击故事区域会显示轻量浮动章节导航。
+- 浮动导航会在短暂延迟后自动淡出。
+- 第一章禁用前一章导航。
+- 最后一章禁用后一章导航，或后续可以暴露最终指认等下一步产品动作。
 
-### Pretext Usage
+### Pretext 使用方式
 
-Pretext is introduced in V2, but it supports the chapter scrolling model rather
-than replacing it with pagination.
+Pretext 在 V2 引入，但它支持章节滚动模型，而不是用分页取代它。
 
-Pretext is used as the story reader's text layout foundation:
+Pretext 作为故事阅读器的文本布局基础：
 
-- prepare chapter text for stable layout;
-- measure and segment long-form text;
-- support future typography, line, and reading-progress enhancements;
-- reduce the chance of rewriting the story reader later.
+- 为稳定布局准备章节文本；
+- 测量和切分长文本；
+- 支持未来的排版、行距和阅读进度增强；
+- 降低后续重写故事阅读器的概率。
 
-The first Pretext integration should stay conservative:
+第一版 Pretext 集成应保持保守：
 
-- render normal readable DOM text;
-- use Pretext for layout preparation or measurement where practical;
-- fall back to plain paragraph rendering if Pretext fails or cannot measure;
-- avoid virtualized story pages in this version.
+- 渲染普通可读 DOM 文本；
+- 在可行处使用 Pretext 做布局准备或测量；
+- 如果 Pretext 失败或无法测量，回退到普通段落渲染；
+- 本版本避免虚拟化故事页。
 
-### Notebook Interaction
+### 笔记交互
 
-The detective notebook is opened from a small top-right button on the main page.
-When closed, it should not occupy a full sidebar rail.
+侦探笔记通过主页面右上角小按钮打开。关闭时不占用完整侧边栏轨道。
 
-Notebook behavior:
+笔记行为：
 
-- notes are filterable by tag;
-- tags include clue, testimony, doubt, and contradiction;
-- notes can be manually added and edited;
-- notes can be deleted only after confirmation;
-- notes sort newest first by default;
-- the system should not decide which notes are "important";
-- any future "important" or "pinned" state should be user-controlled;
-- final accusation entry stays at the bottom of the notebook.
+- 笔记可按标签筛选；
+- 标签包括 clue、testimony、doubt 和 contradiction；
+- 笔记可手动新增和编辑；
+- 删除笔记必须确认；
+- 默认按最新优先排序；
+- 系统不应判断哪些笔记“重要”；
+- 未来的“重要”或“置顶”状态也应由用户控制；
+- 最终指认入口停留在笔记底部。
 
-### Reset Interaction
+### 重置交互
 
-The app should provide a reset/restart entry near the top-right utility area,
-close to the notebook button.
+应用应在右上角工具区附近提供重置 / 重新开始入口，靠近笔记按钮。
 
-Reset behavior:
+重置行为：
 
-- reset always opens a custom confirmation modal;
-- accidental reset must be hard to trigger;
-- confirmed reset clears local play state;
-- cancelled reset preserves everything.
+- 重置始终打开自定义确认弹窗；
+- 应尽量避免误触；
+- 确认后清空本地游玩状态；
+- 取消后保留全部内容。
 
-### Persistence Scope
+### 持久化范围
 
-Local persistence should cover the complete first-version play state:
+本地持久化应覆盖第一版完整游玩状态：
 
-- current chapter;
-- conversation history;
-- expanded or active conversation module;
-- detective notes;
-- active notebook filter/search/sort where useful;
-- player knowledge state;
-- relevant UI state for the investigation desk.
+- 当前章节；
+- 对话历史；
+- 展开或激活的对话模块；
+- 侦探笔记；
+- 有价值时保存当前笔记筛选 / 搜索 / 排序；
+- 玩家已知状态；
+- 调查台相关 UI 状态。
 
-This is localStorage-based only. No account system or server-side save/resume is
-part of this iteration.
+本次迭代仅使用 localStorage，不包含账号系统或服务端存档 / 继续游玩。
 
-### Mobile Model
+### 移动端模型
 
-Desktop and mobile should have different layouts.
+桌面端和移动端应使用不同布局。
 
-Desktop remains:
+桌面端保持：
 
-- left: story reader;
-- right: investigation desk;
-- top-right: notebook drawer button.
+- 左侧：故事阅读器；
+- 右侧：调查台；
+- 右上角：笔记抽屉按钮。
 
-Mobile becomes a three-tab app:
+移动端变成三标签应用：
 
-- Story;
-- Investigation;
-- Notebook.
+- 故事；
+- 调查；
+- 笔记。
 
-All tabs share the same underlying play state.
+所有标签共享同一份底层游玩状态。
 
-## Version Plan
+## 版本计划
 
-### V0: Git Baseline
+### V0：Git 基线
 
-Initialize git before implementation so all future iterations can be reviewed
-and reverted safely.
+实现前初始化 git，确保未来所有迭代都可审查和安全回退。
 
-Tasks:
+任务：
 
-- run `git init` if the repository is not already initialized;
-- inspect the working tree;
-- create an initial baseline commit of the current prototype;
-- do not include local-only artifacts or secrets.
+- 如果仓库尚未初始化，运行 `git init`；
+- 检查工作区；
+- 为当前原型创建初始基线提交；
+- 不包含本地专属产物或密钥。
 
-Acceptance criteria:
+验收标准：
 
-- `git status` is clean after the baseline commit;
-- current prototype files are preserved exactly unless ignored intentionally.
+- 基线提交后 `git status` 干净；
+- 当前原型文件被完整保留，除非有意忽略。
 
-### V1: Notes, Persistence, and Reset
+### V1：笔记、持久化和重置
 
-Improve the investigation loop without touching the story reader architecture.
+在不触碰故事阅读器架构的情况下改善调查循环。
 
-Notebook tasks:
+笔记任务：
 
-- add manual note creation;
-- keep edit support for title, body, and tag;
-- add note deletion with confirmation;
-- sort notes newest first by default;
-- optionally preserve created/updated timestamps in note data;
-- keep tag filtering;
-- add a clear empty state for no notes and no matching filter results.
+- 增加手动新建笔记；
+- 保留标题、正文和标签编辑；
+- 增加带确认的笔记删除；
+- 默认按最新优先排序；
+- 可选地在笔记数据中保存创建 / 更新时间；
+- 保留标签筛选；
+- 为无笔记和无匹配筛选结果提供清晰空状态。
 
-Persistence tasks:
+持久化任务：
 
-- introduce a typed localStorage save shape;
-- persist conversations, notes, player state, current chapter, and key UI state;
-- hydrate safely on load;
-- tolerate missing or older saved fields;
-- avoid crashing on invalid saved JSON.
+- 引入类型化 localStorage 保存结构；
+- 持久化对话、笔记、玩家状态、当前章节和关键 UI 状态；
+- 加载时安全 hydrate；
+- 容忍缺失字段或旧版本字段；
+- 避免无效 JSON 导致崩溃。
 
-Reset tasks:
+重置任务：
 
-- add a small reset/restart utility button near the top-right area;
-- show a custom confirmation modal before clearing anything;
-- clear localStorage only after confirmation;
-- return the player to the initial chapter and initial investigation state.
+- 在右上角区域附近增加小型 reset / restart 工具按钮；
+- 清空任何内容前展示自定义确认弹窗；
+- 仅在确认后清空 localStorage；
+- 将玩家返回初始章节和初始调查状态。
 
-Acceptance criteria:
+验收标准：
 
-- reloading the browser preserves investigation state;
-- deleting a note cannot happen without confirmation;
-- reset cannot happen without confirmation;
-- reset returns the app to a clean initial state.
+- 浏览器刷新后保留调查状态；
+- 删除笔记必须确认；
+- 重置必须确认；
+- 重置后回到干净初始状态。
 
-### V2: Pretext Chapter Reader and Conversation Polish
+### V2：Pretext 章节阅读器与对话打磨
 
-Upgrade the reading surface and make the investigation desk feel more fluid.
+升级阅读界面，让调查台更流畅。
 
-Story reader tasks:
+故事阅读器任务：
 
-- convert story data from a single text block into an ordered chapter structure;
-- create or rename the story component into a chapter-oriented `StoryReader`;
-- integrate `@chenglou/pretext` as the story layout foundation;
-- render one chapter as a continuous scrollable reading page;
-- add bottom previous-chapter and next-chapter controls;
-- add click-to-reveal floating chapter navigation inside the story area;
-- auto-hide floating navigation after a short delay;
-- persist current chapter through localStorage;
-- provide a plain DOM fallback if Pretext layout fails.
+- 将故事数据从单一文本块改为有序章节结构；
+- 创建或重命名故事组件为面向章节的 `StoryReader`；
+- 将 `@chenglou/pretext` 集成为故事布局基础；
+- 将一章渲染为连续可滚动阅读页；
+- 增加底部前一章 / 后一章控件；
+- 在故事区域内增加点击显示的浮动章节导航；
+- 短延迟后自动隐藏浮动导航；
+- 通过 localStorage 持久化当前章节；
+- 如果 Pretext 布局失败，提供普通 DOM 回退。
 
-Conversation polish tasks:
+对话打磨任务：
 
-- keep one global input model;
-- keep routing behavior: general questions stay in the general module, NPC
-  questions route to the matching NPC module;
-- improve loading states so the active module clearly shows that an answer is
-  being generated;
-- improve message hierarchy and spacing;
-- add keyboard-friendly submit behavior;
-- keep excerpt-saving feedback lightweight and visible;
-- show clear error bubbles when an agent call fails.
+- 保持一个全局输入模型；
+- 保持路由行为：通用问题留在 general 模块，NPC 问题路由到匹配 NPC 模块；
+- 改善 loading 状态，使激活模块清楚显示正在生成回答；
+- 改善消息层级与间距；
+- 增加键盘友好的提交行为；
+- 保持摘录保存反馈轻量且可见；
+- agent 调用失败时显示清晰错误气泡。
 
-Notebook polish tasks:
+笔记打磨任务：
 
-- keep notes usable while story and conversation UI change;
-- ensure saved excerpts still create notes correctly;
-- preserve newest-first ordering;
-- preserve tag filtering.
+- 故事和对话 UI 变化时仍保持笔记可用；
+- 确保保存摘录仍能正确创建笔记；
+- 保留最新优先排序；
+- 保留标签筛选。
 
-Non-goals:
+非目标：
 
-- no multi-act dynamic story state;
-- no page-number pagination;
-- no conversation virtualization;
-- no server-side persistence;
-- no rich text authoring system.
+- 不做多幕动态故事状态；
+- 不做页码式分页；
+- 不做对话虚拟化；
+- 不做服务端持久化；
+- 不做富文本创作系统。
 
-Acceptance criteria:
+验收标准：
 
-- a full chapter reads naturally as a scrollable page;
-- chapter buttons work at the bottom of the chapter;
-- clicking the story area reveals temporary chapter navigation;
-- Pretext is present in the story reader path with a fallback;
-- investigation conversations still route and save excerpts correctly.
+- 完整章节可作为滚动页自然阅读；
+- 章节底部按钮可用；
+- 点击故事区域显示临时章节导航；
+- Pretext 出现在故事阅读路径中，并有回退；
+- 调查对话仍能路由并保存摘录。
 
-### V3: Mobile Bottom Tabs
+### V3：移动端底部标签
 
-Create a mobile-specific layout instead of squeezing the desktop two-column
-interface onto a small screen.
+创建移动端专属布局，而不是把桌面端双栏界面挤进小屏幕。
 
-Mobile layout:
+移动端布局：
 
-- bottom fixed tabs: Story, Investigation, Notebook;
-- each tab fills the available viewport;
-- tab state is preserved while switching;
-- shared play state updates immediately across tabs.
+- 底部固定标签：故事、调查、笔记；
+- 每个标签填满可用视口；
+- 切换时保留标签状态；
+- 共享游玩状态会立即同步到所有标签。
 
-Story tab:
+故事标签：
 
-- shows the same chapter reader as desktop;
-- supports continuous chapter scrolling;
-- supports click-to-reveal chapter navigation;
-- keeps bottom chapter navigation.
+- 展示与桌面端相同的章节阅读器；
+- 支持连续章节滚动；
+- 支持点击显示章节导航；
+- 保留底部章节导航。
 
-Investigation tab:
+调查标签：
 
-- defaults to the general investigation assistant;
-- shows conversation modules as a mobile-friendly collapsible list;
-- keeps the input close to the bottom of the screen;
-- automatically expands the routed NPC module when needed;
-- gives lightweight feedback when excerpts are saved.
+- 默认展示通用调查助手；
+- 以移动端友好的可折叠列表展示对话模块；
+- 输入框靠近屏幕底部；
+- 需要时自动展开被路由的 NPC 模块；
+- 摘录保存时给出轻量反馈。
 
-Notebook tab:
+笔记标签：
 
-- shows filters, search if implemented, and newest-first notes;
-- supports create, edit, delete with confirmation;
-- keeps the final accusation button at the bottom;
-- makes final accusation visually distinct from ordinary note actions.
+- 展示筛选器、搜索（如果实现）和最新优先笔记；
+- 支持新建、编辑、带确认删除；
+- 最终指认按钮停留在底部；
+- 最终指认在视觉上与普通笔记操作区分开。
 
-Desktop behavior:
+桌面行为：
 
-- keep the two-column layout;
-- keep the notebook as a drawer opened from the top-right utility button;
-- avoid changing desktop structure just to support mobile.
+- 保持双栏布局；
+- 笔记仍作为从右上角工具按钮打开的抽屉；
+- 不为了支持移动端而改变桌面结构。
 
-Acceptance criteria:
+验收标准：
 
-- mobile viewport presents only one primary workspace at a time;
-- tab switching does not lose conversation, story, or notebook state;
-- notebook actions are usable on mobile;
-- final accusation remains discoverable.
+- 移动端视口一次只展示一个主要工作区；
+- 标签切换不丢失对话、故事或笔记状态；
+- 笔记操作在移动端可用；
+- 最终指认可发现。
 
-## Data Shape Changes
+## 数据结构变化
 
-### Chapter
+### 章节（Chapter）
 
 ```ts
 type StoryChapter = {
@@ -285,10 +272,9 @@ type StoryChapter = {
 };
 ```
 
-`body` is an array of paragraphs so the reader does not need to split on line
-breaks at render time.
+`body` 是段落数组，因此 reader 不需要在渲染时按换行拆分。
 
-### Local Save
+### 本地保存（Local Save）
 
 ```ts
 type LocalPlayState = {
@@ -307,10 +293,9 @@ type LocalPlayState = {
 };
 ```
 
-The first implementation should include a version number so future migrations
-can be added without breaking old saves.
+第一版实现应包含 version number，便于未来迁移旧存档。
 
-### Notebook Note
+### 侦探笔记（Notebook Note）
 
 ```ts
 type NotebookNote = {
@@ -324,78 +309,76 @@ type NotebookNote = {
 };
 ```
 
-Important or pinned state is intentionally omitted from this iteration unless
-the user explicitly asks for it later.
+除非用户后续明确要求，否则本次迭代刻意不包含 important 或 pinned 状态。
 
-## Risks and Mitigations
+## 风险与缓解
 
-### Pretext API Fit
+### Pretext API 适配
 
-Risk: Pretext may not map perfectly to the current React story component.
+风险：Pretext 可能无法完美映射到当前 React 故事组件。
 
-Mitigation:
+缓解：
 
-- keep the DOM rendering path simple;
-- use Pretext as a layout/measurement layer first;
-- isolate Pretext integration in a small helper;
-- provide fallback rendering.
+- 保持 DOM 渲染路径简单；
+- 先把 Pretext 用作布局 / 测量层；
+- 将 Pretext 集成隔离在小 helper 中；
+- 提供回退渲染。
 
-### Save Shape Drift
+### 保存结构漂移
 
-Risk: changing note or conversation data can break old localStorage state.
+风险：修改笔记或对话数据可能破坏旧 localStorage 状态。
 
-Mitigation:
+缓解：
 
-- version the saved state;
-- validate and normalize saved data before hydration;
-- fall back to initial state if saved data is invalid.
+- 为保存状态加版本；
+- hydrate 前验证并规范化保存数据；
+- 如果保存数据无效，回退到初始状态。
 
-### Mobile Scope Creep
+### 移动端范围膨胀
 
-Risk: mobile layout can become a second full product.
+风险：移动端布局可能变成第二套完整产品。
 
-Mitigation:
+缓解：
 
-- keep the first mobile version to navigation and layout;
-- reuse existing story, investigation, and notebook components;
-- avoid separate mobile-only business logic.
+- 第一版移动端只做导航和布局；
+- 复用现有 story、investigation 和 notebook 组件；
+- 避免移动端专属业务逻辑。
 
-### Reset Misclick
+### 误触重置
 
-Risk: reset could erase a user's investigation progress.
+风险：重置可能清空用户调查进度。
 
-Mitigation:
+缓解：
 
-- use a custom confirmation modal;
-- make destructive copy explicit;
-- keep cancel as the easy/default path.
+- 使用自定义确认弹窗；
+- 破坏性文案必须明确；
+- 取消应是容易选择的默认路径。
 
-## Verification Plan
+## 验证计划
 
-Automated checks:
+自动检查：
 
-- type check;
-- lint;
-- existing tests;
-- add tests for localStorage hydration and invalid saved data;
-- add tests for note creation/deletion behavior where practical;
-- add tests for chapter navigation helper logic.
+- 类型检查；
+- lint；
+- 现有测试；
+- 为 localStorage hydrate 和无效保存数据添加测试；
+- 在可行时为笔记新建 / 删除行为添加测试；
+- 为章节导航 helper 逻辑添加测试。
 
-Manual browser checks:
+手动浏览器检查：
 
-- desktop initial load;
-- notebook open/close;
-- note create/edit/delete;
-- reset modal cancel and confirm;
-- reload persistence;
-- story chapter navigation;
-- click-to-reveal floating story navigation;
-- investigation routing and excerpt saving;
-- mobile Story tab;
-- mobile Investigation tab;
-- mobile Notebook tab.
+- 桌面端初始加载；
+- 笔记打开 / 关闭；
+- 笔记新建 / 编辑 / 删除；
+- 重置弹窗取消和确认；
+- 刷新后状态持久化；
+- 故事章节导航；
+- 点击故事区显示浮动导航；
+- 调查路由和保存摘录；
+- 移动端故事标签；
+- 移动端调查标签；
+- 移动端笔记标签。
 
-## Open Follow-Up
+## 后续开放项
 
-After this spec is approved, the next step is to create a concrete
-implementation plan with file-by-file tasks and checkpoints.
+该规格获批后，下一步是创建具体实现计划，拆成逐文件任务和检查点。

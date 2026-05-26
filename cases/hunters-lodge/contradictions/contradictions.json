@@ -1,0 +1,47 @@
+[
+  {
+    "id": "contradiction-middleton-existence",
+    "title": "女管家的身份无法独立成立",
+    "factIds": [
+      "fact-middleton-visitor-story",
+      "fact-agency-denies-middleton",
+      "fact-middleton-no-transport",
+      "fact-dim-hall-housekeeper",
+      "fact-no-one-saw-both-women"
+    ],
+    "clueIds": [
+      "clue-middleton-testimony",
+      "clue-agency-denial",
+      "clue-transport-gap",
+      "clue-dim-hall-housekeeper",
+      "clue-never-seen-together"
+    ],
+    "agentIds": ["middleton", "zoe", "poirot", "japp"]
+  },
+  {
+    "id": "contradiction-ealing-revolver",
+    "title": "伊灵左轮像被故意投放",
+    "factIds": [
+      "fact-missing-revolver",
+      "fact-ealing-revolver-found",
+      "fact-roger-train-alibi"
+    ],
+    "clueIds": ["clue-missing-revolver", "clue-ealing-revolver", "clue-roger-alibi"],
+    "agentIds": ["roger", "japp", "poirot"]
+  },
+  {
+    "id": "contradiction-zoe-alibi",
+    "title": "佐伊的不在场证明依赖可疑女管家",
+    "factIds": [
+      "fact-middleton-visitor-story",
+      "fact-zoe-did-not-see-visitor",
+      "fact-no-one-saw-both-women"
+    ],
+    "clueIds": [
+      "clue-middleton-testimony",
+      "clue-zoe-no-visitor",
+      "clue-never-seen-together"
+    ],
+    "agentIds": ["zoe", "middleton"]
+  }
+]

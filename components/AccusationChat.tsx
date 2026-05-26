@@ -37,7 +37,17 @@ function createMessage(role: AccusationMessage["role"], content: string): Accusa
   };
 }
 
-export default function AccusationChat() {
+type AccusationChatProps = {
+  caseId?: string;
+  continueHref?: string;
+  endHref?: string;
+};
+
+export default function AccusationChat({
+  caseId,
+  continueHref = caseId ? `/cases/${caseId}` : "/",
+  endHref = "/"
+}: AccusationChatProps) {
   const [messages, setMessages] = useState<AccusationMessage[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -54,7 +64,8 @@ export default function AccusationChat() {
 
     async function loadFirstQuestion() {
       try {
-        const response = await fetch("/api/accuse");
+        const url = caseId ? `/api/accuse?caseId=${encodeURIComponent(caseId)}` : "/api/accuse";
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to load accusation question.");
         }
@@ -82,7 +93,7 @@ export default function AccusationChat() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [caseId]);
 
   async function submitAnswer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,7 +112,7 @@ export default function AccusationChat() {
       const response = await fetch("/api/accuse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionIndex, answer: trimmedAnswer })
+        body: JSON.stringify({ caseId, questionIndex, answer: trimmedAnswer })
       });
 
       if (!response.ok) {
@@ -142,8 +153,7 @@ export default function AccusationChat() {
     <main className="accusation-shell">
       <section className="accusation-card" aria-labelledby="accusation-title">
         <header className="accusation-header">
-          <p>最终指控</p>
-          <h1 id="accusation-title">最后质询</h1>
+          <h1 id="accusation-title">最终指认</h1>
         </header>
 
         <div className="accusation-messages" aria-live="polite">
@@ -169,7 +179,7 @@ export default function AccusationChat() {
           <div className="accusation-result accusation-result-wrong" role="alertdialog">
             <h2>回答错误</h2>
             <p>这项指控还缺少可靠证据。回到案卷，重新核对证词与现场细节。</p>
-            <Link className="accusation-action" href="/">
+            <Link className="accusation-action" href={continueHref}>
               继续调查
             </Link>
           </div>
@@ -202,7 +212,7 @@ export default function AccusationChat() {
                 </ul>
               </div>
             ) : null}
-            <Link className="accusation-action" href="/">
+            <Link className="accusation-action" href={endHref}>
               结束游戏
             </Link>
           </div>
@@ -210,20 +220,20 @@ export default function AccusationChat() {
 
         {state === "answering" ? (
           <form className="accusation-form" onSubmit={submitAnswer}>
-            <div className="composer-heading">
-              <label htmlFor="accusation-answer">回答当前问题</label>
-              <span>只提交你能证明的答案</span>
-            </div>
+            <label className="sr-only" htmlFor="accusation-answer">
+              回答
+            </label>
             <div className="accusation-input-row">
               <textarea
                 id="accusation-answer"
                 value={answer}
                 onChange={(event) => setAnswer(event.target.value)}
                 disabled={isLoading}
+                placeholder="回答"
                 rows={3}
               />
               <button type="submit" disabled={isLoading || answer.trim().length === 0}>
-                提交回答
+                提交
               </button>
             </div>
           </form>

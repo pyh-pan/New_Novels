@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ConfirmDialog from "./ConfirmDialog";
 
-export type NoteTag = "clue" | "testimony" | "doubt" | "contradiction";
+export type NoteTag = "comment" | "clue" | "testimony" | "doubt" | "contradiction";
 export type NoteFilter = "all" | NoteTag;
 
 export type NotebookNote = {
@@ -13,6 +13,7 @@ export type NotebookNote = {
   text: string;
   tag: NoteTag;
   source: string;
+  quote?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -20,8 +21,6 @@ export type NotebookNote = {
 interface NotebookDrawerProps {
   isOpen: boolean;
   notes: NotebookNote[];
-  hypotheses: string[];
-  knownContradictions: string[];
   activeTag: NoteFilter;
   onToggle: () => void;
   onFilterChange: (tag: NoteFilter) => void;
@@ -31,12 +30,12 @@ interface NotebookDrawerProps {
   ) => void;
   onCreateNote: () => void;
   onDeleteNote: (id: string) => void;
-  onCreateHypothesis: (hypothesis: string) => void;
-  onDeleteHypothesis: (hypothesis: string) => void;
+  accusationHref?: string;
 }
 
 const tagLabels: Record<NoteFilter, string> = {
   all: "全部",
+  comment: "批注",
   clue: "线索",
   testimony: "证词",
   doubt: "疑点",
@@ -46,19 +45,15 @@ const tagLabels: Record<NoteFilter, string> = {
 export default function NotebookDrawer({
   isOpen,
   notes,
-  hypotheses = [],
-  knownContradictions = [],
   activeTag,
   onToggle,
   onFilterChange,
   onUpdateNote,
   onCreateNote,
   onDeleteNote,
-  onCreateHypothesis,
-  onDeleteHypothesis
+  accusationHref = "/accuse"
 }: NotebookDrawerProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [hypothesisDraft, setHypothesisDraft] = useState("");
   const visibleNotes =
     activeTag === "all" ? notes : notes.filter((note) => note.tag === activeTag);
   const filters = Object.keys(tagLabels) as NoteFilter[];
@@ -73,8 +68,7 @@ export default function NotebookDrawer({
         aria-label="打开侦探笔记"
         onClick={onToggle}
       >
-        <span aria-hidden="true">□</span>
-        <span>笔记</span>
+        <span aria-hidden="true">▤</span>
       </button>
     );
   }
@@ -83,13 +77,17 @@ export default function NotebookDrawer({
     <aside className="notebook-drawer" aria-labelledby="notebook-title">
       <div className="notebook-header">
         <div>
-          <p className="notebook-kicker">Detective notebook</p>
           <h2 id="notebook-title">侦探笔记</h2>
         </div>
         <div className="notebook-header-actions">
-          <button type="button" className="notebook-create" onClick={onCreateNote}>
+          <button
+            type="button"
+            className="notebook-create"
+            aria-label="新建笔记"
+            title="新建笔记"
+            onClick={onCreateNote}
+          >
             <span aria-hidden="true">＋</span>
-            新建笔记
           </button>
           <button
             type="button"
@@ -97,7 +95,7 @@ export default function NotebookDrawer({
             aria-label="收起侦探笔记"
             onClick={onToggle}
           >
-            ‹
+            ›
           </button>
         </div>
       </div>
@@ -118,7 +116,7 @@ export default function NotebookDrawer({
 
       <div className="notebook-notes">
         {visibleNotes.length === 0 ? (
-          <p className="notebook-empty">摘录调查回复后，笔记会出现在这里。</p>
+          <p className="notebook-empty">暂无笔记</p>
         ) : (
           visibleNotes.map((note) => (
             <article className={`note-card note-${note.tag}`} key={note.id}>
@@ -150,6 +148,12 @@ export default function NotebookDrawer({
                   </select>
                 </label>
               </div>
+              {note.quote ? (
+                <details className="note-quote">
+                  <summary>查看引用</summary>
+                  <blockquote>{note.quote}</blockquote>
+                </details>
+              ) : null}
               <label className="note-field note-text-field">
                 <span className="sr-only">笔记正文</span>
                 <textarea
@@ -175,71 +179,8 @@ export default function NotebookDrawer({
         )}
       </div>
 
-      <section className="notebook-hypotheses" aria-labelledby="hypothesis-title">
-        <div className="notebook-section-heading">
-          <h3 id="hypothesis-title">推理假设</h3>
-          <span>{hypotheses.length}</span>
-        </div>
-        <form
-          className="hypothesis-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const nextHypothesis = hypothesisDraft.trim();
-            if (!nextHypothesis) {
-              return;
-            }
-            onCreateHypothesis(nextHypothesis);
-            setHypothesisDraft("");
-          }}
-        >
-          <input
-            value={hypothesisDraft}
-            aria-label="新增推理假设"
-            onChange={(event) => setHypothesisDraft(event.target.value)}
-            placeholder="例如：小锤可能来自高处"
-          />
-          <button type="submit" disabled={hypothesisDraft.trim().length === 0}>
-            记录假设
-          </button>
-        </form>
-        <div className="hypothesis-list">
-          {hypotheses.length === 0 ? (
-            <p>把你的临时推理留在这里，系统不会替你判断对错。</p>
-          ) : (
-            hypotheses.map((hypothesis) => (
-              <article key={hypothesis}>
-                <span>{hypothesis}</span>
-                <button
-                  type="button"
-                  aria-label={`删除假设：${hypothesis}`}
-                  onClick={() => onDeleteHypothesis(hypothesis)}
-                >
-                  ×
-                </button>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
-
-      <section className="notebook-contradictions" aria-labelledby="contradiction-title">
-        <div className="notebook-section-heading">
-          <h3 id="contradiction-title">已识别矛盾</h3>
-          <span>{knownContradictions.length}</span>
-        </div>
-        {knownContradictions.length === 0 ? (
-          <p>调查回复识别出的矛盾会在这里汇总。</p>
-        ) : (
-          <ul>
-            {knownContradictions.map((contradiction) => (
-              <li key={contradiction}>{contradiction}</li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <Link className="accusation-link" href="/accuse">
-        提出最终指控
+      <Link className="accusation-link" href={accusationHref}>
+        提出最终指认
       </Link>
 
       {pendingDeleteNote ? (

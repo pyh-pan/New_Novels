@@ -2,16 +2,29 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
-import { getDefaultCase } from "../../../lib/case/default-case";
+import { getDefaultCaseId, loadBundledCase } from "../../../lib/case/default-case";
 import { checkAccusationAnswer } from "../../../lib/game/accusation";
 
 const requestSchema = z.object({
+  caseId: z.string().trim().min(1).optional(),
   questionIndex: z.number().int().min(0),
   answer: z.string().trim().min(1)
 });
 
-export async function GET() {
-  const firstQuestion = getDefaultCase().accusation.questions[0];
+function getCaseFromId(caseId?: string) {
+  return loadBundledCase(caseId ?? getDefaultCaseId());
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  let caseFile: ReturnType<typeof loadBundledCase>;
+  try {
+    caseFile = getCaseFromId(searchParams.get("caseId") ?? undefined);
+  } catch {
+    return NextResponse.json({ error: "Unknown case." }, { status: 404 });
+  }
+
+  const firstQuestion = caseFile.accusation.questions[0];
 
   return NextResponse.json({
     questionIndex: 0,
@@ -26,8 +39,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { questionIndex, answer } = parsed.data;
-  const question = getDefaultCase().accusation.questions[questionIndex];
+  const { caseId, questionIndex, answer } = parsed.data;
+  let caseFile: ReturnType<typeof loadBundledCase>;
+  try {
+    caseFile = getCaseFromId(caseId);
+  } catch {
+    return NextResponse.json({ error: "Unknown case." }, { status: 404 });
+  }
+
+  const question = caseFile.accusation.questions[questionIndex];
 
   if (!question) {
     return NextResponse.json({ status: "wrong" });
@@ -40,7 +60,6 @@ export async function POST(request: Request) {
   }
 
   const nextIndex = questionIndex + 1;
-  const caseFile = getDefaultCase();
   const nextQuestion = caseFile.accusation.questions[nextIndex];
 
   if (!nextQuestion) {

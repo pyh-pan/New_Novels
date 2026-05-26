@@ -34,23 +34,23 @@ describe("/api/route-message semantic routing", () => {
         {
           message: {
             content: JSON.stringify({
-              targetId: "wilfred",
+              targetId: "poirot",
               confidence: 0.91,
-              reason: "用户想和牧师对话"
+              reason: "用户想和侦探对话"
             })
           }
         }
       ]
     });
 
-    const response = await POST(jsonRequest({ message: "那个神职人员有没有撒谎？" }));
+    const response = await POST(jsonRequest({ message: "波洛为什么关心衣着？" }));
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      targetId: "wilfred",
-      label: "威尔弗里德牧师",
+      targetId: "poirot",
+      label: "赫尔克里·波洛",
       confidence: 0.91,
-      reason: "用户想和牧师对话"
+      reason: "用户想和侦探对话"
     });
     expect(createMock).toHaveBeenCalledTimes(1);
   });
@@ -60,12 +60,12 @@ describe("/api/route-message semantic routing", () => {
       choices: [{ message: { content: "not json" } }]
     });
 
-    const response = await POST(jsonRequest({ message: "问威尔弗里德他在哪里" }));
+    const response = await POST(jsonRequest({ message: "问佐伊有没有看清访客" }));
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      targetId: "wilfred",
-      label: "威尔弗里德牧师"
+      targetId: "zoe",
+      label: "佐伊·哈弗林"
     });
   });
 
@@ -75,7 +75,7 @@ describe("/api/route-message semantic routing", () => {
         {
           message: {
             content: JSON.stringify({
-              targetId: "joe",
+              targetId: "roger",
               confidence: 0.31,
               reason: "不确定"
             })
@@ -84,7 +84,7 @@ describe("/api/route-message semantic routing", () => {
       ]
     });
 
-    const response = await POST(jsonRequest({ message: "我想看看锤子和伤口的关系" }));
+    const response = await POST(jsonRequest({ message: "我想看看左轮和窗户的关系" }));
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
@@ -96,12 +96,12 @@ describe("/api/route-message semantic routing", () => {
   it("falls back to deterministic routing when OpenAI is unavailable", async () => {
     createMock.mockRejectedValueOnce(new Error("network"));
 
-    const response = await POST(jsonRequest({ message: "问铁匠妻子怎么看诺曼" }));
+    const response = await POST(jsonRequest({ message: "问米德尔顿太太看到了什么" }));
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      targetId: "elizabeth",
-      label: "伊丽莎白"
+      targetId: "middleton",
+      label: "米德尔顿太太"
     });
   });
 });

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "scene-gun-room",
+    "actId": "act-opening",
+    "location": "猎人小屋枪房",
+    "observableFactIds": [
+      "fact-pace-shot",
+      "fact-locked-door-open-window",
+      "fact-missing-revolver",
+      "fact-close-shot-behind"
+    ],
+    "interactableObjects": ["尸体", "窗户", "门锁", "左轮手枪", "血迹"],
+    "ambientText": [
+      "枪房里有猎具、墙上的左轮空出一处，窗外是暗下来的荒原。",
+      "佩斯中弹的位置让人很难相信这只是一次正面争吵后的仓促开枪。"
+    ]
+  },
+  {
+    "id": "scene-hall",
+    "actId": "act-opening",
+    "location": "猎人小屋门厅",
+    "observableFactIds": [
+      "fact-middleton-visitor-story",
+      "fact-zoe-did-not-see-visitor",
+      "fact-dim-hall-housekeeper"
+    ],
+    "interactableObjects": ["门铃", "楼梯", "门厅光线", "女管家黑衣", "佐伊的火色衣帽"],
+    "ambientText": [
+      "门厅很暗，来人开门时只能迅速捕捉到黑衣、低声和中年轮廓。",
+      "佐伊从楼上下来时衣着鲜明，与女管家的沉暗形象几乎像两个舞台角色。"
+    ]
+  },
+  {
+    "id": "scene-elmer-dale-station",
+    "actId": "act-testimony",
+    "location": "埃尔默斯代尔车站",
+    "observableFactIds": ["fact-no-stranger-at-station", "fact-middleton-no-transport"],
+    "interactableObjects": ["站台", "车行记录", "马车登记", "候车室"],
+    "ambientText": [
+      "这里的交通稀少，陌生人的来去本该很难完全无痕。",
+      "黑胡子访客和新来的女管家，都没有留下该有的到达痕迹。"
+    ]
+  },
+  {
+    "id": "scene-selbourne-agency",
+    "actId": "act-testimony",
+    "location": "伦敦塞尔本家政介绍所",
+    "observableFactIds": ["fact-agency-denies-middleton"],
+    "interactableObjects": ["登记簿", "介绍信", "雇佣费记录"],
+    "ambientText": [
+      "介绍所承认收到了哈弗林夫人的申请，却没有米德尔顿太太这个人。",
+      "如果女管家的来源是假的，她的证词就不能再作为独立支撑。"
+    ]
+  },
+  {
+    "id": "scene-ealing-green",
+    "actId": "act-confrontation",
+    "location": "伦敦伊灵绿地",
+    "observableFactIds": ["fact-ealing-revolver-found"],
+    "interactableObjects": ["栏杆", "牛皮纸包", "左轮手枪"],
+    "ambientText": [
+      "左轮被放在一个足够显眼的位置，像是希望警方尽快看见。",
+      "真正从猎人小屋逃走的人，为什么要把凶器带到伦敦后再丢弃？"
+    ]
+  }
+]

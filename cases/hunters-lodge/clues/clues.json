@@ -1,0 +1,160 @@
+[
+  {
+    "id": "clue-body-gun-room",
+    "title": "枪房里的尸体",
+    "text": "佩斯死在枪房，案件表面上发生在一间门被锁住、窗户敞开的屋子里。",
+    "tag": "clue",
+    "source": "现场",
+    "unlockHints": ["枪房", "尸体", "现场"],
+    "unlock": { "type": "story", "factIds": ["fact-pace-shot"] }
+  },
+  {
+    "id": "clue-roger-alibi",
+    "title": "六点十五分火车",
+    "text": "罗杰的不在场证明看似牢固：他离开德比郡并在伦敦俱乐部出现。",
+    "tag": "testimony",
+    "source": "罗杰证词",
+    "unlockHints": ["罗杰", "火车", "不在场证明"],
+    "unlock": { "type": "agent-response", "agentId": "roger", "topics": ["火车", "伦敦"], "factIds": ["fact-roger-train-alibi"] }
+  },
+  {
+    "id": "clue-telegram",
+    "title": "佐伊的电报",
+    "text": "罗杰赶回猎人小屋，是因为佐伊发来叔父遇害的电报。",
+    "tag": "testimony",
+    "source": "罗杰证词",
+    "unlockHints": ["电报", "佐伊", "罗杰"],
+    "unlock": { "type": "agent-response", "agentId": "roger", "topics": ["电报"], "factIds": ["fact-telegram-from-zoe"] }
+  },
+  {
+    "id": "clue-middleton-testimony",
+    "title": "女管家的访客证词",
+    "text": "米德尔顿太太是黑胡子访客的主要目击者，也是佐伊不在场证明的关键。",
+    "tag": "testimony",
+    "source": "米德尔顿证词",
+    "unlockHints": ["米德尔顿", "女管家", "黑胡子", "访客"],
+    "unlock": { "type": "agent-response", "agentId": "middleton", "topics": ["访客", "黑胡子"], "factIds": ["fact-middleton-visitor-story"] }
+  },
+  {
+    "id": "clue-locked-door-window",
+    "title": "锁门与开窗",
+    "text": "枪房门从里面锁着，窗户开着，像是访客从窗外逃走。",
+    "tag": "clue",
+    "source": "现场",
+    "unlockHints": ["门", "窗户", "逃走"],
+    "unlock": { "type": "agent-response", "agentId": "general", "topics": ["门", "窗户"], "factIds": ["fact-locked-door-open-window"] }
+  },
+  {
+    "id": "clue-missing-revolver",
+    "title": "失踪的左轮",
+    "text": "墙上的一对左轮少了一支，表面上正好解释凶器来源。",
+    "tag": "clue",
+    "source": "现场",
+    "unlockHints": ["左轮", "手枪", "墙上"],
+    "unlock": { "type": "agent-response", "agentId": "general", "topics": ["左轮", "手枪"], "factIds": ["fact-missing-revolver"] }
+  },
+  {
+    "id": "clue-close-shot",
+    "title": "背后的近距离枪击",
+    "text": "佩斯从后脑近距离中弹，这与正面争吵后临时夺枪的故事并不完全贴合。",
+    "tag": "doubt",
+    "source": "贾普验尸信息",
+    "unlockHints": ["后脑", "近距离", "枪伤", "背后"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["枪伤", "尸体"], "factIds": ["fact-close-shot-behind"] }
+  },
+  {
+    "id": "clue-roger-debts",
+    "title": "罗杰的债务",
+    "text": "罗杰债务缠身，又可能继承佩斯的财产，他有强烈经济动机。",
+    "tag": "clue",
+    "source": "贾普调查",
+    "unlockHints": ["罗杰", "债务", "遗产", "动机"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["罗杰", "债务"], "factIds": ["fact-roger-debts"] }
+  },
+  {
+    "id": "clue-ealing-revolver",
+    "title": "伊灵的牛皮纸包",
+    "text": "失踪左轮在伦敦伊灵出现，像是把凶手轨迹故意引向伦敦。",
+    "tag": "contradiction",
+    "source": "伦敦警方",
+    "unlockHints": ["伊灵", "伦敦", "牛皮纸", "左轮"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["伊灵", "左轮"], "factIds": ["fact-ealing-revolver-found"] }
+  },
+  {
+    "id": "clue-station-no-stranger",
+    "title": "车站没有黑胡子陌生人",
+    "text": "案发当晚，车站没有留下黑胡子陌生人的清晰踪迹。",
+    "tag": "doubt",
+    "source": "贾普调查",
+    "unlockHints": ["车站", "黑胡子", "陌生人"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["车站", "陌生人"], "factIds": ["fact-no-stranger-at-station"] }
+  },
+  {
+    "id": "clue-agency-denial",
+    "title": "介绍所没有米德尔顿",
+    "text": "所谓派来米德尔顿太太的家政介绍所，从未登记过这个人。",
+    "tag": "contradiction",
+    "source": "介绍所调查",
+    "unlockHints": ["介绍所", "米德尔顿", "女管家"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["介绍所", "米德尔顿"], "factIds": ["fact-agency-denies-middleton"] }
+  },
+  {
+    "id": "clue-transport-gap",
+    "title": "不存在的到达路线",
+    "text": "当地交通记录无法解释米德尔顿太太如何来到偏僻的猎人小屋。",
+    "tag": "doubt",
+    "source": "当地交通调查",
+    "unlockHints": ["交通", "车站", "马车", "米德尔顿"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["交通", "车站"], "factIds": ["fact-middleton-no-transport"] }
+  },
+  {
+    "id": "clue-zoe-actress",
+    "title": "佐伊的演员出身",
+    "text": "佐伊婚前是演员，这让换装、化装和改变声音不再只是抽象可能。",
+    "tag": "clue",
+    "source": "波洛提示",
+    "unlockHints": ["佐伊", "演员", "化装", "声音"],
+    "unlock": { "type": "agent-response", "agentId": "poirot", "topics": ["佐伊", "演员"], "factIds": ["fact-zoe-actress"] }
+  },
+  {
+    "id": "clue-never-seen-together",
+    "title": "从未同框的两个女人",
+    "text": "警方从未同时见过佐伊和米德尔顿太太；女管家的证词因此变得危险。",
+    "tag": "contradiction",
+    "source": "波洛推理提示",
+    "unlockHints": ["同时", "佐伊", "米德尔顿", "女主人", "女管家"],
+    "unlock": { "type": "agent-response", "agentId": "poirot", "topics": ["同时", "衣着", "女管家"], "factIds": ["fact-no-one-saw-both-women"] }
+  },
+  {
+    "id": "clue-zoe-no-visitor",
+    "title": "佐伊没有看清访客",
+    "text": "佐伊本人没有看清黑胡子访客，最完整的访客形象只来自女管家。",
+    "tag": "testimony",
+    "source": "佐伊证词",
+    "unlockHints": ["佐伊", "访客", "没看清"],
+    "unlock": { "type": "agent-response", "agentId": "zoe", "topics": ["访客"], "factIds": ["fact-zoe-did-not-see-visitor"] }
+  },
+  {
+    "id": "clue-dim-hall-housekeeper",
+    "title": "昏暗门厅里的女管家",
+    "text": "米德尔顿太太第一次出现时只是昏暗门厅中的黑衣身影，声音压低，细节并不牢靠。",
+    "tag": "doubt",
+    "source": "黑斯廷斯观察",
+    "unlockHints": ["门厅", "昏暗", "黑衣", "声音", "女管家"],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "poirot",
+      "topics": ["门厅", "衣着", "声音", "女管家"],
+      "factIds": ["fact-dim-hall-housekeeper"]
+    }
+  },
+  {
+    "id": "clue-middleton-vanished",
+    "title": "消失的女管家",
+    "text": "米德尔顿太太在被看住前消失，只留下没有身份线索的箱子。",
+    "tag": "doubt",
+    "source": "贾普调查",
+    "unlockHints": ["消失", "箱子", "米德尔顿"],
+    "unlock": { "type": "agent-response", "agentId": "japp", "topics": ["消失", "女管家"], "factIds": ["fact-middleton-vanished"] }
+  }
+]

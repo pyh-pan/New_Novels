@@ -72,6 +72,11 @@ const generalKeywords = [
   "线索",
   "物证",
   "血迹",
+  "枪房",
+  "左轮",
+  "手枪",
+  "访客",
+  "女管家",
   "锤子",
   "小锤",
   "尸体",
@@ -110,18 +115,7 @@ function labelForAgent(caseFile: CaseFile, targetId: string): string {
 }
 
 function toConversationTarget(targetId: string): ConversationTarget {
-  if (
-    targetId === "general" ||
-    targetId === "wilfred" ||
-    targetId === "simeon" ||
-    targetId === "elizabeth" ||
-    targetId === "joe" ||
-    targetId === "unsupported"
-  ) {
-    return targetId;
-  }
-
-  return "unsupported";
+  return targetId;
 }
 
 function textContainsTopic(text: string, topic: string): boolean {
@@ -631,6 +625,8 @@ export function validateAgentOutput({
         .replace(/^不得/u, "")
         .replace(/^直接/u, "")
         .replace(/^主动/u, "")
+        .replace(/^说/u, "")
+        .replace(/^确认/u, "")
         .replace(/。$/u, "")
         .trim();
       return fragment.length >= 4 && trimmed.includes(fragment);

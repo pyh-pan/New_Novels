@@ -1,0 +1,15 @@
+[
+  {
+    "fromAgentId": "japp",
+    "toAgentId": "poirot",
+    "factId": "fact-agency-denies-middleton",
+    "condition": {
+      "requiresAllClues": ["clue-agency-denial"],
+      "requiresAnyClues": [],
+      "requiresFacts": ["fact-agency-denies-middleton"],
+      "requiresContradictions": [],
+      "requiresAct": "act-testimony"
+    },
+    "mode": "direct"
+  }
+]

@@ -1,5 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
+import SelectionCommentPopover, {
+  getSelectionWithin,
+  type SelectionCommentPayload,
+  type SelectionCommentTarget
+} from "./SelectionCommentPopover";
+
 export type ConversationMessage = {
   id: string;
   role: "user" | "assistant";
@@ -15,21 +22,41 @@ interface ConversationModuleProps {
   isLoading?: boolean;
   messages: ConversationMessage[];
   onToggle: () => void;
-  onSaveExcerpt: (content: string) => void;
+  onCommentSelection: (payload: SelectionCommentPayload) => void;
 }
 
 export default function ConversationModule({
   id,
   title,
-  subtitle,
   stateLabel,
   isExpanded,
   isLoading = false,
   messages,
   onToggle,
-  onSaveExcerpt
+  onCommentSelection
 }: ConversationModuleProps) {
   const panelId = `${id}-conversation-panel`;
+  const messageListRef = useRef<HTMLDivElement | null>(null);
+  const [commentTarget, setCommentTarget] = useState<SelectionCommentTarget | null>(null);
+
+  const handleMessageMouseUp = () => {
+    window.setTimeout(() => {
+      if (!messageListRef.current) {
+        return;
+      }
+
+      const selection = getSelectionWithin(messageListRef.current);
+      if (!selection) {
+        setCommentTarget(null);
+        return;
+      }
+
+      setCommentTarget({
+        ...selection,
+        source: `${title} · 对话`
+      });
+    }, 0);
+  };
 
   return (
     <article className={`conversation-module ${isExpanded ? "is-expanded" : ""}`}>
@@ -42,7 +69,6 @@ export default function ConversationModule({
       >
         <span>
           <strong>{title}</strong>
-          {subtitle ? <small>{subtitle}</small> : null}
           {stateLabel ? <small>{stateLabel}</small> : null}
         </span>
         <span className="module-meta" aria-hidden="true">
@@ -51,31 +77,26 @@ export default function ConversationModule({
         </span>
       </button>
 
-      {isExpanded ? (
+      {isExpanded && (messages.length > 0 || isLoading) ? (
         <div className="module-body" id={panelId}>
-          <div className="message-list">
-            {messages.length === 0 ? (
-              <p className="module-empty">尚无记录。</p>
-            ) : (
-              messages.map((message) => (
+          <SelectionCommentPopover
+            target={commentTarget}
+            onClose={() => setCommentTarget(null)}
+            onSubmit={onCommentSelection}
+          />
+          <div
+            className="message-list"
+            ref={messageListRef}
+            onMouseUp={handleMessageMouseUp}
+          >
+            {messages.map((message) => (
                 <div
                   className={`message-bubble message-${message.role}`}
                   key={message.id}
                 >
                   <p>{message.content}</p>
-                  {message.role === "assistant" ? (
-                    <button
-                      type="button"
-                      className="excerpt-button"
-                      aria-label="摘录这条回复"
-                      onClick={() => onSaveExcerpt(message.content)}
-                    >
-                      摘录到笔记
-                    </button>
-                  ) : null}
                 </div>
-              ))
-            )}
+              ))}
             {isLoading ? (
               <div className="message-bubble message-assistant">
                 <p>正在整理回答...</p>

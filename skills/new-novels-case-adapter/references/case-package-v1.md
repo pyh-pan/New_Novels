@@ -1,8 +1,8 @@
-# Case Package v1 Reference
+# 案件包 v1 参考
 
-This reference summarizes the current New Novels schema as of this repository state. Always prefer the live TypeScript schema in `lib/case/schema.ts` and `lib/case-package/schema.ts` if they differ.
+本文档总结当前仓库状态下的 New Novels schema。如果与 `lib/case/schema.ts` 或 `lib/case-package/schema.ts` 中的实时 TypeScript schema 不一致，始终以代码 schema 为准。
 
-## Package Shape
+## 包形状
 
 ```json
 {
@@ -11,7 +11,7 @@ This reference summarizes the current New Novels schema as of this repository st
 }
 ```
 
-The importable filesystem package must include:
+可导入的文件系统案件包必须包含：
 
 ```text
 manifest.json
@@ -33,25 +33,25 @@ victims/victims.json
 accusation/questions.json
 ```
 
-`case.json` is the aggregate review snapshot. The directory loader reads the split files and uses `story/*.md` as the chapter body source, so copied or uploaded packages must keep these files in sync.
+`case.json` 是聚合审查快照。目录加载器读取拆分文件，并使用 `story/*.md` 作为章节正文来源，因此复制或上传案件包时必须保持这些文件同步。
 
-`manifest` must satisfy:
+`manifest` 必须满足：
 
-- `schemaVersion`: exactly `case-package/v1`
-- `caseId`: same as `caseFile.id`
+- `schemaVersion`：必须等于 `case-package/v1`。
+- `caseId`：与 `caseFile.id` 相同。
 - `title`
-- `language`, for example `zh-CN`
-- `entryChapterId`: must match a chapter id
+- `language`，例如 `zh-CN`。
+- `entryChapterId`：必须匹配某个章节 id。
 - `createdBy`
 - `source.title`
 - `source.author`
 - `source.rightsNote`
 
-`caseFile` is the runtime object consumed by the app.
+`caseFile` 是应用消费的 runtime 对象。
 
-## Required CaseFile Sections
+## 必需 CaseFile 部分
 
-- `id`, `title`
+- `id`、`title`
 - `globalContext`
 - `source`
 - `storyText`
@@ -69,47 +69,54 @@ accusation/questions.json
 - `clues`
 - `accusation.questions`
 
-## Global Context
+## 全局上下文（Global Context）
 
-Use short, concrete rules:
+使用简短、具体的规则：
 
-- `fairPlayRules`: how the mystery remains solvable and fixed.
-- `conversationRules`: how agents answer.
-- `spoilerRules`: what cannot be revealed before final accusation.
-- `fabricationRules`: what agents must never invent.
-- `toneRules`: language, length, and literary style.
+- `fairPlayRules`：谜题如何保持可解且真相固定。
+- `conversationRules`：agent 如何回答。
+- `spoilerRules`：最终指认前不能揭示什么。
+- `fabricationRules`：agent 绝不能编造什么。
+- `toneRules`：语言、长度和文学风格。
 
-## Chapters
+## 章节（Chapters）
 
-Each chapter:
+每个章节包含：
 
 - `id`
 - `title`
-- optional `subtitle`
+- 可选 `subtitle`
 - `body`
 - `availableFromStart`
-- optional `previousChapterId`
-- optional `nextChapterId`
+- 可选 `previousChapterId`
+- 可选 `nextChapterId`
 
-Use chapters for readable prose, not system instructions. If the source is long, rewrite into playable chapters that preserve clue order and fair-play pacing.
+章节用于可读正文，不用于系统指令。如果源文本较长，应重写为可玩的章节，并保留线索顺序和公平推理节奏。
 
-## Acts
+从小说源文本改写时，章节应由改写过程中的分段标签组装：
 
-Each act:
+- `story-keep`：非调查叙事、氛围、关系和普通人物对话。它们应在版权和翻译约束允许的范围内尽量完整地保留在读者可见故事中。
+- `bridge-rewrite`：只有在移除侦探调查会破坏连续性时插入的短连接文本。
+
+不要把 `investigation-hide`、`deduction-hide` 或 `solution-lock` 片段留在读者可见章节中。这些片段必须移动到 scenes、clues、agent knowledge、reveal rules、contradictions、act gates 或 final accusation material。每个隐藏调查或推理项都需要清晰的 `可探索入口`：scene object、NPC topic、clue unlock hint、contradiction 或 act gate condition，使玩家能通过游玩发现它。
+
+## 剧情幕（Acts）
+
+每个 act 包含：
 
 - `id`
 - `title`
 - `availableAgentIds`
 - `visibleClueIds`
 - `lockedFactIds`
-- optional `entryConditions`
-- optional `exitConditions`
+- 可选 `entryConditions`
+- 可选 `exitConditions`
 
-Use acts to gate information. Opening acts should expose suspects and obvious evidence, while later acts can unlock contradictions or deeper testimony.
+使用 acts 控制信息门禁。开局幕应暴露嫌疑人和表层证据，后续幕可以解锁矛盾或更深证词。
 
-## ActGates
+## 剧情幕门槛（ActGates）
 
-Each act gate:
+每个 act gate 包含：
 
 - `id`
 - `fromActId`
@@ -121,11 +128,11 @@ Each act gate:
 - `requiredSceneInteractions`
 - `unlockNarrative`
 
-Use actGates to create 剧本杀式 progression. A gate should prove the player has completed a phase of reasoning before the next act opens. Do not unlock acts from vague topics alone.
+使用 actGates 创造剧本杀式 progression。gate 应证明玩家已经完成某个推理阶段，然后才打开下一幕。不要仅凭模糊话题解锁 acts。
 
-## Scenes
+## 场景（Scenes）
 
-Each scene:
+每个 scene 包含：
 
 - `id`
 - `actId`
@@ -134,49 +141,49 @@ Each scene:
 - `interactableObjects`
 - `ambientText`
 
-Scenes are investigation surfaces. Observable facts must point to existing fact ids.
+Scenes 是调查表面。Observable facts 必须指向已有 fact ids。
 
-## Facts
+## 事实（Facts）
 
-Each fact:
+每个 fact 包含：
 
 - `id`
 - `text`
-- `visibility`: `public`, `private`, `truth`, or `unlocked`
+- `visibility`：`public`、`private`、`truth` 或 `unlocked`
 - `ownerAgentIds`
 - `relatedClueIds`
-- optional `actId`
+- 可选 `actId`
 - `keywords`
 
-Use facts as the ledger. Every clue, reveal, contradiction, scene observation, and accusation should trace back to facts.
+Facts 是事实账本。每条 clue、reveal、contradiction、scene observation 和 accusation 都应追溯到 facts。
 
-Visibility guidance:
+可见性说明：
 
-- `public`: safe from the start.
-- `unlocked`: found by investigation.
-- `private`: known to one or more NPCs but not automatically revealed.
-- `truth`: final solution or spoiler-level fact.
+- `public`：开局安全可见。
+- `unlocked`：通过调查发现。
+- `private`：一个或多个 NPC 知道，但不会自动揭示。
+- `truth`：最终解答或剧透级事实。
 
-## Clues
+## 线索（Clues）
 
-Each clue:
+每条 clue 包含：
 
 - `id`
 - `title`
 - `text`
-- `tag`: `clue`, `testimony`, `doubt`, or `contradiction`
+- `tag`：`clue`、`testimony`、`doubt` 或 `contradiction`
 - `source`
 - `unlockHints`
-- optional `unlock.type`: `agent-response`, `story`, `manual`, or `system`
-- optional `unlock.agentId`
-- optional `unlock.topics`
-- optional `unlock.factIds`
+- 可选 `unlock.type`：`agent-response`、`story`、`manual` 或 `system`
+- 可选 `unlock.agentId`
+- 可选 `unlock.topics`
+- 可选 `unlock.factIds`
 
-A clue should be player-useful: it either changes suspicion, opens a new question, resolves a false solution, or supports final accusation.
+Clue 应对玩家有用：它要么改变怀疑方向，要么打开新问题，要么解决假解答，要么支撑最终指认。
 
-## Agents
+## Agent（Agents）
 
-All agents share:
+所有 agents 共享：
 
 - `id`
 - `type`
@@ -195,7 +202,7 @@ All agents share:
 - `knowledge`
 - `revealRules`
 
-The case must include:
+案件必须包含：
 
 ```json
 {
@@ -205,15 +212,15 @@ The case must include:
 }
 ```
 
-The general agent also needs `allowedTopics` and `forbiddenClaims`.
+通用 agent 还需要 `allowedTopics` 和 `forbiddenClaims`。
 
-NPC agents need `boundaries`:
+NPC agents 需要 `boundaries`：
 
 - `hides`
 - `liesAbout`
 - `forbiddenClaims`
 
-Permissions usually keep agents bounded:
+权限通常用于约束 agents：
 
 ```json
 {
@@ -225,11 +232,11 @@ Permissions usually keep agents bounded:
 }
 ```
 
-Only the general agent commonly sets `canReferencePlayerNotes` to true.
+通常只有 general agent 将 `canReferencePlayerNotes` 设为 true。
 
-## Runtime Behavior Fields
+## Runtime 行为字段
 
-Each NPC should have a source-specific `pressureProfile`:
+每个 NPC 都应有来自源文本的 `pressureProfile`：
 
 ```json
 {
@@ -249,79 +256,79 @@ Each NPC should have a source-specific `pressureProfile`:
 }
 ```
 
-`emotionalArc` must define `calm`, `guarded`, and `cornered`. `confrontationTriggers` lists the topics that should increase pressure. `confessionBoundary` names what the NPC still cannot directly admit. `styleAnchors` gives short in-character examples for tone.
+`emotionalArc` 必须定义 `calm`、`guarded` 和 `cornered`。`confrontationTriggers` 列出会增加压力的话题。`confessionBoundary` 标明 NPC 仍不能直接承认什么。`styleAnchors` 提供短角色台词示例，用于控制语气。
 
-## Reveal Rules
+## 揭示规则（Reveal Rules）
 
-Each reveal rule:
+每条 reveal rule 包含：
 
 - `id`
 - `factId`
 - `fact`
-- optional `requiresClues`
-- optional `requiresAllClues`
-- optional `requiresAnyClues`
-- optional `requiresTopics`
-- optional `requiresPressureAtLeast`
-- optional `requiresAct`
-- optional `requiresContradictions`
-- `revealMode`: `direct`, `reluctant`, `evasive`, or `partial`
+- 可选 `requiresClues`
+- 可选 `requiresAllClues`
+- 可选 `requiresAnyClues`
+- 可选 `requiresTopics`
+- 可选 `requiresPressureAtLeast`
+- 可选 `requiresAct`
+- 可选 `requiresContradictions`
+- `revealMode`：`direct`、`reluctant`、`evasive` 或 `partial`
 
-Every `factId`, clue id, act id, and contradiction id must exist.
+每个 `factId`、clue id、act id 和 contradiction id 都必须存在。
 
-## Relationships and Propagation
+## Relationships 与 Propagation
 
-Relationships model attitudes between NPCs:
+Relationships 描述 NPC 之间的态度：
 
 - `from`
 - `to`
-- `attitude`: `protective`, `hostile`, `fearful`, or `indifferent`
+- `attitude`：`protective`、`hostile`、`fearful` 或 `indifferent`
 - `knownFactsAboutOther`
 
-Propagation rules model how information can move:
+Propagation rules 描述信息如何移动：
 
 - `fromAgentId`
 - `toAgentId`
 - `factId`
 - `condition`
-- `mode`: `rumor`, `direct`, or `observed`
+- `mode`：`rumor`、`direct` 或 `observed`
 
-Use these only when they clarify runtime behavior. Leave arrays empty when not needed.
+只有当这些字段能澄清 runtime 行为时才使用。无需时保持数组为空。
 
-## Contradictions
+## 矛盾（Contradictions）
 
-Each contradiction:
+每个 contradiction 包含：
 
 - `id`
 - `title`
-- `factIds`: at least two
+- `factIds`：至少两个
 - `clueIds`
 - `agentIds`
 
-Contradictions are ideal for fair-play locks and final accusation questions.
+Contradictions 很适合公平推理锁和最终指认问题。
 
-## Truth and Accusation
+## Truth 与 Accusation
 
-`truth`:
+`truth`：
 
-- `culprit`: must match an agent id
-- `victim`: must match a victim id
+- `culprit`：必须匹配 agent id
+- `victim`：必须匹配 victim id
 - `motive`
 - `method`
 - `decisiveEvidence`
 
-Each accusation question:
+每个 accusation question：
 
 - `id`
 - `prompt`
 - `acceptedAnswers`
 - `explanation`
 
-Minimum useful final accusation set:
+最低可用最终指认集合：
 
-- culprit
-- method
-- decisive contradiction or evidence
-- motive
+- 真凶（culprit）
+- 手法（method）
+- 决定性矛盾或证据（decisive contradiction 或 evidence）
+- 动机（motive）
 
-Add victim, opportunity, or alibi questions only when the mystery needs them.
+只有当谜题需要时，才增加 victim、opportunity 或 alibi 问题。

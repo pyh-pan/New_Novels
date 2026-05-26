@@ -20,6 +20,8 @@ tar \
   --exclude "node_modules" \
   --exclude "dist" \
   --exclude "coverage" \
+  --exclude ".superpowers" \
+  --exclude ".worktrees" \
   --exclude ".DS_Store" \
   -cf - -C "$ROOT_DIR" . | tar -xf - -C "$COPY_DIR"
 
@@ -36,6 +38,7 @@ cp -R .next/static .next/standalone/.next/static
 if [ -d public ]; then
   cp -R public .next/standalone/public
 fi
+rm -rf .next/cache .worktrees .superpowers
 node - <<'NODE'
 const { readFileSync, writeFileSync } = require("node:fs");
 const file = ".next/standalone/server.js";
@@ -56,6 +59,8 @@ zip -qr "$ZIP_PATH" . \
   -x ".git/*" \
   -x "coverage/*" \
   -x ".superpowers/*" \
+  -x ".worktrees/*" \
+  -x ".next/cache/*" \
   -x "docs/superpowers/*"
 
 echo "[guard-package] wrote $ZIP_PATH"

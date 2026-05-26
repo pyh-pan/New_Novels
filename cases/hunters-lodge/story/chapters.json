@@ -1,0 +1,26 @@
+[
+  {
+    "id": "chapter-1",
+    "title": "猎人小屋疑案",
+    "subtitle": "第一章 病榻上的委托",
+    "body": "story/chapter-1.md",
+    "availableFromStart": true,
+    "nextChapterId": "chapter-2"
+  },
+  {
+    "id": "chapter-2",
+    "title": "猎人小屋疑案",
+    "subtitle": "第二章 荒原上的枪声",
+    "body": "story/chapter-2.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-1"
+  },
+  {
+    "id": "chapter-3",
+    "title": "猎人小屋疑案",
+    "subtitle": "第三章 电报、衣着与空白",
+    "body": "story/chapter-3.md",
+    "availableFromStart": false,
+    "previousChapterId": "chapter-2"
+  }
+]

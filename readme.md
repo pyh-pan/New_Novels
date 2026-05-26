@@ -1,78 +1,67 @@
 # New Novels
 
-New Novels is a text-first web prototype for turning detective fiction into
-interactive fair-play mystery experiences.
+New Novels 是一个文字优先的网页原型，用于把推理小说转化为可交互的公平推理体验。
 
-Players read a story, question AI-driven NPCs, inspect clues through natural
-language, keep their own detective notebook, and make a final accusation. The AI
-can perform characters, but it is not the source of truth: the case package and
-runtime rules decide what facts exist, what each NPC knows, and when the final
-solution is accepted.
+玩家阅读故事，用自然语言询问 AI 驱动的 NPC，调查线索，维护自己的侦探笔记，并在信息足够后进行最终指认。AI 可以扮演角色，但不是事实源：案件包和 runtime 规则决定事实是否存在、每个 NPC 知道什么，以及最终答案是否被接受。
 
-The built-in demo case is based on G. K. Chesterton's public-domain Father Brown
-story **"The Hammer of God"**.
+当前内置默认案件是基于用户提供原文生成的中文互动改写版 Agatha Christie **《The Mystery of Hunter's Lodge》**，以 `case-package/v1` 文件系统案件包形式运行。较早的 G. K. Chesterton **《The Hammer of God》** demo 仍作为参考包和测试 fixture 保留。
 
-## Current Prototype
+## 当前原型
 
-Implemented:
+已实现：
 
-- Next.js web app with story reader, investigation desk, notebook drawer, and
-  final accusation page.
-- Default case loaded from `cases/hammer-of-god/` through `CaseLoader`.
-- `case-package/v1` filesystem layout for story text, agents, facts, acts,
-  act gates, clues, contradictions, truth, victims, and accusation questions.
-- Agent Runtime with semantic/keyword routing, player knowledge state, reveal
-  rules, pressure profiles, act gate evaluation, and output guardrails.
-- AI-backed investigation API using the CoWork/Guard Runway Bedrock gateway
-  contract (`ai.properties`) with structured prompt and response handling.
-- Deterministic final accusation checking with a truth summary after success.
-- Local browser persistence for chapter progress, conversations, notes, and UI
-  state, including per-agent sessions and player hypotheses.
-- Case package zip preview API and toolbar UI.
-- Guard-compatible `install.sh`, `start.sh`, `health.sh`, `/health`, and
-  standalone build configuration.
-- `new-novels-case-adapter` skill for adapting mystery stories into case
-  packages.
+- 基于 Next.js 的网页应用，包含故事书架、故事阅读区、调查台、笔记抽屉、最终指认页面和创作者 Studio。
+- 首页以封面书架展示内置案件；玩家点击案件后进入 `/cases/<case-id>` 的阅读与调查界面。
+- 默认可玩案件通过 `CaseLoader` 从 `cases/hunters-lodge/` 加载，`cases/hammer-of-god/` 仍作为内置参考案件可用。
+- `case-package/v1` 文件系统布局，覆盖故事文本、agent、事实、剧情幕、幕间门槛、线索、矛盾、真相、受害者和指认问题。
+- Agent Runtime，支持语义 / 关键词路由、玩家已知状态、揭示规则、压力模型、剧情幕门槛和输出护栏。
+- 基于 CoWork / Guard Runway Bedrock 网关契约（`ai.properties`）的 AI 调查 API，包含结构化 prompt 与响应处理。
+- 基于真相数据的确定性最终指认校验，成功后展示真相摘要。
+- 本地浏览器持久化章节进度、对话、批注式侦探笔记和 UI 状态，包括每个 agent session 与玩家已知状态。
+- 原文和 agent 对话均支持选中文字后批注；批注会同步到侦探笔记，并在原文高亮处提供悬浮预览。
+- 案件包 zip 预览 API 与 Studio 导入入口。
+- Studio v1 提供原文上传入口、案件包导入入口，以及按章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织的审阅工作台。
+- Guard 兼容的 `install.sh`、`start.sh`、`health.sh`、`/health` 和独立构建配置。
+- `new-novels-case-adapter` skill，用于把推理小说改写为案件包。
 
-Not implemented yet:
+尚未实现：
 
-- Activating an uploaded case as the current playable runtime.
-- Persistent server-side save/resume.
-- Full creator editing workspace.
-- Model retry/repair after guardrail rejection.
+- 将上传案件激活为当前可玩 runtime。
+- 服务端持久化存档 / 继续游玩。
+- Studio 批注被真实改写 agent 应用为案件包 diff。
+- 护栏拒绝后的模型重试 / 修复流程。
 
-## Quick Start
+## 快速开始
 
-Install dependencies:
+安装依赖：
 
 ```bash
 npm install
 ```
 
-For local AI testing, create `ai.properties` at the project root or set matching
-environment variables:
+如需本地 AI 测试，在项目根目录创建 `ai.properties`，或设置匹配的环境变量：
 
 ```properties
 ai.base_url=<platform-runway-base-url>
 ai.api_key=<platform-api-key>
 ```
 
-Environment variable fallback:
+环境变量回退：
 
 ```bash
 APP_AI_BASE_URL=<platform-runway-base-url>
 APP_AI_API_KEY=<platform-api-key>
 ```
 
-Run the app:
+运行应用：
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+打开 [http://localhost:3000](http://localhost:3000)。
 
-Useful checks:
+常用检查：
 
 ```bash
 npm test
@@ -80,49 +69,46 @@ npm run lint
 npm run build
 ```
 
-Build a CoWork/Guard package:
+构建 CoWork / Guard 包：
 
 ```bash
 npm run guard:package
 ```
 
-The package is written to `dist/new-novels-guard.zip`.
+生成产物位于 `dist/new-novels-guard.zip`。
 
-Validate the built-in case package:
+校验内置案件包：
 
 ```bash
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hammer-of-god
 ```
 
-## Project Map
+## 项目结构
 
-- `app/` - Next.js pages and API routes.
-- `components/` - story reader, investigation desk, notebook, dialogs, and
-  accusation UI.
-- `lib/case/` - canonical case schema and default case service.
-- `lib/case-package/` - case package manifest schema and directory loader.
-- `lib/agent-runtime/` - routing, runtime context, reveal rules, pressure state,
-  act gates, and output validation.
-- `lib/ai/` - platform AI provider adapter and prompt builders.
-- `lib/game/` - play state, routing wrappers, story view helpers, IDs, and final
-  accusation checking.
-- `cases/hammer-of-god/` - the built-in filesystem case package.
-- `skills/new-novels-case-adapter/` - local skill for adapting mystery stories
-  into playable packages.
-- `docs/` - architecture, package, implementation, and platform notes.
+- `app/`：Next.js 页面和 API routes。
+- `components/`：书架、故事阅读器、调查台、笔记、弹窗、Studio 和指认 UI。
+- `lib/case/`：标准案件 schema 和默认案件服务。
+- `lib/case-package/`：案件包 manifest schema 和目录加载器。
+- `lib/agent-runtime/`：路由、runtime context、揭示规则、压力状态、剧情幕门槛和输出校验。
+- `lib/ai/`：平台 AI provider 适配器和 prompt builder。
+- `lib/game/`：游玩状态、路由包装、故事视图辅助、ID 和最终指认校验。
+- `lib/studio/`：Studio 草稿视图与原文上传任务原型。
+- `cases/hunters-lodge/`：当前内置默认可玩案件包。
+- `cases/hammer-of-god/`：较早的内置参考案件包。
+- `skills/new-novels-case-adapter/`：把推理小说改写为可玩案件包的本地 skill。
+- `docs/`：架构、案件包、实现和平台说明。
 
-## Core Documentation
+## 核心文档
 
-- [Design](./design.md)
-- [Architecture](./docs/architecture.md)
+- [设计文档](./design.md)
+- [架构文档](./docs/architecture.md)
 - [Case Package v1](./docs/case-package.md)
-- [Roadmap](./roadmap.md)
-- [Development Guidelines](./agents.md)
+- [路线图](./roadmap.md)
+- [开发规范](./agents.md)
 
-## License
+## 许可证
 
-License has not been selected yet.
+尚未选择许可证。
 
-The source story selected for the first prototype, "The Hammer of God", is from a
-public-domain collection in the United States. Confirm copyright status for your
-target jurisdiction before distributing adapted content.
+当前《猎人小屋疑案》改写基于用户提供的源文本生成。分发改写内容前，请确认目标司法辖区的版权状态。较早的《The Hammer of God》原型来自美国公有领域合集。

@@ -13,7 +13,11 @@ import {
   parseAgentResponseContract,
   updateSessionForUserMessage
 } from "../../../lib/agent-runtime";
-import { getDefaultCase, getDefaultRuntime } from "../../../lib/case/default-case";
+import {
+  getDefaultCaseId,
+  getRuntimeForCase,
+  loadBundledCase
+} from "../../../lib/case/default-case";
 import { playerKnowledgeStateSchema } from "../../../lib/case/schema";
 
 const historyMessageSchema = z.object({
@@ -34,6 +38,7 @@ const agentSessionSchema = z.object({
 });
 
 const requestSchema = z.object({
+  caseId: z.string().trim().min(1).optional(),
   targetId: z.string().trim().min(1),
   message: z.string().trim().min(1),
   history: z.array(historyMessageSchema).default([]),
@@ -41,10 +46,10 @@ const requestSchema = z.object({
   agentSession: agentSessionSchema.optional()
 });
 
-const caseFile = getDefaultCase();
-const runtime = getDefaultRuntime();
-
-function nextChapterIdForAct(nextActId: string): string | undefined {
+function nextChapterIdForAct(
+  caseFile: ReturnType<typeof loadBundledCase>,
+  nextActId: string
+): string | undefined {
   const actIndex = caseFile.acts.findIndex((act) => act.id === nextActId);
   return actIndex >= 0 ? caseFile.chapters[actIndex]?.id : undefined;
 }
@@ -56,7 +61,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { targetId, message, history, playerState, agentSession } = parsed.data;
+  const { caseId, targetId, message, history, playerState, agentSession } = parsed.data;
+  let caseFile: ReturnType<typeof loadBundledCase>;
+  let runtime: ReturnType<typeof getRuntimeForCase>;
+  try {
+    const resolvedCaseId = caseId ?? getDefaultCaseId();
+    caseFile = loadBundledCase(resolvedCaseId);
+    runtime = getRuntimeForCase(resolvedCaseId);
+  } catch {
+    return NextResponse.json({ error: "Unknown case." }, { status: 404 });
+  }
+
   if (targetId === "unsupported") {
     return NextResponse.json({ error: "Investigation target unsupported." }, { status: 501 });
   }
@@ -127,7 +142,7 @@ export async function POST(request: Request) {
       sceneInteractionIds: applied.playerState.sceneInteractionIds
     });
     const nextChapterId = actGate.nextActId
-      ? nextChapterIdForAct(actGate.nextActId)
+      ? nextChapterIdForAct(caseFile, actGate.nextActId)
       : undefined;
     const nextPlayerState = actGate.nextActId
       ? { ...applied.playerState, currentActId: actGate.nextActId }

@@ -10,74 +10,26 @@ import Page from "../app/page";
 test("renders the scaffolded home page", () => {
   render(<Page />);
 
-  expect(
-    screen.getByRole("heading", { name: "New Novels" })
-  ).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /通用调查助手/ })).toHaveAttribute(
-    "aria-expanded",
-    "true"
+  expect(screen.getByRole("heading", { name: "推理故事书架" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "猎人小屋疑案 封面" })).toHaveAttribute(
+    "href",
+    "/cases/hunters-lodge"
+  );
+  expect(screen.getByRole("link", { name: "创作者工作台" })).toHaveAttribute(
+    "href",
+    "/studio"
   );
 });
 
-test("case package zip can be previewed from the case toolbar", async () => {
-  const fetchMock = vi.fn().mockResolvedValueOnce({
-    ok: true,
-    json: async () => ({
-      ok: true,
-      manifest: {
-        schemaVersion: "case-package/v1",
-        caseId: "custom-case",
-        title: "自定义案件"
-      },
-      caseSummary: {
-        id: "custom-case",
-        title: "自定义案件",
-        chapters: 4,
-        agents: 6,
-        acts: 3,
-        clues: 12,
-        accusationQuestions: 4
-      },
-      issues: []
-    })
-  });
-  vi.stubGlobal("fetch", fetchMock);
-
-  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
-
-  fireEvent.click(screen.getByRole("button", { name: "导入案件包" }));
-  const fileInput = screen.getByLabelText("选择案件包 zip");
-  const file = new File(["zip"], "custom-case.zip", { type: "application/zip" });
-
-  fireEvent.change(fileInput, { target: { files: [file] } });
-
-  expect(await screen.findByText("自定义案件")).toBeInTheDocument();
-  expect(screen.getByText("章节 4 · Agent 6 · 幕 3 · 线索 12")).toBeInTheDocument();
-  expect(fetchMock).toHaveBeenCalledWith(
-    "/api/cases/preview",
-    expect.objectContaining({
-      method: "POST",
-      body: expect.any(FormData)
-    })
-  );
-});
-
-test("player hypotheses are saved in the notebook workspace", () => {
+test("notebook focuses on tagged notes without separate hypothesis workspaces", () => {
   window.localStorage.clear();
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
   fireEvent.click(screen.getByRole("button", { name: "打开侦探笔记" }));
-  const hypothesisInput = screen.getByLabelText("新增推理假设");
-  fireEvent.change(hypothesisInput, {
-    target: { value: "小锤可能是从高处落下的" }
-  });
-  fireEvent.click(screen.getByRole("button", { name: "记录假设" }));
 
-  expect(screen.getByText("小锤可能是从高处落下的")).toBeInTheDocument();
-  expect(
-    JSON.parse(window.localStorage.getItem("new-novels.play-state.v1") ?? "{}").playerState
-      .hypotheses
-  ).toContain("小锤可能是从高处落下的");
+  expect(screen.queryByText("推理假设")).not.toBeInTheDocument();
+  expect(screen.queryByText("已识别矛盾")).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "批注" })).toBeInTheDocument();
 });
 
 test("notebook notes can be edited, retagged, and filtered with selected semantics", () => {
@@ -99,8 +51,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       <NotebookDrawer
         isOpen
         notes={notes}
-        hypotheses={[]}
-        knownContradictions={[]}
         activeTag={activeTag}
         onToggle={() => undefined}
         onFilterChange={(tag) => {
@@ -111,8 +61,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
         }}
         onCreateNote={() => undefined}
         onDeleteNote={() => undefined}
-        onCreateHypothesis={() => undefined}
-        onDeleteHypothesis={() => undefined}
       />
     );
 
@@ -137,8 +85,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
     <NotebookDrawer
       isOpen
       notes={notes}
-      hypotheses={[]}
-      knownContradictions={[]}
       activeTag="all"
       onToggle={() => undefined}
       onFilterChange={(tag) => {
@@ -149,8 +95,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       }}
       onCreateNote={() => undefined}
       onDeleteNote={() => undefined}
-      onCreateHypothesis={() => undefined}
-      onDeleteHypothesis={() => undefined}
     />
   );
 
@@ -163,8 +107,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
     <NotebookDrawer
       isOpen
       notes={notes}
-      hypotheses={[]}
-      knownContradictions={[]}
       activeTag={activeTag}
       onToggle={() => undefined}
       onFilterChange={(tag) => {
@@ -175,8 +117,6 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
       }}
       onCreateNote={() => undefined}
       onDeleteNote={() => undefined}
-      onCreateHypothesis={() => undefined}
-      onDeleteHypothesis={() => undefined}
     />
   );
 
@@ -188,21 +128,15 @@ test("notebook notes can be edited, retagged, and filtered with selected semanti
 });
 
 test("general investigation questions stay in the general module", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ content: "小锤很轻，和伤口严重程度不相称。" })
-    });
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ content: "小锤很轻，和伤口严重程度不相称。" })
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
+  const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
 
   const form = input.closest("form");
@@ -224,17 +158,49 @@ test("general investigation questions stay in the general module", async () => {
   );
 });
 
+test("mention menu inserts an agent and routes the message to that conversation", async () => {
+  window.localStorage.clear();
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ content: "我当时在钟楼下面。" })
+  });
+  vi.stubGlobal("fetch", fetchMock);
+
+  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+
+  const input = screen.getByLabelText("调查问题");
+  fireEvent.change(input, { target: { value: "@" } });
+
+  expect(screen.getByRole("listbox", { name: "选择对话角色" })).toBeInTheDocument();
+  fireEvent.mouseDown(screen.getByRole("option", { name: "威尔弗里德牧师" }));
+  expect(input).toHaveValue("@威尔弗里德牧师 ");
+
+  fireEvent.change(input, { target: { value: "@威尔弗里德牧师 你在哪里？" } });
+  fireEvent.submit(input.closest("form") as HTMLFormElement);
+
+  await waitFor(() => {
+    expect(screen.getByText("我当时在钟楼下面。")).toBeInTheDocument();
+  });
+
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/investigate",
+    expect.objectContaining({
+      body: expect.stringContaining('"targetId":"wilfred"')
+    })
+  );
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/investigate",
+    expect.objectContaining({
+      body: expect.stringContaining('"message":"你在哪里？"')
+    })
+  );
+});
+
 test("investigation patches player state, agent session, and unlocked act narrative", async () => {
   window.localStorage.clear();
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({
         content: "小锤很轻，钟楼高度让这个矛盾变得重要。",
         agentSession: {
           caseId: "hammer-of-god",
@@ -266,12 +232,12 @@ test("investigation patches player state, agent session, and unlocked act narrat
           ]
         }
       })
-    });
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={({ currentChapterId }) => <section>{currentChapterId}</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
+  const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
   fireEvent.submit(input.closest("form") as HTMLFormElement);
 
@@ -293,15 +259,9 @@ test("investigation patches player state, agent session, and unlocked act narrat
 
 test("npc session mood appears as player-facing state without exposing rules", async () => {
   window.localStorage.clear();
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "wilfred", label: "威尔弗里德牧师" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({
         content: "我只是在下面祈祷。",
         agentSession: {
           caseId: "hammer-of-god",
@@ -326,13 +286,13 @@ test("npc session mood appears as player-facing state without exposing rules", a
           hypotheses: []
         }
       })
-    });
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
-  fireEvent.change(input, { target: { value: "问威尔弗里德他在哪里" } });
+  const input = screen.getByLabelText("调查问题");
+  fireEvent.change(input, { target: { value: "@威尔弗里德牧师 他在哪里" } });
   fireEvent.submit(input.closest("form") as HTMLFormElement);
 
   await waitFor(() => {
@@ -340,19 +300,25 @@ test("npc session mood appears as player-facing state without exposing rules", a
   });
 
   expect(screen.queryByText(/wilfred-tower-contradiction/)).not.toBeInTheDocument();
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/investigate",
+    expect.objectContaining({
+      body: expect.stringContaining('"targetId":"wilfred"')
+    })
+  );
 });
 
-test("unsupported routed targets stay in the general module and do not call investigate", async () => {
+test("unknown mentions fall back to the general assistant", async () => {
   const fetchMock = vi.fn().mockResolvedValueOnce({
     ok: true,
-    json: async () => ({ targetId: "unsupported", label: "未配置调查对象" })
+    json: async () => ({ content: "我会先从已知信息里整理这个问题。" })
   });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
-  fireEvent.change(input, { target: { value: "问问村长" } });
+  const input = screen.getByLabelText("调查问题");
+  fireEvent.change(input, { target: { value: "@村长 他看到了什么" } });
 
   const form = input.closest("form");
   if (!form) {
@@ -362,28 +328,28 @@ test("unsupported routed targets stay in the general module and do not call inve
   fireEvent.submit(form);
 
   await waitFor(() => {
-    expect(screen.getByText("这个对象还没有配置为可询问角色。")).toBeInTheDocument();
+    expect(screen.getByText("我会先从已知信息里整理这个问题。")).toBeInTheDocument();
   });
 
   expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/investigate",
+    expect.objectContaining({
+      body: expect.stringContaining('"targetId":"general"')
+    })
+  );
 });
 
-test("investigation submit is locked during routing and non-ok API errors use fallback path", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "wilfred", label: "威尔弗里德牧师" })
-    })
-    .mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({})
-    });
+test("investigation submit is locked during request and non-ok API errors use fallback path", async () => {
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: false,
+    json: async () => ({})
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
+  const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "询问威尔弗里德在哪里" } });
 
   const form = input.closest("form");
@@ -398,26 +364,20 @@ test("investigation submit is locked during routing and non-ok API errors use fa
     expect(screen.getByText("请求失败。")).toBeInTheDocument();
   });
 
-  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(fetchMock).toHaveBeenCalledTimes(1);
 });
 
 test("investigation state persists across reloads and reset requires confirmation", async () => {
   window.localStorage.clear();
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ content: "锤柄上没有明显血迹。" })
-    });
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ content: "锤柄上没有明显血迹。" })
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   const { unmount } = render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
+  const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "看看锤柄" } });
   fireEvent.submit(input.closest("form") as HTMLFormElement);
 
@@ -451,23 +411,17 @@ test("reset utility does not render over the open notebook drawer", () => {
   expect(screen.queryByRole("button", { name: "重新开始" })).not.toBeInTheDocument();
 });
 
-test("conversation input supports keyboard submit and excerpt feedback", async () => {
+test("conversation input supports keyboard submit without inline note extraction controls", async () => {
   window.localStorage.clear();
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ content: "现场没有明显拖拽痕迹。" })
-    });
+  const fetchMock = vi.fn().mockResolvedValueOnce({
+    ok: true,
+    json: async () => ({ content: "现场没有明显拖拽痕迹。" })
+  });
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
-  const input = screen.getByLabelText("新的调查问题");
+  const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "现场有没有拖拽痕迹" } });
   fireEvent.keyDown(input, { key: "Enter", metaKey: true });
 
@@ -475,7 +429,5 @@ test("conversation input supports keyboard submit and excerpt feedback", async (
     expect(screen.getByText("现场没有明显拖拽痕迹。")).toBeInTheDocument();
   });
 
-  const excerptButtons = screen.getAllByRole("button", { name: "摘录这条回复" });
-  fireEvent.click(excerptButtons[excerptButtons.length - 1]);
-  expect(screen.getByText("已加入侦探笔记。")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "摘录这条回复" })).not.toBeInTheDocument();
 });

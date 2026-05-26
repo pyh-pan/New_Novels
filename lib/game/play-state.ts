@@ -1,18 +1,14 @@
 import type { ConversationMessage } from "../../components/ConversationModule";
 import type { NotebookNote, NoteFilter } from "../../components/NotebookDrawer";
 import type { AgentSession } from "../agent-runtime";
-import type { PlayerKnowledgeState } from "../case/schema";
+import type { CaseAgent, PlayerKnowledgeState, StoryChapter } from "../case/schema";
 
 export const PLAY_STATE_VERSION = 1;
 export const PLAY_STATE_STORAGE_KEY = "new-novels.play-state.v1";
+const LEGACY_GENERAL_OPENING_MESSAGE =
+  "我会基于你已掌握的信息协助调查；如果问题更适合某位人物，我会把对话转到对应 NPC。";
 
-export type ConversationTarget =
-  | "general"
-  | "wilfred"
-  | "simeon"
-  | "elizabeth"
-  | "joe"
-  | "unsupported";
+export type ConversationTarget = string;
 
 export type Conversation = {
   id: string;
@@ -27,6 +23,7 @@ export type MobileTab = "story" | "investigation" | "notebook";
 
 export type LocalPlayState = {
   version: number;
+  caseId: string;
   currentChapterId: string;
   conversations: Conversation[];
   agentSessions: Record<string, AgentSession>;
@@ -58,16 +55,9 @@ export const initialConversations: Conversation[] = [
     id: "general",
     targetId: "general",
     title: "通用调查助手",
-    subtitle: "理解问题、整理已知线索，并自动转交给相关 NPC",
+    subtitle: "默认接收未指定对象的问题，整理已知线索",
     isExpanded: true,
-    messages: [
-      {
-        id: "general-opening",
-        role: "assistant",
-        content:
-          "我会基于你已掌握的信息协助调查；如果问题更适合某位人物，我会把对话转到对应 NPC。"
-      }
-    ]
+    messages: []
   },
   {
     id: "wilfred",
@@ -103,11 +93,46 @@ export const initialConversations: Conversation[] = [
   }
 ];
 
-export function createInitialPlayState(): LocalPlayState {
+export type ConversationAgentSummary = Pick<CaseAgent, "id" | "name" | "role" | "type">;
+
+function createInitialConversations(agents: ConversationAgentSummary[]): Conversation[] {
+  const sortedAgents = [
+    ...agents.filter((agent) => agent.id === "general"),
+    ...agents.filter((agent) => agent.id !== "general" && agent.type === "npc")
+  ];
+
+  return sortedAgents.map((agent) => ({
+    id: agent.id,
+    targetId: agent.id,
+    title: agent.name,
+    subtitle:
+      agent.id === "general"
+        ? "默认接收未指定对象的问题，整理已知线索"
+        : agent.role,
+    isExpanded: agent.id === "general",
+    messages: []
+  }));
+}
+
+export function createInitialPlayState({
+  caseId = "hunters-lodge",
+  entryChapterId = "chapter-1",
+  agents = initialConversations.map((conversation) => ({
+    id: conversation.targetId,
+    name: conversation.title,
+    role: conversation.subtitle ?? conversation.title,
+    type: conversation.targetId === "general" ? "general" : "npc"
+  })) as ConversationAgentSummary[]
+}: {
+  caseId?: string;
+  entryChapterId?: StoryChapter["id"];
+  agents?: ConversationAgentSummary[];
+} = {}): LocalPlayState {
   return {
     version: PLAY_STATE_VERSION,
-    currentChapterId: "chapter-1",
-    conversations: initialConversations,
+    caseId,
+    currentChapterId: entryChapterId,
+    conversations: createInitialConversations(agents),
     agentSessions: {},
     notes: [],
     playerState: initialPlayerState,
@@ -137,6 +162,51 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function normalizeConversations(value: unknown, initial: Conversation[]): Conversation[] {
+  if (!Array.isArray(value)) {
+    return initial;
+  }
+
+  return value.filter(isRecord).map((conversation, index) => {
+    const initialConversation = initial[index];
+    const messages = Array.isArray(conversation.messages)
+      ? conversation.messages
+          .filter(isRecord)
+          .filter((message) => message.content !== LEGACY_GENERAL_OPENING_MESSAGE)
+          .map((message, messageIndex) => ({
+            id: typeof message.id === "string" ? message.id : `message-${messageIndex}`,
+            role: message.role === "user" ? "user" as const : "assistant" as const,
+            content: typeof message.content === "string" ? message.content : ""
+          }))
+          .filter((message) => message.content.trim().length > 0)
+      : [];
+
+    return {
+      id:
+        typeof conversation.id === "string"
+          ? conversation.id
+          : initialConversation?.id ?? `conversation-${index}`,
+      targetId:
+        typeof conversation.targetId === "string"
+          ? conversation.targetId
+          : initialConversation?.targetId ?? `conversation-${index}`,
+      title:
+        typeof conversation.title === "string"
+          ? conversation.title
+          : initialConversation?.title ?? "未命名角色",
+      subtitle:
+        typeof conversation.subtitle === "string"
+          ? conversation.subtitle
+          : initialConversation?.subtitle,
+      isExpanded:
+        typeof conversation.isExpanded === "boolean"
+          ? conversation.isExpanded
+          : Boolean(initialConversation?.isExpanded),
+      messages
+    };
+  });
+}
+
 function normalizeNotes(value: unknown): NotebookNote[] {
   if (!Array.isArray(value)) {
     return [];
@@ -149,6 +219,7 @@ function normalizeNotes(value: unknown): NotebookNote[] {
     title: typeof note.title === "string" ? note.title : "未命名笔记",
     text: typeof note.text === "string" ? note.text : "",
     tag:
+      note.tag === "comment" ||
       note.tag === "testimony" ||
       note.tag === "doubt" ||
       note.tag === "contradiction" ||
@@ -156,6 +227,7 @@ function normalizeNotes(value: unknown): NotebookNote[] {
         ? note.tag
         : "clue",
     source: typeof note.source === "string" ? note.source : "手动记录",
+    quote: typeof note.quote === "string" ? note.quote : undefined,
     createdAt: typeof note.createdAt === "string" ? note.createdAt : now,
     updatedAt: typeof note.updatedAt === "string" ? note.updatedAt : now
   }));
@@ -204,11 +276,18 @@ function normalizeAgentSessions(value: unknown): Record<string, AgentSession> {
   return sessions;
 }
 
-export function normalizePlayState(value: unknown): LocalPlayState {
-  const initial = createInitialPlayState();
+export function normalizePlayState(
+  value: unknown,
+  options?: Parameters<typeof createInitialPlayState>[0]
+): LocalPlayState {
+  const initial = createInitialPlayState(options);
   const parsed = parseUnknown(value);
 
   if (!isRecord(parsed)) {
+    return initial;
+  }
+
+  if (parsed.caseId !== initial.caseId) {
     return initial;
   }
 
@@ -216,13 +295,12 @@ export function normalizePlayState(value: unknown): LocalPlayState {
 
   return {
     ...initial,
+    caseId: initial.caseId,
     currentChapterId:
       typeof parsed.currentChapterId === "string"
         ? parsed.currentChapterId
         : initial.currentChapterId,
-    conversations: Array.isArray(parsed.conversations)
-      ? (parsed.conversations as Conversation[])
-      : initial.conversations,
+    conversations: normalizeConversations(parsed.conversations, initial.conversations),
     agentSessions: normalizeAgentSessions(parsed.agentSessions),
     notes: normalizeNotes(parsed.notes),
     playerState: isRecord(parsed.playerState)
@@ -232,6 +310,7 @@ export function normalizePlayState(value: unknown): LocalPlayState {
       ...initial.ui,
       activeNotebookFilter:
         ui.activeNotebookFilter === "clue" ||
+        ui.activeNotebookFilter === "comment" ||
         ui.activeNotebookFilter === "testimony" ||
         ui.activeNotebookFilter === "doubt" ||
         ui.activeNotebookFilter === "contradiction" ||

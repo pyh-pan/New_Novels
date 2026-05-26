@@ -1,1820 +1,287 @@
-# General UX Iteration Implementation Plan
+# 通用体验迭代执行计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> 面向 agentic workers：实现本计划时应使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans`，按任务逐项推进。本文是早期英文计划的中文归档版，保留原有目标、架构边界、任务顺序、关键文件、验证方式和验收逻辑。
 
-**Goal:** Improve the prototype's general UX with versioned git history, better notebook workflows, local persistence, Pretext-backed chapter reading, conversation polish, and mobile bottom tabs.
+**目标：** 优化原型的通用体验，包括版本化 Git 历史、更完整的侦探笔记工作流、本地进度持久化、基于 Pretext 的章节阅读、对话体验打磨和移动端底部标签。
 
-**Architecture:** Keep the current Next.js app and agent API architecture. Add focused client-side helpers for local play state, chapter data, and Pretext layout preparation, then reuse the same state across desktop and mobile layouts. Ship in V0-V3 so each phase is independently testable.
+**架构：** 保留当前 Next.js 应用和 agent API 架构。新增聚焦客户端的 play state、章节数据和 Pretext 排版辅助层，然后在桌面端与移动端复用同一套状态。按 V0 到 V3 分阶段交付，保证每一阶段都可以独立测试。
 
-**Tech Stack:** Next.js 15, React 19, TypeScript, Vitest, Testing Library, localStorage, `@chenglou/pretext`.
-
----
-
-## Source Spec
-
-- Design spec: `docs/superpowers/specs/2026-04-29-general-ux-iteration-design.md`
-- Pretext reference: `https://github.com/chenglou/pretext`
-
-## File Structure
-
-Create:
-
-- `lib/game/ids.ts`: deterministic helper wrapper for generated ids.
-- `lib/game/play-state.ts`: initial state, localStorage schema, validation, hydration, serialization, reset helpers.
-- `lib/game/story.ts`: chapter data derived from the current case text and chapter navigation helpers.
-- `lib/reading/pretext-layout.ts`: small isolation layer around Pretext.
-- `components/StoryReader.tsx`: chapter reader replacing `StoryPane`.
-- `components/ConfirmDialog.tsx`: reusable custom confirmation modal.
-- `tests/play-state.test.ts`: localStorage normalization tests.
-- `tests/story-reader.test.tsx`: chapter navigation and floating-nav tests.
-- `tests/notebook-drawer.test.tsx`: notebook create/delete/sort/filter tests.
-- `tests/mobile-tabs.test.tsx`: mobile tab state tests where practical.
-
-Modify:
-
-- `package.json`: add `@chenglou/pretext`.
-- `package-lock.json`: update through `npm install`.
-- `app/page.tsx`: render `StoryReader` through `InvestigationDesk`.
-- `components/InvestigationDesk.tsx`: state ownership, persistence, reset, mobile tabs, conversation polish.
-- `components/NotebookDrawer.tsx`: manual note creation, deletion confirmation, timestamps.
-- `components/ConversationModule.tsx`: better loading/error/excerpt feedback.
-- `app/globals.css`: desktop utilities, dialog, story reader, mobile tabs.
-- `tests/smoke.test.tsx`: update old expectations after component rename and notebook API changes.
-- `roadmap.md`: mark this UX iteration as underway or update after completion.
+**技术栈：** Next.js 15、React 19、TypeScript、Vitest、Testing Library、`localStorage`、`@chenglou/pretext`。
 
 ---
 
-## Task 0: Git Baseline
+## 来源规范
 
-**Files:**
-- No source edits.
+- 设计规范：`docs/superpowers/specs/2026-04-29-general-ux-iteration-design.md`
+- Pretext 参考：`https://github.com/chenglou/pretext`
 
-- [ ] **Step 1: Check repository state**
+## 文件范围
 
-Run:
+新增文件：
+
+- `lib/game/ids.ts`：为生成 ID 提供确定性辅助封装。
+- `lib/game/play-state.ts`：定义初始状态、`localStorage` schema、校验、水合、序列化和重置辅助函数。
+- `lib/game/story.ts`：从当前案件文本派生章节数据与章节导航辅助函数。
+- `lib/reading/pretext-layout.ts`：围绕 Pretext 的小型隔离层。
+- `components/StoryReader.tsx`：替换 `StoryPane` 的章节阅读组件。
+- `components/ConfirmDialog.tsx`：可复用自定义确认弹窗。
+- `tests/play-state.test.ts`：本地状态规范化测试。
+- `tests/story-reader.test.tsx`：章节导航和浮动导航测试。
+- `tests/notebook-drawer.test.tsx`：笔记新建、删除、排序、筛选测试。
+- `tests/mobile-tabs.test.tsx`：移动端标签状态测试。
+
+修改文件：
+
+- `package.json`：加入 `@chenglou/pretext`。
+- `package-lock.json`：通过 `npm install` 更新。
+- `app/page.tsx`：通过 `InvestigationDesk` 渲染 `StoryReader`。
+- `components/InvestigationDesk.tsx`：集中处理状态所有权、持久化、重置、移动端标签和对话打磨。
+- `components/NotebookDrawer.tsx`：支持手动新建笔记、删除确认和时间戳。
+- `components/ConversationModule.tsx`：优化 loading、错误状态和摘录反馈。
+- `app/globals.css`：加入桌面工具类、弹窗、阅读器和移动端标签样式。
+- `tests/smoke.test.tsx`：根据组件命名和笔记 API 变化更新旧断言。
+- `roadmap.md`：记录本轮体验迭代状态。
+
+## 任务 0：建立 Git 基线
+
+**涉及文件：** 不修改源码。
+
+执行逻辑：
+
+1. 检查当前目录是否已经是 Git 仓库。
+2. 如果尚未初始化，则执行 `git init`。
+3. 使用 `git status --short` 检查待纳入版本管理的文件，确认没有 `.env`、密钥、构建产物或本地浏览器产物。
+4. 创建原型基线提交。
+5. 再次检查工作区状态。
+
+关键命令：
 
 ```bash
 git rev-parse --is-inside-work-tree
-```
-
-Expected if git is not initialized:
-
-```text
-fatal: not a git repository
-```
-
-Expected if already initialized:
-
-```text
-true
-```
-
-- [ ] **Step 2: Initialize git only if needed**
-
-Run only if Step 1 says this is not a git repository:
-
-```bash
-git init
-```
-
-Expected:
-
-```text
-Initialized empty Git repository
-```
-
-- [ ] **Step 3: Inspect files before staging**
-
-Run:
-
-```bash
 git status --short
-```
-
-Expected: project files appear as untracked on first initialization. Confirm no `.env`, secrets, build output, or local browser artifacts are staged.
-
-- [ ] **Step 4: Create baseline commit**
-
-Run:
-
-```bash
 git add agents.md app components design.md docs eslint.config.mjs lib next-env.d.ts next.config.mjs package-lock.json package.json readme.md roadmap.md tests tsconfig.json vitest.config.ts
 git commit -m "chore: create prototype baseline"
-```
-
-Expected: commit succeeds.
-
-- [ ] **Step 5: Verify clean baseline**
-
-Run:
-
-```bash
 git status --short
 ```
 
-Expected:
+验收标准：仓库完成初始化或确认已初始化；基线提交成功；没有意外文件被纳入版本管理。
 
-```text
-```
+## 任务 1：Play State 与 ID 辅助函数
 
----
+**涉及文件：**
 
-## Task 1: Play State and ID Helpers
+- 新建 `lib/game/ids.ts`
+- 新建 `lib/game/play-state.ts`
+- 新建 `tests/play-state.test.ts`
 
-**Files:**
-- Create: `lib/game/ids.ts`
-- Create: `lib/game/play-state.ts`
-- Test: `tests/play-state.test.ts`
+执行逻辑：
 
-- [ ] **Step 1: Write failing play-state tests**
+1. 先编写失败测试，覆盖初始状态、状态规范化、缺失字段补齐、无效数据回退和序列化。
+2. 创建 `lib/game/ids.ts`，提供稳定 ID 生成入口。
+3. 创建 `lib/game/play-state.ts`，定义玩家进度、章节、笔记、对话、已发现信息等状态模型。
+4. 实现 `localStorage` 读写前的规范化，避免旧数据或损坏数据破坏 UI。
+5. 运行测试直到通过。
 
-Create `tests/play-state.test.ts`:
-
-```ts
-import { describe, expect, test } from "vitest";
-import {
-  createInitialPlayState,
-  normalizePlayState,
-  PLAY_STATE_STORAGE_KEY,
-  serializePlayState
-} from "../lib/game/play-state";
-
-describe("play state persistence", () => {
-  test("creates a versioned initial play state", () => {
-    const state = createInitialPlayState();
-
-    expect(state.version).toBe(1);
-    expect(state.currentChapterId).toBe("chapter-1");
-    expect(state.conversations[0]?.targetId).toBe("general");
-    expect(state.notes).toEqual([]);
-    expect(state.ui.activeNotebookFilter).toBe("all");
-    expect(PLAY_STATE_STORAGE_KEY).toBe("new-novels.play-state.v1");
-  });
-
-  test("normalizes partial saved state without losing valid data", () => {
-    const normalized = normalizePlayState({
-      version: 1,
-      currentChapterId: "chapter-2",
-      notes: [
-        {
-          id: "note-1",
-          title: "旧笔记",
-          text: "正文",
-          tag: "clue",
-          source: "调查助手"
-        }
-      ],
-      ui: { activeNotebookFilter: "clue", mobileTab: "notebook" }
-    });
-
-    expect(normalized.currentChapterId).toBe("chapter-2");
-    expect(normalized.notes[0]).toMatchObject({
-      id: "note-1",
-      title: "旧笔记",
-      tag: "clue"
-    });
-    expect(normalized.notes[0]?.createdAt).toEqual(expect.any(String));
-    expect(normalized.ui.activeNotebookFilter).toBe("clue");
-    expect(normalized.ui.mobileTab).toBe("notebook");
-  });
-
-  test("invalid saved state falls back to initial state", () => {
-    const normalized = normalizePlayState("{ broken json");
-
-    expect(normalized.currentChapterId).toBe("chapter-1");
-    expect(normalized.notes).toEqual([]);
-  });
-
-  test("serializes valid state as JSON", () => {
-    const serialized = serializePlayState(createInitialPlayState());
-
-    expect(JSON.parse(serialized)).toMatchObject({
-      version: 1,
-      currentChapterId: "chapter-1"
-    });
-  });
-});
-```
-
-- [ ] **Step 2: Run the failing tests**
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/play-state.test.ts
 ```
 
-Expected: FAIL because `lib/game/play-state.ts` does not exist.
+验收标准：play state 可以被安全创建、加载、修复、序列化和重置。
 
-- [ ] **Step 3: Add ID helper**
+## 任务 2：笔记新建、删除与确认弹窗
 
-Create `lib/game/ids.ts`:
+**涉及文件：**
 
-```ts
-export function makeId(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-```
+- 新建 `components/ConfirmDialog.tsx`
+- 修改 `components/NotebookDrawer.tsx`
+- 修改 `components/InvestigationDesk.tsx`
+- 修改 `tests/smoke.test.tsx`
+- 新建或更新 `tests/notebook-drawer.test.tsx`
 
-- [ ] **Step 4: Add play-state model and normalization**
+执行逻辑：
 
-Create `lib/game/play-state.ts`:
+1. 先写失败测试，覆盖新建笔记、删除确认、取消删除、标签筛选和排序。
+2. 创建 `ConfirmDialog`，替代浏览器原生 `confirm`。
+3. 为 `NotebookDrawer` 增加 `onCreateNote` 与 `onDeleteNote`。
+4. 在 `InvestigationDesk` 中接入新建、删除、更新时间戳和保存摘录逻辑。
+5. 更新旧测试中对 `NotebookDrawer` 的渲染参数。
 
-```ts
-import type { ConversationMessage } from "../../components/ConversationModule";
-import type { NotebookNote, NoteFilter } from "../../components/NotebookDrawer";
-import type { PlayerKnowledgeState } from "../case/schema";
-
-export const PLAY_STATE_VERSION = 1;
-export const PLAY_STATE_STORAGE_KEY = "new-novels.play-state.v1";
-
-export type ConversationTarget =
-  | "general"
-  | "wilfred"
-  | "simeon"
-  | "elizabeth"
-  | "joe"
-  | "unsupported";
-
-export type Conversation = {
-  id: string;
-  targetId: ConversationTarget;
-  title: string;
-  subtitle?: string;
-  messages: ConversationMessage[];
-  isExpanded: boolean;
-};
-
-export type MobileTab = "story" | "investigation" | "notebook";
-
-export type LocalPlayState = {
-  version: number;
-  currentChapterId: string;
-  conversations: Conversation[];
-  notes: NotebookNote[];
-  playerState: PlayerKnowledgeState;
-  ui: {
-    activeNotebookFilter: NoteFilter;
-    activeConversationId?: string;
-    notebookOpen?: boolean;
-    mobileTab?: MobileTab;
-  };
-  savedAt: string;
-};
-
-export const initialPlayerState: PlayerKnowledgeState = {
-  discoveredClueIds: [],
-  heardTestimonyIds: [],
-  knownContradictionIds: [],
-  confrontedAgentIds: [],
-  askedTopics: []
-};
-
-export const initialConversations: Conversation[] = [
-  {
-    id: "general",
-    targetId: "general",
-    title: "通用调查助手",
-    subtitle: "理解问题、整理已知线索，并自动转交给相关 NPC",
-    isExpanded: true,
-    messages: [
-      {
-        id: "general-opening",
-        role: "assistant",
-        content: "我会基于你已掌握的信息协助调查；如果问题更适合某位人物，我会把对话转到对应 NPC。"
-      }
-    ]
-  },
-  {
-    id: "wilfred",
-    targetId: "wilfred",
-    title: "威尔弗里德牧师",
-    subtitle: "死者的弟弟，村中牧师",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "simeon",
-    targetId: "simeon",
-    title: "铁匠西米恩",
-    subtitle: "村中铁匠，表面嫌疑人",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "elizabeth",
-    targetId: "elizabeth",
-    title: "伊丽莎白",
-    subtitle: "铁匠妻子",
-    isExpanded: false,
-    messages: []
-  },
-  {
-    id: "joe",
-    targetId: "joe",
-    title: "疯乔",
-    subtitle: "村中边缘人",
-    isExpanded: false,
-    messages: []
-  }
-];
-
-export function createInitialPlayState(): LocalPlayState {
-  return {
-    version: PLAY_STATE_VERSION,
-    currentChapterId: "chapter-1",
-    conversations: initialConversations,
-    notes: [],
-    playerState: initialPlayerState,
-    ui: {
-      activeNotebookFilter: "all",
-      activeConversationId: "general",
-      notebookOpen: false,
-      mobileTab: "story"
-    },
-    savedAt: new Date().toISOString()
-  };
-}
-
-function parseUnknown(value: unknown): unknown {
-  if (typeof value !== "string") {
-    return value;
-  }
-
-  try {
-    return JSON.parse(value) as unknown;
-  } catch {
-    return undefined;
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function normalizeNotes(value: unknown): NotebookNote[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  const now = new Date().toISOString();
-
-  return value
-    .filter(isRecord)
-    .map((note, index) => ({
-      id: typeof note.id === "string" ? note.id : `note-${index}`,
-      title: typeof note.title === "string" ? note.title : "未命名笔记",
-      text: typeof note.text === "string" ? note.text : "",
-      tag:
-        note.tag === "testimony" ||
-        note.tag === "doubt" ||
-        note.tag === "contradiction" ||
-        note.tag === "clue"
-          ? note.tag
-          : "clue",
-      source: typeof note.source === "string" ? note.source : "手动记录",
-      createdAt: typeof note.createdAt === "string" ? note.createdAt : now,
-      updatedAt: typeof note.updatedAt === "string" ? note.updatedAt : now
-    }));
-}
-
-export function normalizePlayState(value: unknown): LocalPlayState {
-  const initial = createInitialPlayState();
-  const parsed = parseUnknown(value);
-
-  if (!isRecord(parsed)) {
-    return initial;
-  }
-
-  const ui = isRecord(parsed.ui) ? parsed.ui : {};
-
-  return {
-    ...initial,
-    currentChapterId:
-      typeof parsed.currentChapterId === "string"
-        ? parsed.currentChapterId
-        : initial.currentChapterId,
-    conversations: Array.isArray(parsed.conversations)
-      ? (parsed.conversations as Conversation[])
-      : initial.conversations,
-    notes: normalizeNotes(parsed.notes),
-    playerState: isRecord(parsed.playerState)
-      ? ({ ...initial.playerState, ...parsed.playerState } as PlayerKnowledgeState)
-      : initial.playerState,
-    ui: {
-      ...initial.ui,
-      activeNotebookFilter:
-        ui.activeNotebookFilter === "clue" ||
-        ui.activeNotebookFilter === "testimony" ||
-        ui.activeNotebookFilter === "doubt" ||
-        ui.activeNotebookFilter === "contradiction" ||
-        ui.activeNotebookFilter === "all"
-          ? ui.activeNotebookFilter
-          : "all",
-      activeConversationId:
-        typeof ui.activeConversationId === "string"
-          ? ui.activeConversationId
-          : initial.ui.activeConversationId,
-      notebookOpen:
-        typeof ui.notebookOpen === "boolean"
-          ? ui.notebookOpen
-          : initial.ui.notebookOpen,
-      mobileTab:
-        ui.mobileTab === "story" ||
-        ui.mobileTab === "investigation" ||
-        ui.mobileTab === "notebook"
-          ? ui.mobileTab
-          : "story"
-    },
-    savedAt: typeof parsed.savedAt === "string" ? parsed.savedAt : initial.savedAt
-  };
-}
-
-export function serializePlayState(state: LocalPlayState) {
-  return JSON.stringify({ ...state, savedAt: new Date().toISOString() });
-}
-```
-
-- [ ] **Step 5: Verify play-state tests pass**
-
-Run:
-
-```bash
-npm test -- tests/play-state.test.ts
-```
-
-Expected: PASS.
-
-- [ ] **Step 6: Commit**
-
-Run:
-
-```bash
-git add lib/game/ids.ts lib/game/play-state.ts tests/play-state.test.ts
-git commit -m "feat: add local play state model"
-```
-
----
-
-## Task 2: Notebook Creation, Deletion, and Confirmation Dialog
-
-**Files:**
-- Create: `components/ConfirmDialog.tsx`
-- Modify: `components/NotebookDrawer.tsx`
-- Modify: `components/InvestigationDesk.tsx`
-- Test: `tests/notebook-drawer.test.tsx`
-- Modify: `tests/smoke.test.tsx`
-
-- [ ] **Step 1: Write failing notebook tests**
-
-Create `tests/notebook-drawer.test.tsx`:
-
-```tsx
-import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import NotebookDrawer, {
-  type NotebookNote,
-  type NoteFilter
-} from "../components/NotebookDrawer";
-
-function renderNotebook(initialNotes: NotebookNote[] = []) {
-  let notes = initialNotes;
-  let activeTag: NoteFilter = "all";
-
-  const handlers = {
-    onToggle: vi.fn(),
-    onFilterChange: vi.fn((tag: NoteFilter) => {
-      activeTag = tag;
-    }),
-    onUpdateNote: vi.fn((id: string, updates: Partial<NotebookNote>) => {
-      notes = notes.map((note) =>
-        note.id === id ? { ...note, ...updates, updatedAt: "updated" } : note
-      );
-    }),
-    onCreateNote: vi.fn(() => {
-      notes = [
-        {
-          id: "created-note",
-          title: "新笔记",
-          text: "",
-          tag: "clue",
-          source: "手动记录",
-          createdAt: "2026-04-29T00:00:00.000Z",
-          updatedAt: "2026-04-29T00:00:00.000Z"
-        },
-        ...notes
-      ];
-    }),
-    onDeleteNote: vi.fn((id: string) => {
-      notes = notes.filter((note) => note.id !== id);
-    })
-  };
-
-  const view = render(
-    <NotebookDrawer
-      isOpen
-      notes={notes}
-      activeTag={activeTag}
-      {...handlers}
-    />
-  );
-
-  return { ...view, handlers, getNotes: () => notes, getActiveTag: () => activeTag };
-}
-
-test("creates a manual note from the notebook", () => {
-  const view = renderNotebook();
-
-  fireEvent.click(screen.getByRole("button", { name: "新建笔记" }));
-
-  expect(view.handlers.onCreateNote).toHaveBeenCalledTimes(1);
-});
-
-test("deletes notes only after confirmation", () => {
-  const view = renderNotebook([
-    {
-      id: "note-1",
-      title: "线索",
-      text: "小锤很轻",
-      tag: "clue",
-      source: "调查助手",
-      createdAt: "2026-04-29T00:00:00.000Z",
-      updatedAt: "2026-04-29T00:00:00.000Z"
-    }
-  ]);
-
-  fireEvent.click(screen.getByRole("button", { name: "删除笔记：线索" }));
-  expect(screen.getByRole("dialog", { name: "删除这条笔记？" })).toBeInTheDocument();
-  expect(view.handlers.onDeleteNote).not.toHaveBeenCalled();
-
-  fireEvent.click(screen.getByRole("button", { name: "确认删除" }));
-  expect(view.handlers.onDeleteNote).toHaveBeenCalledWith("note-1");
-});
-```
-
-- [ ] **Step 2: Run the failing notebook tests**
-
-Run:
-
-```bash
-npm test -- tests/notebook-drawer.test.tsx
-```
-
-Expected: FAIL because `onCreateNote`, `onDeleteNote`, and the dialog do not exist.
-
-- [ ] **Step 3: Create confirmation dialog**
-
-Create `components/ConfirmDialog.tsx`:
-
-```tsx
-"use client";
-
-type ConfirmDialogProps = {
-  title: string;
-  description: string;
-  confirmLabel: string;
-  cancelLabel?: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
-
-export default function ConfirmDialog({
-  title,
-  description,
-  confirmLabel,
-  cancelLabel = "取消",
-  onConfirm,
-  onCancel
-}: ConfirmDialogProps) {
-  return (
-    <div className="dialog-backdrop" role="presentation">
-      <section
-        className="confirm-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-      >
-        <h2>{title}</h2>
-        <p>{description}</p>
-        <div className="dialog-actions">
-          <button type="button" className="dialog-secondary" onClick={onCancel}>
-            {cancelLabel}
-          </button>
-          <button type="button" className="dialog-danger" onClick={onConfirm}>
-            {confirmLabel}
-          </button>
-        </div>
-      </section>
-    </div>
-  );
-}
-```
-
-- [ ] **Step 4: Modify notebook props and UI**
-
-In `components/NotebookDrawer.tsx`:
-
-- add `createdAt` and `updatedAt` to `NotebookNote`;
-- add props `onCreateNote` and `onDeleteNote`;
-- render a `新建笔记` button in the notebook header;
-- render a delete button per note;
-- use `ConfirmDialog` before calling `onDeleteNote`.
-
-The delete state should be local to `NotebookDrawer`:
-
-```tsx
-const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-const pendingDeleteNote = notes.find((note) => note.id === pendingDeleteId);
-```
-
-The delete button must be accessible:
-
-```tsx
-<button
-  type="button"
-  className="note-delete"
-  aria-label={`删除笔记：${note.title}`}
-  onClick={() => setPendingDeleteId(note.id)}
->
-  删除
-</button>
-```
-
-The confirmation dialog must call:
-
-```tsx
-{pendingDeleteNote ? (
-  <ConfirmDialog
-    title="删除这条笔记？"
-    description="删除后无法从当前原型中恢复。"
-    confirmLabel="确认删除"
-    onCancel={() => setPendingDeleteId(null)}
-    onConfirm={() => {
-      onDeleteNote(pendingDeleteNote.id);
-      setPendingDeleteId(null);
-    }}
-  />
-) : null}
-```
-
-- [ ] **Step 5: Wire notebook handlers in InvestigationDesk**
-
-In `components/InvestigationDesk.tsx`, import `makeId` from `lib/game/ids` and add:
-
-```ts
-const createNote = () => {
-  const now = new Date().toISOString();
-  setNotes((current) => [
-    {
-      id: makeId("note"),
-      title: "新笔记",
-      text: "",
-      tag: "clue",
-      source: "手动记录",
-      createdAt: now,
-      updatedAt: now
-    },
-    ...current
-  ]);
-  setActiveTag("all");
-  setNotebookOpen(true);
-};
-
-const deleteNote = (id: string) => {
-  setNotes((current) => current.filter((note) => note.id !== id));
-};
-```
-
-Update `saveExcerpt` and `updateNote` so saved/updated notes include timestamps.
-
-- [ ] **Step 6: Run notebook and smoke tests**
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/notebook-drawer.test.tsx tests/smoke.test.tsx
 ```
 
-Expected: PASS after updating old `NotebookDrawer` usages in `tests/smoke.test.tsx` to pass `onCreateNote` and `onDeleteNote`.
+验收标准：用户可以主动新建笔记；删除笔记必须先弹出确认弹窗；取消时不删除；笔记排序、筛选和时间戳行为稳定。
 
-- [ ] **Step 7: Commit**
+## 任务 3：本地持久化与重置弹窗
 
-Run:
+**涉及文件：**
 
-```bash
-git add components/ConfirmDialog.tsx components/NotebookDrawer.tsx components/InvestigationDesk.tsx tests/notebook-drawer.test.tsx tests/smoke.test.tsx
-git commit -m "feat: improve detective notebook actions"
-```
+- 修改 `components/InvestigationDesk.tsx`
+- 修改 `app/globals.css`
+- 新建或更新持久化相关测试
 
----
+执行逻辑：
 
-## Task 3: Local Persistence and Reset Modal
+1. 先写失败测试，确认页面可以从 `localStorage` 恢复状态，并可以重置状态。
+2. 在组件初始化时从 `localStorage` 水合 play state。
+3. 在状态变化时持久化到 `localStorage`。
+4. 新增“重新开始”入口，并使用自定义确认弹窗防止误触。
+5. 补充弹窗、危险按钮和辅助状态的 CSS。
 
-**Files:**
-- Modify: `components/InvestigationDesk.tsx`
-- Modify: `app/globals.css`
-- Test: `tests/smoke.test.tsx`
-
-- [ ] **Step 1: Add failing persistence test**
-
-Append to `tests/smoke.test.tsx`:
-
-```tsx
-test("investigation state persists across reloads and reset requires confirmation", async () => {
-  window.localStorage.clear();
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ content: "锤柄上没有明显血迹。" })
-    });
-  vi.stubGlobal("fetch", fetchMock);
-
-  const { unmount } = render(<InvestigationDesk storySlot={<section>Story</section>} />);
-
-  const input = screen.getByLabelText("新的调查问题");
-  fireEvent.change(input, { target: { value: "看看锤柄" } });
-  fireEvent.submit(input.closest("form") as HTMLFormElement);
-
-  await waitFor(() => {
-    expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
-  });
-
-  unmount();
-  render(<InvestigationDesk storySlot={<section>Story</section>} />);
-  expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
-  expect(screen.getByRole("dialog", { name: "重新开始调查？" })).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "取消" }));
-  expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
-  fireEvent.click(screen.getByRole("button", { name: "确认重置" }));
-  expect(screen.queryByText("锤柄上没有明显血迹。")).not.toBeInTheDocument();
-});
-```
-
-- [ ] **Step 2: Run the failing persistence test**
-
-Run:
-
-```bash
-npm test -- tests/smoke.test.tsx
-```
-
-Expected: FAIL because persistence and reset UI are not wired.
-
-- [ ] **Step 3: Hydrate from localStorage**
-
-In `components/InvestigationDesk.tsx`, replace separate initial `useState` calls with one initialized play state:
-
-```ts
-const [playState, setPlayState] = useState<LocalPlayState>(() => {
-  if (typeof window === "undefined") {
-    return createInitialPlayState();
-  }
-
-  return normalizePlayState(window.localStorage.getItem(PLAY_STATE_STORAGE_KEY));
-});
-```
-
-Derive:
-
-```ts
-const conversations = playState.conversations;
-const notes = playState.notes;
-const playerState = playState.playerState;
-const activeTag = playState.ui.activeNotebookFilter;
-const notebookOpen = Boolean(playState.ui.notebookOpen);
-```
-
-Use `setPlayState` updates instead of separate setters.
-
-- [ ] **Step 4: Persist on state changes**
-
-Add:
-
-```ts
-useEffect(() => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(PLAY_STATE_STORAGE_KEY, serializePlayState(playState));
-}, [playState]);
-```
-
-- [ ] **Step 5: Add reset button and confirmation**
-
-Add local state:
-
-```ts
-const [resetOpen, setResetOpen] = useState(false);
-```
-
-Render near the top of `case-shell`:
-
-```tsx
-<div className="utility-actions">
-  <button type="button" className="utility-button" onClick={() => setResetOpen(true)}>
-    重新开始
-  </button>
-</div>
-```
-
-Render:
-
-```tsx
-{resetOpen ? (
-  <ConfirmDialog
-    title="重新开始调查？"
-    description="这会清空当前浏览器里的章节进度、对话记录和侦探笔记。"
-    confirmLabel="确认重置"
-    onCancel={() => setResetOpen(false)}
-    onConfirm={() => {
-      window.localStorage.removeItem(PLAY_STATE_STORAGE_KEY);
-      setPlayState(createInitialPlayState());
-      setResetOpen(false);
-    }}
-  />
-) : null}
-```
-
-- [ ] **Step 6: Style utilities and dialog**
-
-Add to `app/globals.css`:
-
-```css
-.utility-actions {
-  position: absolute;
-  top: 20px;
-  right: 74px;
-  z-index: 3;
-}
-
-.utility-button {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  color: var(--ink);
-  padding: 7px 10px;
-  box-shadow: 0 8px 18px var(--shadow);
-  font-size: 13px;
-}
-
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  display: grid;
-  place-items: center;
-  background: rgba(32, 32, 32, 0.32);
-  padding: 18px;
-}
-
-.confirm-dialog {
-  width: min(100%, 420px);
-  border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: 0 18px 48px rgba(32, 32, 32, 0.22);
-  padding: 22px;
-}
-
-.confirm-dialog h2 {
-  margin: 0 0 8px;
-  font-size: 20px;
-}
-
-.confirm-dialog p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.dialog-secondary,
-.dialog-danger {
-  border: 1px solid var(--line);
-  padding: 9px 12px;
-}
-
-.dialog-secondary {
-  background: var(--paper);
-  color: var(--ink);
-}
-
-.dialog-danger {
-  border-color: #6f2f2a;
-  background: #6f2f2a;
-  color: var(--paper);
-}
-```
-
-- [ ] **Step 7: Run tests**
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/play-state.test.ts tests/smoke.test.tsx
 ```
 
-Expected: PASS.
+验收标准：刷新页面后进度仍在；用户点击重新开始前必须确认；确认后调查、笔记和章节状态被重置。
 
-- [ ] **Step 8: Commit**
+## 任务 4：故事章节与 Pretext 辅助层
 
-Run:
+**涉及文件：**
 
-```bash
-git add components/InvestigationDesk.tsx app/globals.css tests/smoke.test.tsx
-git commit -m "feat: persist investigation progress"
-```
+- 修改 `package.json`
+- 修改 `package-lock.json`
+- 新建 `lib/game/story.ts`
+- 新建 `lib/reading/pretext-layout.ts`
+- 新建或更新 `tests/story-reader.test.tsx`
 
----
+执行逻辑：
 
-## Task 4: Story Chapters and Pretext Helper
+1. 安装 `@chenglou/pretext`。
+2. 编写章节辅助测试，覆盖当前章节、上一章、下一章和边界条件。
+3. 创建章节数据与导航辅助函数。
+4. 创建 Pretext 包装层，只在 `lib/reading/pretext-layout.ts` 中隔离第三方库细节。
+5. 如果 Pretext 类型出现问题，只修复该隔离层，不把第三方复杂度扩散到业务组件。
 
-**Files:**
-- Modify: `package.json`
-- Modify: `package-lock.json`
-- Create: `lib/game/story.ts`
-- Create: `lib/reading/pretext-layout.ts`
-- Test: `tests/story-reader.test.tsx`
-
-- [ ] **Step 1: Install Pretext**
-
-Run:
+关键命令：
 
 ```bash
 npm install @chenglou/pretext
-```
-
-Expected: package appears in `dependencies` and lockfile updates.
-
-- [ ] **Step 2: Write story helper tests**
-
-Create the first half of `tests/story-reader.test.tsx`:
-
-```tsx
-import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import {
-  getChapterById,
-  getNextChapter,
-  getPreviousChapter,
-  storyChapters
-} from "../lib/game/story";
-
-test("story chapters expose ordered navigation", () => {
-  expect(storyChapters.length).toBeGreaterThanOrEqual(1);
-
-  const first = getChapterById("chapter-1");
-
-  expect(first?.title).toBe("钟楼下的锤击案");
-  expect(getPreviousChapter("chapter-1")).toBeUndefined();
-  expect(getNextChapter("chapter-1")?.id).toBe("chapter-2");
-});
-```
-
-- [ ] **Step 3: Add chapter data and helpers**
-
-Create `lib/game/story.ts`:
-
-```ts
-import { hammerOfGodCase } from "../case/hammer-of-god";
-
-export type StoryChapter = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  body: string[];
-  previousChapterId?: string;
-  nextChapterId?: string;
-};
-
-const openingParagraphs = hammerOfGodCase.storyText
-  .split(/\n\s*\n/)
-  .map((paragraph) => paragraph.trim())
-  .filter(Boolean);
-
-export const storyChapters: StoryChapter[] = [
-  {
-    id: "chapter-1",
-    title: hammerOfGodCase.title,
-    subtitle: "第一章 案发现场",
-    body: openingParagraphs,
-    nextChapterId: "chapter-2"
-  },
-  {
-    id: "chapter-2",
-    title: hammerOfGodCase.title,
-    subtitle: "第二章 证词的阴影",
-    previousChapterId: "chapter-1",
-    body: [
-      "威尔弗里德坚持自己从未登上钟楼。铁匠西米恩沉默得像一块铁，只在被问及那把小锤时说，它太轻了。",
-      "伊丽莎白提到诺曼时明显迟疑。疯乔则在教堂附近看见过高处的人影，却不愿承认自己当时为什么在那里。"
-    ]
-  }
-];
-
-export function getChapterById(id: string) {
-  return storyChapters.find((chapter) => chapter.id === id);
-}
-
-export function getPreviousChapter(id: string) {
-  const chapter = getChapterById(id);
-  return chapter?.previousChapterId
-    ? getChapterById(chapter.previousChapterId)
-    : undefined;
-}
-
-export function getNextChapter(id: string) {
-  const chapter = getChapterById(id);
-  return chapter?.nextChapterId ? getChapterById(chapter.nextChapterId) : undefined;
-}
-```
-
-- [ ] **Step 4: Add Pretext wrapper**
-
-Create `lib/reading/pretext-layout.ts`:
-
-```ts
-import { layout, prepare } from "@chenglou/pretext";
-
-export type PreparedChapterLayout = {
-  prepared: unknown;
-  lineCount: number;
-  failed: boolean;
-};
-
-export function prepareChapterLayout(
-  paragraphs: string[],
-  width: number,
-  lineHeight: number
-): PreparedChapterLayout {
-  try {
-    const text = paragraphs.join("\n\n");
-    const prepared = prepare(text);
-    const laidOut = layout(prepared, { width, lineHeight });
-    const lineCount = Array.isArray(laidOut) ? laidOut.length : 0;
-
-    return { prepared, lineCount, failed: false };
-  } catch {
-    return { prepared: null, lineCount: paragraphs.length, failed: true };
-  }
-}
-```
-
-If TypeScript reports the Pretext layout options differ, inspect `node_modules/@chenglou/pretext` and adapt this wrapper only. Do not leak Pretext API details into React components.
-
-- [ ] **Step 5: Run story helper tests**
-
-Run:
-
-```bash
 npm test -- tests/story-reader.test.tsx
 ```
 
-Expected: PASS for chapter helpers. If Pretext type errors appear, fix only `lib/reading/pretext-layout.ts`.
+验收标准：章节数据可被业务 UI 读取；Pretext 只作为排版体验辅助，不改变故事数据结构。
 
-- [ ] **Step 6: Commit**
+## 任务 5：StoryReader 组件
 
-Run:
+**涉及文件：**
 
-```bash
-git add package.json package-lock.json lib/game/story.ts lib/reading/pretext-layout.ts tests/story-reader.test.tsx
-git commit -m "feat: add chapter story model"
-```
+- 新建 `components/StoryReader.tsx`
+- 修改 `app/page.tsx`
+- 修改 `components/InvestigationDesk.tsx`
+- 修改 `app/globals.css`
+- 修改 `tests/smoke.test.tsx`
+- 更新 `tests/story-reader.test.tsx`
 
----
+执行逻辑：
 
-## Task 5: StoryReader Component
+1. 先写行为测试，覆盖章节正文展示、章节底部上一章/下一章按钮、点击阅读区浮现导航、章节边界禁用状态。
+2. 创建 `StoryReader`，替代旧 `StoryPane`。
+3. 让 `InvestigationDesk` 持有当前章节状态，并传给阅读器。
+4. 更新 `app/page.tsx` 和 smoke test。
+5. 删除或停用旧 `StoryPane` 引用。
+6. 补充章节阅读器 CSS。
 
-**Files:**
-- Create: `components/StoryReader.tsx`
-- Delete: `components/StoryPane.tsx`
-- Modify: `app/page.tsx`
-- Modify: `components/InvestigationDesk.tsx`
-- Modify: `app/globals.css`
-- Test: `tests/story-reader.test.tsx`
-- Modify: `tests/smoke.test.tsx`
-
-- [ ] **Step 1: Add StoryReader behavior tests**
-
-Append to `tests/story-reader.test.tsx`:
-
-```tsx
-import StoryReader from "../components/StoryReader";
-
-test("story reader renders a scrollable chapter with bottom navigation", () => {
-  const onChapterChange = vi.fn();
-
-  render(<StoryReader currentChapterId="chapter-1" onChapterChange={onChapterChange} />);
-
-  expect(screen.getByRole("heading", { name: "钟楼下的锤击案" })).toBeInTheDocument();
-  expect(screen.getByText("第一章 案发现场")).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "前一章" })).toBeDisabled();
-
-  fireEvent.click(screen.getByRole("button", { name: "后一章" }));
-  expect(onChapterChange).toHaveBeenCalledWith("chapter-2");
-});
-
-test("clicking the story reader reveals floating chapter controls", () => {
-  render(<StoryReader currentChapterId="chapter-1" onChapterChange={vi.fn()} />);
-
-  expect(screen.queryByLabelText("章节快捷导航")).not.toBeInTheDocument();
-
-  fireEvent.click(screen.getByLabelText("故事阅读区"));
-  expect(screen.getByLabelText("章节快捷导航")).toBeInTheDocument();
-});
-```
-
-- [ ] **Step 2: Run failing StoryReader tests**
-
-Run:
-
-```bash
-npm test -- tests/story-reader.test.tsx
-```
-
-Expected: FAIL because `components/StoryReader.tsx` does not exist.
-
-- [ ] **Step 3: Create StoryReader**
-
-Create `components/StoryReader.tsx`:
-
-```tsx
-"use client";
-
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  getChapterById,
-  getNextChapter,
-  getPreviousChapter
-} from "../lib/game/story";
-import { prepareChapterLayout } from "../lib/reading/pretext-layout";
-
-type StoryReaderProps = {
-  currentChapterId: string;
-  onChapterChange: (chapterId: string) => void;
-};
-
-export default function StoryReader({
-  currentChapterId,
-  onChapterChange
-}: StoryReaderProps) {
-  const chapter = getChapterById(currentChapterId) ?? getChapterById("chapter-1");
-  const previous = chapter ? getPreviousChapter(chapter.id) : undefined;
-  const next = chapter ? getNextChapter(chapter.id) : undefined;
-  const [navVisible, setNavVisible] = useState(false);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const layoutMeta = useMemo(() => {
-    return prepareChapterLayout(chapter?.body ?? [], 680, 34);
-  }, [chapter]);
-
-  useEffect(() => {
-    return () => {
-      if (hideTimer.current) {
-        clearTimeout(hideTimer.current);
-      }
-    };
-  }, []);
-
-  if (!chapter) {
-    return null;
-  }
-
-  const showFloatingNav = () => {
-    setNavVisible(true);
-    if (hideTimer.current) {
-      clearTimeout(hideTimer.current);
-    }
-    hideTimer.current = setTimeout(() => setNavVisible(false), 2800);
-  };
-
-  return (
-    <section
-      className="story-pane story-reader"
-      aria-labelledby="case-title"
-      aria-label="故事阅读区"
-      onClick={showFloatingNav}
-      data-pretext-lines={layoutMeta.lineCount}
-      data-pretext-fallback={layoutMeta.failed ? "true" : "false"}
-    >
-      {navVisible ? (
-        <div className="floating-chapter-nav" aria-label="章节快捷导航">
-          <button
-            type="button"
-            disabled={!previous}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (previous) onChapterChange(previous.id);
-            }}
-          >
-            前一章
-          </button>
-          <button
-            type="button"
-            disabled={!next}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (next) onChapterChange(next.id);
-            }}
-          >
-            后一章
-          </button>
-        </div>
-      ) : null}
-
-      <div className="story-header">
-        <p className="story-source">The Hammer of God</p>
-        <h1 id="case-title">{chapter.title}</h1>
-        {chapter.subtitle ? <p className="story-chapter">{chapter.subtitle}</p> : null}
-      </div>
-
-      <div className="story-text">
-        {chapter.body.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
-      </div>
-
-      <nav className="chapter-nav" aria-label="章节导航">
-        <button
-          type="button"
-          disabled={!previous}
-          onClick={(event) => {
-            event.stopPropagation();
-            if (previous) onChapterChange(previous.id);
-          }}
-        >
-          前一章
-        </button>
-        <button
-          type="button"
-          disabled={!next}
-          onClick={(event) => {
-            event.stopPropagation();
-            if (next) onChapterChange(next.id);
-          }}
-        >
-          后一章
-        </button>
-      </nav>
-    </section>
-  );
-}
-```
-
-- [ ] **Step 4: Wire current chapter through InvestigationDesk**
-
-Change `InvestigationDeskProps` to:
-
-```ts
-interface InvestigationDeskProps {
-  storySlot: (props: {
-    currentChapterId: string;
-    onChapterChange: (chapterId: string) => void;
-  }) => ReactNode;
-}
-```
-
-Render story with:
-
-```tsx
-{storySlot({
-  currentChapterId: playState.currentChapterId,
-  onChapterChange: (currentChapterId) =>
-    setPlayState((current) => ({ ...current, currentChapterId }))
-})}
-```
-
-- [ ] **Step 5: Update page**
-
-Modify `app/page.tsx`:
-
-```tsx
-import InvestigationDesk from "../components/InvestigationDesk";
-import StoryReader from "../components/StoryReader";
-
-export default function Page() {
-  return (
-    <InvestigationDesk
-      storySlot={(storyProps) => <StoryReader {...storyProps} />}
-    />
-  );
-}
-```
-
-- [ ] **Step 6: Remove old StoryPane**
-
-Delete `components/StoryPane.tsx` after all imports are replaced.
-
-- [ ] **Step 7: Add StoryReader CSS**
-
-Add to `app/globals.css`:
-
-```css
-.story-reader {
-  position: relative;
-}
-
-.floating-chapter-nav {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: -18px auto 18px;
-  pointer-events: auto;
-}
-
-.floating-chapter-nav button,
-.chapter-nav button {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  color: var(--ink);
-  padding: 8px 12px;
-  box-shadow: 0 8px 18px var(--shadow);
-}
-
-.chapter-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 720px;
-  margin: 36px auto 0;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
-}
-```
-
-- [ ] **Step 8: Update tests and run**
-
-Update `tests/smoke.test.tsx` where `InvestigationDesk` is rendered:
-
-```tsx
-<InvestigationDesk storySlot={() => <section>Story</section>} />
-```
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/story-reader.test.tsx tests/smoke.test.tsx
 ```
 
-Expected: PASS.
+验收标准：一章内容默认整章上下滚动；章节结束处有前后章按钮；阅读过程中点击屏幕可以浮现章节跳转按钮。
 
-- [ ] **Step 9: Commit**
+## 任务 6：对话体验打磨
 
-Run:
+**涉及文件：**
 
-```bash
-git add app/page.tsx app/globals.css components/StoryReader.tsx components/InvestigationDesk.tsx tests/story-reader.test.tsx tests/smoke.test.tsx
-git rm components/StoryPane.tsx
-git commit -m "feat: add pretext chapter reader"
-```
+- 修改 `components/ConversationModule.tsx`
+- 修改 `components/InvestigationDesk.tsx`
+- 修改 `app/globals.css`
+- 新建或更新对话体验测试
 
----
+执行逻辑：
 
-## Task 6: Conversation Polish
+1. 先写失败测试，覆盖 Enter 发送、loading 状态、错误提示和摘录成功反馈。
+2. 为全局输入框和模块内输入框加入键盘发送体验。
+3. 保存摘录后给出轻量反馈，避免用户不知道笔记是否保存成功。
+4. 优化摘录按钮文案和状态，不改变原有保存逻辑。
+5. 补充必要 CSS。
 
-**Files:**
-- Modify: `components/ConversationModule.tsx`
-- Modify: `components/InvestigationDesk.tsx`
-- Modify: `app/globals.css`
-- Test: `tests/smoke.test.tsx`
-
-- [ ] **Step 1: Add keyboard submit and excerpt feedback test**
-
-Append to `tests/smoke.test.tsx`:
-
-```tsx
-test("conversation input supports keyboard submit and excerpt feedback", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ targetId: "general", label: "调查助手" })
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ content: "现场没有明显拖拽痕迹。" })
-    });
-  vi.stubGlobal("fetch", fetchMock);
-
-  render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
-
-  const input = screen.getByLabelText("新的调查问题");
-  fireEvent.change(input, { target: { value: "现场有没有拖拽痕迹" } });
-  fireEvent.keyDown(input, { key: "Enter", metaKey: true });
-
-  await waitFor(() => {
-    expect(screen.getByText("现场没有明显拖拽痕迹。")).toBeInTheDocument();
-  });
-
-  fireEvent.click(screen.getByRole("button", { name: "摘录这条回复" }));
-  expect(screen.getByText("已加入侦探笔记。")).toBeInTheDocument();
-});
-```
-
-- [ ] **Step 2: Run failing polish test**
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/smoke.test.tsx
 ```
 
-Expected: FAIL because keyboard submit and feedback are missing.
+验收标准：用户可以通过 Enter 发送问题；请求中和失败时有清晰状态；摘录成功后有明确反馈。
 
-- [ ] **Step 3: Add keyboard submit**
+## 任务 7：移动端底部标签
 
-In `InvestigationDesk`, add:
+**涉及文件：**
 
-```ts
-const formRef = useRef<HTMLFormElement | null>(null);
+- 修改 `components/InvestigationDesk.tsx`
+- 修改 `app/globals.css`
+- 新建 `tests/mobile-tabs.test.tsx`
 
-const submitOnShortcut = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-    event.preventDefault();
-    formRef.current?.requestSubmit();
-  }
-};
-```
+执行逻辑：
 
-Attach:
+1. 先写移动端标签测试，覆盖故事、调查、笔记三个视图。
+2. 在 `InvestigationDesk` 中增加移动端当前标签状态。
+3. 用语义化容器包裹故事区、调查区和笔记区。
+4. 在移动端显示底部标签栏。
+5. 在桌面端保持三栏/两栏布局，不展示底部标签栏。
 
-```tsx
-<form ref={formRef} className="global-input" onSubmit={submitMessage}>
-```
-
-and:
-
-```tsx
-onKeyDown={submitOnShortcut}
-```
-
-- [ ] **Step 4: Add excerpt feedback**
-
-Add state:
-
-```ts
-const [excerptNotice, setExcerptNotice] = useState<string | null>(null);
-```
-
-Update `saveExcerpt`:
-
-```ts
-setExcerptNotice("已加入侦探笔记。");
-window.setTimeout(() => setExcerptNotice(null), 1800);
-```
-
-Render:
-
-```tsx
-{excerptNotice ? <p className="excerpt-notice">{excerptNotice}</p> : null}
-```
-
-- [ ] **Step 5: Improve excerpt button label**
-
-In `ConversationModule`, change the assistant excerpt button to:
-
-```tsx
-<button
-  type="button"
-  className="excerpt-button"
-  aria-label="摘录这条回复"
-  onClick={() => onSaveExcerpt(message.content)}
->
-  摘录
-</button>
-```
-
-- [ ] **Step 6: Add CSS**
-
-Add:
-
-```css
-.excerpt-notice {
-  margin: 0 14px 10px;
-  border: 1px solid rgba(65, 92, 68, 0.28);
-  background: #f3fbf1;
-  color: #315a35;
-  padding: 8px 10px;
-  font-size: 13px;
-}
-```
-
-- [ ] **Step 7: Run tests and commit**
-
-Run:
-
-```bash
-npm test -- tests/smoke.test.tsx
-```
-
-Expected: PASS.
-
-Commit:
-
-```bash
-git add components/ConversationModule.tsx components/InvestigationDesk.tsx app/globals.css tests/smoke.test.tsx
-git commit -m "feat: polish investigation conversation flow"
-```
-
----
-
-## Task 7: Mobile Bottom Tabs
-
-**Files:**
-- Modify: `components/InvestigationDesk.tsx`
-- Modify: `app/globals.css`
-- Test: `tests/mobile-tabs.test.tsx`
-
-- [ ] **Step 1: Write mobile tab test**
-
-Create `tests/mobile-tabs.test.tsx`:
-
-```tsx
-import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import InvestigationDesk from "../components/InvestigationDesk";
-
-test("mobile bottom tabs switch primary workspace without losing state", () => {
-  render(<InvestigationDesk storySlot={() => <section>Story workspace</section>} />);
-
-  expect(screen.getByText("Story workspace")).toBeInTheDocument();
-  expect(screen.getByRole("tab", { name: "故事" })).toHaveAttribute("aria-selected", "true");
-
-  fireEvent.click(screen.getByRole("tab", { name: "调查" }));
-  expect(screen.getByRole("tab", { name: "调查" })).toHaveAttribute("aria-selected", "true");
-  expect(screen.getByRole("heading", { name: "调查台" })).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("tab", { name: "笔记" }));
-  expect(screen.getByRole("tab", { name: "笔记" })).toHaveAttribute("aria-selected", "true");
-  expect(screen.getByRole("heading", { name: "侦探笔记" })).toBeInTheDocument();
-});
-```
-
-- [ ] **Step 2: Run failing mobile test**
-
-Run:
+关键命令：
 
 ```bash
 npm test -- tests/mobile-tabs.test.tsx
 ```
 
-Expected: FAIL because tabs are missing.
+验收标准：移动端可以在故事、调查和笔记之间切换；桌面端不受影响；标签切换不会丢失对话或笔记状态。
 
-- [ ] **Step 3: Add mobile tab state**
+## 任务 8：文档、路线图与完整验证
 
-In `InvestigationDesk`, derive:
+**涉及文件：**
 
-```ts
-const mobileTab = playState.ui.mobileTab ?? "story";
-const setMobileTab = (mobileTab: MobileTab) => {
-  setPlayState((current) => ({
-    ...current,
-    ui: { ...current.ui, mobileTab }
-  }));
-};
-```
+- 修改 `roadmap.md`
+- 根据实际实现同步相关文档
 
-- [ ] **Step 4: Wrap workspaces**
+执行逻辑：
 
-Render story, investigation, and notebook with workspace classes:
+1. 更新 `roadmap.md`，记录本轮通用体验迭代已实现内容与后续待办。
+2. 运行完整自动化验证。
+3. 启动开发服务器进行人工浏览器验证。
+4. 提交文档更新。
 
-```tsx
-<div className={`workspace workspace-story ${mobileTab === "story" ? "is-mobile-active" : ""}`}>
-  {storySlot(...)}
-</div>
-<section className={`investigation-desk workspace workspace-investigation ${mobileTab === "investigation" ? "is-mobile-active" : ""}`}>
-  ...
-</section>
-<div className={`workspace workspace-notebook ${mobileTab === "notebook" ? "is-mobile-active" : ""}`}>
-  <NotebookDrawer isOpen={notebookOpen || mobileTab === "notebook"} ... />
-</div>
-```
-
-Keep desktop drawer behavior unchanged through CSS. On mobile, notebook should be visible as its own tab.
-
-- [ ] **Step 5: Add bottom tab bar**
-
-Add:
-
-```tsx
-<nav className="mobile-tabbar" role="tablist" aria-label="移动端工作区">
-  <button
-    type="button"
-    role="tab"
-    aria-selected={mobileTab === "story"}
-    onClick={() => setMobileTab("story")}
-  >
-    故事
-  </button>
-  <button
-    type="button"
-    role="tab"
-    aria-selected={mobileTab === "investigation"}
-    onClick={() => setMobileTab("investigation")}
-  >
-    调查
-  </button>
-  <button
-    type="button"
-    role="tab"
-    aria-selected={mobileTab === "notebook"}
-    onClick={() => setMobileTab("notebook")}
-  >
-    笔记
-  </button>
-</nav>
-```
-
-- [ ] **Step 6: Add mobile CSS**
-
-Append inside `@media (max-width: 640px)`:
-
-```css
-.case-shell,
-.case-shell.notebook-open {
-  display: block;
-  min-height: 100vh;
-  padding: 12px 12px 74px;
-}
-
-.workspace {
-  display: none;
-}
-
-.workspace.is-mobile-active {
-  display: block;
-}
-
-.workspace-story .story-pane,
-.workspace-investigation,
-.workspace-notebook .notebook-drawer {
-  min-height: calc(100vh - 98px);
-  max-height: none;
-}
-
-.mobile-tabbar {
-  position: fixed;
-  right: 12px;
-  bottom: 12px;
-  left: 12px;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: 1px solid var(--line);
-  background: var(--paper);
-  box-shadow: 0 12px 30px var(--shadow);
-}
-
-.mobile-tabbar button {
-  border: 0;
-  border-right: 1px solid var(--line);
-  background: transparent;
-  color: var(--ink);
-  padding: 12px 8px;
-}
-
-.mobile-tabbar button:last-child {
-  border-right: 0;
-}
-
-.mobile-tabbar button[aria-selected="true"] {
-  background: var(--primary);
-  color: var(--paper);
-}
-```
-
-Add desktop default:
-
-```css
-.mobile-tabbar {
-  display: none;
-}
-```
-
-- [ ] **Step 7: Run mobile tests**
-
-Run:
+关键命令：
 
 ```bash
-npm test -- tests/mobile-tabs.test.tsx tests/smoke.test.tsx
-```
-
-Expected: PASS.
-
-- [ ] **Step 8: Commit**
-
-Run:
-
-```bash
-git add components/InvestigationDesk.tsx app/globals.css tests/mobile-tabs.test.tsx
-git commit -m "feat: add mobile workspace tabs"
-```
-
----
-
-## Task 8: Documentation, Roadmap, and Full Verification
-
-**Files:**
-- Modify: `roadmap.md`
-- Optional modify: `design.md`
-
-- [ ] **Step 1: Update roadmap**
-
-In `roadmap.md`, add an entry under current/near-term work:
-
-```md
-### General UX Iteration
-
-- Git baseline is established before future product iterations.
-- Detective notebook supports manual notes, editing, tag filtering, newest-first ordering, and delete confirmation.
-- Play state persists locally across reloads and can be reset only through a confirmation modal.
-- Story reading uses a Pretext-backed chapter reader with one chapter per scrollable page.
-- Chapter navigation is available at the bottom of the chapter and through click-to-reveal floating controls.
-- Mobile uses Story / Investigation / Notebook bottom tabs with shared state.
-```
-
-- [ ] **Step 2: Run full automated verification**
-
-Run:
-
-```bash
-npm run lint
 npm test
 npm run build
-```
-
-Expected: all commands PASS.
-
-- [ ] **Step 3: Manual browser verification**
-
-Run the dev server:
-
-```bash
 npm run dev
 ```
 
-Open the local URL shown by Next.js and manually verify:
+人工验证重点：
 
-- desktop shows story left, investigation right, notebook button top-right;
-- notebook opens and closes;
-- manual note creation works;
-- note editing works;
-- note delete opens confirmation and cancel preserves the note;
-- reset opens confirmation and cancel preserves state;
-- confirmed reset clears saved state;
-- story chapter bottom navigation works;
-- clicking story reveals floating chapter navigation;
-- investigation routing still works with mocked or real API settings;
-- mobile viewport shows bottom Story / Investigation / Notebook tabs;
-- switching mobile tabs preserves state.
+- 页面可以正常加载。
+- 重新开始按钮不会与新建笔记按钮重叠。
+- 删除笔记有确认弹窗。
+- 刷新后进度能够恢复。
+- 章节阅读支持底部翻章和点击浮现导航。
+- 对话发送、摘录和错误状态清晰。
+- 移动端底部标签可用。
 
-- [ ] **Step 4: Commit docs**
+## 自检记录
 
-Run:
+- V0 Git 基线由任务 0 覆盖。
+- V1 笔记、持久化和重置由任务 1 到任务 3 覆盖。
+- V2 Pretext 章节阅读和对话打磨由任务 4 到任务 6 覆盖。
+- V3 移动端底部标签由任务 7 覆盖。
+- 文档与完整验证由任务 8 覆盖。
 
-```bash
-git add roadmap.md design.md
-git commit -m "docs: update ux iteration roadmap"
-```
-
-If `design.md` did not change, stage only `roadmap.md`.
-
----
-
-## Self-Review Notes
-
-Spec coverage:
-
-- V0 git baseline is Task 0.
-- V1 notes, persistence, and reset are Tasks 1-3.
-- V2 Pretext chapter reader and conversation polish are Tasks 4-6.
-- V3 mobile bottom tabs are Task 7.
-- Documentation and verification are Task 8.
-
-Placeholder scan:
-
-- The plan contains no unresolved placeholder steps or vague edge-case instructions.
-- The only conditional instruction is for adapting Pretext wrapper types after installing the actual package, isolated to `lib/reading/pretext-layout.ts`.
-
-Type consistency:
-
-- `Conversation`, `ConversationTarget`, `MobileTab`, and `LocalPlayState` are defined before use.
-- `NotebookNote` timestamp fields are introduced before persistence uses them.
-- `StoryChapter` and chapter helpers are introduced before `StoryReader` uses them.
+已知边界：Pretext 在本计划中只作为前端阅读体验增强层，不改变案件包 schema、agent runtime 或服务端 API 边界。

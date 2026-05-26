@@ -1,0 +1,205 @@
+[
+  {
+    "id": "fact-pace-shot",
+    "text": "哈林顿·佩斯在猎人小屋的枪房中被枪杀。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "japp", "zoe", "roger", "middleton"],
+    "relatedClueIds": ["clue-body-gun-room"],
+    "actId": "act-opening",
+    "keywords": ["佩斯", "枪房", "枪杀", "尸体", "猎人小屋"]
+  },
+  {
+    "id": "fact-poirot-ill",
+    "text": "波洛因流感留在伦敦，黑斯廷斯代他前往德比郡调查。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "poirot"],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": ["波洛", "黑斯廷斯", "流感", "伦敦"]
+  },
+  {
+    "id": "fact-roger-train-alibi",
+    "text": "罗杰声称自己案发当晚乘六点十五分火车离开，并在伦敦俱乐部露面。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "roger", "japp"],
+    "relatedClueIds": ["clue-roger-alibi"],
+    "actId": "act-opening",
+    "keywords": ["罗杰", "火车", "六点十五", "伦敦", "俱乐部", "不在场证明"]
+  },
+  {
+    "id": "fact-telegram-from-zoe",
+    "text": "罗杰收到佐伊电报，电报称叔父被杀并要求他立刻回来。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "roger", "zoe"],
+    "relatedClueIds": ["clue-telegram"],
+    "actId": "act-opening",
+    "keywords": ["电报", "佐伊", "叔父", "回来"]
+  },
+  {
+    "id": "fact-middleton-visitor-story",
+    "text": "米德尔顿太太说一名黑胡子、像美国人的中年访客在晚饭后进入枪房见佩斯。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "middleton", "japp"],
+    "relatedClueIds": ["clue-middleton-testimony"],
+    "actId": "act-opening",
+    "keywords": ["米德尔顿", "女管家", "黑胡子", "美国人", "访客"]
+  },
+  {
+    "id": "fact-locked-door-open-window",
+    "text": "枪声后枪房门从里面锁住，窗户开着。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "japp", "zoe", "middleton"],
+    "relatedClueIds": ["clue-locked-door-window"],
+    "actId": "act-opening",
+    "keywords": ["门", "锁", "窗户", "逃走", "枪房"]
+  },
+  {
+    "id": "fact-missing-revolver",
+    "text": "墙上原本挂着一对罗杰的左轮手枪，其中一支失踪。",
+    "visibility": "public",
+    "ownerAgentIds": ["general", "japp", "roger", "zoe"],
+    "relatedClueIds": ["clue-missing-revolver"],
+    "actId": "act-opening",
+    "keywords": ["左轮", "手枪", "失踪", "墙上", "罗杰"]
+  },
+  {
+    "id": "fact-close-shot-behind",
+    "text": "佩斯从后脑近距离中弹，开枪者很可能在他背后。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp"],
+    "relatedClueIds": ["clue-close-shot"],
+    "actId": "act-opening",
+    "keywords": ["后脑", "近距离", "背后", "枪伤"]
+  },
+  {
+    "id": "fact-roger-debts",
+    "text": "罗杰债务严重，且佩斯的遗产很可能会落到他手里。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "roger"],
+    "relatedClueIds": ["clue-roger-debts"],
+    "actId": "act-testimony",
+    "keywords": ["罗杰", "债务", "遗产", "动机", "钱"]
+  },
+  {
+    "id": "fact-ealing-revolver-found",
+    "text": "一把包在牛皮纸中的左轮手枪在伦敦伊灵被发现，枪中少了一发子弹。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "roger"],
+    "relatedClueIds": ["clue-ealing-revolver"],
+    "actId": "act-testimony",
+    "keywords": ["伊灵", "伦敦", "左轮", "牛皮纸", "子弹"]
+  },
+  {
+    "id": "fact-no-stranger-at-station",
+    "text": "车站没有人记得案发当晚有黑胡子陌生人抵达或离开。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "poirot"],
+    "relatedClueIds": ["clue-station-no-stranger"],
+    "actId": "act-testimony",
+    "keywords": ["车站", "陌生人", "黑胡子", "没有人看见"]
+  },
+  {
+    "id": "fact-agency-denies-middleton",
+    "text": "伦敦家政介绍所否认曾派出名叫米德尔顿太太的女管家。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "poirot"],
+    "relatedClueIds": ["clue-agency-denial"],
+    "actId": "act-testimony",
+    "keywords": ["介绍所", "米德尔顿", "女管家", "否认", "伦敦"]
+  },
+  {
+    "id": "fact-middleton-no-transport",
+    "text": "当地车站、出租马车和车行都没有米德尔顿太太到达猎人小屋的记录。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "poirot"],
+    "relatedClueIds": ["clue-transport-gap"],
+    "actId": "act-testimony",
+    "keywords": ["交通", "车站", "马车", "车行", "米德尔顿"]
+  },
+  {
+    "id": "fact-zoe-actress",
+    "text": "佐伊婚前曾是演员，懂得化装、换装和改变声音。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "zoe", "poirot"],
+    "relatedClueIds": ["clue-zoe-actress"],
+    "actId": "act-confrontation",
+    "keywords": ["佐伊", "演员", "化装", "声音", "换装"]
+  },
+  {
+    "id": "fact-no-one-saw-both-women",
+    "text": "黑斯廷斯、贾普和当地警方从未同时看见佐伊与米德尔顿太太出现在同一处。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "poirot", "japp"],
+    "relatedClueIds": ["clue-never-seen-together"],
+    "actId": "act-confrontation",
+    "keywords": ["同时", "佐伊", "米德尔顿", "女主人", "女管家"]
+  },
+  {
+    "id": "fact-zoe-did-not-see-visitor",
+    "text": "佐伊说自己没有看清黑胡子访客，访客的完整描述主要来自米德尔顿太太。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "zoe", "middleton"],
+    "relatedClueIds": ["clue-zoe-no-visitor"],
+    "actId": "act-testimony",
+    "keywords": ["佐伊", "没看清", "访客", "描述", "米德尔顿"]
+  },
+  {
+    "id": "fact-dim-hall-housekeeper",
+    "text": "黑斯廷斯第一次见到米德尔顿太太是在昏暗门厅里，只留下黑衣、中年、低声的粗略印象。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "poirot", "japp", "middleton"],
+    "relatedClueIds": ["clue-dim-hall-housekeeper"],
+    "actId": "act-testimony",
+    "keywords": ["门厅", "昏暗", "黑衣", "低声", "米德尔顿", "看见"]
+  },
+  {
+    "id": "fact-middleton-vanished",
+    "text": "米德尔顿太太在波洛建议看住她之前已经消失，只留下没有身份线索的箱子。",
+    "visibility": "unlocked",
+    "ownerAgentIds": ["general", "japp", "poirot"],
+    "relatedClueIds": ["clue-middleton-vanished"],
+    "actId": "act-testimony",
+    "keywords": ["米德尔顿", "消失", "箱子", "身份"]
+  },
+  {
+    "id": "fact-middleton-fiction",
+    "text": "所谓米德尔顿太太并不是独立存在的证人，而是佐伊伪装出的身份。",
+    "visibility": "truth",
+    "ownerAgentIds": ["zoe", "middleton", "poirot"],
+    "relatedClueIds": [
+      "clue-agency-denial",
+      "clue-transport-gap",
+      "clue-dim-hall-housekeeper",
+      "clue-never-seen-together"
+    ],
+    "actId": "act-confrontation",
+    "keywords": ["米德尔顿", "不存在", "佐伊", "伪装", "女管家"]
+  },
+  {
+    "id": "fact-zoe-shot-pace",
+    "text": "佐伊在晚饭后从佩斯背后近距离开枪杀死了他。",
+    "visibility": "truth",
+    "ownerAgentIds": ["zoe"],
+    "relatedClueIds": ["clue-close-shot", "clue-never-seen-together"],
+    "actId": "act-confrontation",
+    "keywords": ["佐伊", "枪杀", "佩斯", "背后", "真凶"]
+  },
+  {
+    "id": "fact-roger-planted-revolver",
+    "text": "罗杰把另一支左轮带到伦敦，开一枪后藏在伊灵，用来把警方注意力引离猎人小屋。",
+    "visibility": "truth",
+    "ownerAgentIds": ["roger"],
+    "relatedClueIds": ["clue-ealing-revolver"],
+    "actId": "act-confrontation",
+    "keywords": ["罗杰", "伊灵", "左轮", "假线索", "伦敦"]
+  },
+  {
+    "id": "fact-haverings-motive",
+    "text": "罗杰和佐伊为获得佩斯的巨额遗产合谋杀人。",
+    "visibility": "truth",
+    "ownerAgentIds": ["roger", "zoe"],
+    "relatedClueIds": ["clue-roger-debts"],
+    "actId": "act-confrontation",
+    "keywords": ["罗杰", "佐伊", "遗产", "合谋", "动机"]
+  }
+]

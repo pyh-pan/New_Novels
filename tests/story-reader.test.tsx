@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import StoryReader from "../components/StoryReader";
 import {
   getChapterById,
@@ -17,7 +17,7 @@ test("story chapters expose ordered navigation", () => {
 
   const first = getChapterById(storyChapters, "chapter-1");
 
-  expect(first?.title).toBe("钟楼下的锤击案");
+  expect(first?.title).toBe("猎人小屋疑案");
   expect(getPreviousChapter(storyChapters, "chapter-1")).toBeUndefined();
   expect(getNextChapter(storyChapters, "chapter-1")?.id).toBe("chapter-2");
 });
@@ -28,24 +28,26 @@ test("story reader renders a scrollable chapter with bottom navigation", () => {
   render(
     <StoryReader
       sourceTitle={caseFile.source.title}
+      storyTitle={caseFile.title}
       chapters={storyChapters}
       currentChapterId="chapter-1"
       onChapterChange={onChapterChange}
     />
   );
 
-  expect(screen.getByRole("heading", { name: "钟楼下的锤击案" })).toBeInTheDocument();
-  expect(screen.getByText("第一章 案发现场")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "第一章 病榻上的委托" })).toBeInTheDocument();
+  expect(screen.getByText("猎人小屋疑案")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "前一章" })).toBeDisabled();
 
   fireEvent.click(screen.getByRole("button", { name: "后一章" }));
   expect(onChapterChange).toHaveBeenCalledWith("chapter-2");
 });
 
-test("clicking the story reader reveals floating chapter controls", () => {
+test("clicking the story reader reveals floating chapter controls", async () => {
   render(
     <StoryReader
       sourceTitle={caseFile.source.title}
+      storyTitle={caseFile.title}
       chapters={storyChapters}
       currentChapterId="chapter-1"
       onChapterChange={vi.fn()}
@@ -54,6 +56,9 @@ test("clicking the story reader reveals floating chapter controls", () => {
 
   expect(screen.queryByLabelText("章节快捷导航")).not.toBeInTheDocument();
 
-  fireEvent.click(screen.getByLabelText("故事阅读区"));
-  expect(screen.getByLabelText("章节快捷导航")).toBeInTheDocument();
+  fireEvent.mouseUp(screen.getByLabelText("故事阅读区"));
+  await waitFor(() => {
+    expect(screen.getByLabelText("章节快捷导航")).toBeInTheDocument();
+  });
+  expect(screen.getByLabelText("章节快捷导航")).toHaveAttribute("data-overlay", "true");
 });

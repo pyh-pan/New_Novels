@@ -1,10 +1,4 @@
-export type ConversationTarget =
-  | "general"
-  | "wilfred"
-  | "simeon"
-  | "elizabeth"
-  | "joe"
-  | "unsupported";
+export type ConversationTarget = string;
 export type NpcConversationTarget = Exclude<ConversationTarget, "general" | "unsupported">;
 
 export interface RoutedMessage {

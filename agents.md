@@ -1,113 +1,175 @@
-# Development Guidelines
+# 开发规范
 
-This file defines how developers and coding agents should work in this repository.
-It intentionally avoids product-specific requirements. Product context belongs in
-`readme.md`, `roadmap.md`, and design/spec documents.
+本文档定义开发者和编码 agent 在本仓库中的协作方式。它只记录工程工作原则，不承载产品需求；产品上下文应放在 `readme.md`、`roadmap.md`、`design.md` 和规格文档中。
 
-## Core Principles
+本规范参考 Karpathy 风格的 agent 开发准则：谨慎胜过速度，简单胜过炫技，每一行改动都应能追溯到用户请求。
 
-- Read existing documentation before changing code.
-- Keep changes small, intentional, and easy to review.
-- Prefer clear behavior over clever abstractions.
-- Preserve user work. Do not revert or overwrite unrelated changes.
-- Treat tests, type checks, and manual verification as part of the work, not a
-  cleanup step.
-- When requirements are ambiguous, clarify before making broad architectural
-  decisions.
+## 1. 编码前先思考
 
-## Working Process
+不要假设，不要掩盖不确定性。
 
-1. Understand the task and current state.
-2. Identify the smallest useful change.
-3. Make focused edits.
-4. Run the relevant checks.
-5. Summarize what changed, how it was verified, and what remains uncertain.
+开始实现前必须先明确：
 
-For larger work, write or update a plan before implementation. The plan should
-name the user-facing outcome, affected modules, data flow, risks, and test
-strategy.
+- 用户真正要的结果是什么。
+- 当前代码和文档已经如何处理相关问题。
+- 有哪些合理解释，如果存在歧义应先澄清。
+- 受影响模块、数据流、风险和验证方式是什么。
+- 是否存在更简单的做法。
 
-## Code Style
+如果需求不清楚，应停下来说明不清楚的地方并询问。不要默默选择一个大范围架构方向。
 
-- Follow the patterns already present in the repository.
-- Use descriptive names for files, functions, components, variables, and data
-  structures.
-- Keep modules focused. If a file starts mixing unrelated responsibilities,
-  split it.
-- Avoid broad refactors unless they are required for the task.
-- Add comments only when they explain non-obvious intent or constraints.
-- Prefer typed and structured data over ad hoc string parsing.
-- Keep UI copy concise and specific.
+## 2. 简单优先
 
-## Frontend Guidelines
+用能解决问题的最小代码完成任务，不做投机式扩展。
 
-- Build the actual product surface, not a marketing landing page, unless the
-  task explicitly asks for one.
-- Respect existing design direction before introducing new visual language.
-- Keep text readable on desktop and mobile.
-- Use stable layout dimensions for panels, toolbars, boards, and repeated items
-  to avoid layout shifts.
-- Avoid decorative UI that competes with the main workflow.
-- Use accessible controls, labels, focus states, and keyboard-friendly flows.
-- Verify important UI changes in a browser, including at least one mobile-sized
-  viewport when the feature is user-facing.
+必须避免：
 
-## Backend Guidelines
+- 添加用户没有要求的功能。
+- 为单次使用代码创建抽象。
+- 引入“以后可能有用”的配置项、插件点或灵活性。
+- 为不可能发生的场景堆砌错误处理。
+- 把 50 行能讲清的实现写成 200 行。
 
-- Keep business rules out of presentation code.
-- Make data contracts explicit.
-- Validate all external input at service boundaries.
-- Handle error states deliberately. Do not hide failures behind silent fallbacks
-  unless the fallback is a product requirement.
-- Keep secrets in environment variables. Never commit credentials, API keys, or
-  private tokens.
-- Log enough to diagnose failures, but do not log sensitive data.
+做完后自问：资深工程师看到这个 diff，会不会觉得它过度复杂？如果会，先简化。
 
-## AI/LLM Guidelines
+## 3. 外科手术式改动
 
-- Treat model output as untrusted.
-- Put product rules in code and structured data where possible, not only in
-  prompts.
-- Keep prompts versioned and reviewable.
-- Make model inputs explicit: role, task, allowed facts, forbidden claims, and
-  response format.
-- Do not let a model invent persistent facts, user data, or source-of-truth state.
-- Add guardrails and tests for any behavior that affects correctness, safety, or
-  user trust.
+只改必须改的地方，只清理自己造成的问题。
 
-## Testing
+编辑既有代码时：
 
-- Add tests near the behavior being changed.
-- Cover normal paths, edge cases, and failure paths that matter to the user.
-- For regressions, add a test that would fail before the fix.
-- Run the smallest relevant check first, then broader checks when the change
-  touches shared behavior.
-- Do not claim something is fixed or complete without verification.
+- 不顺手“优化”相邻代码、注释、格式或命名。
+- 不重构没有坏掉且不影响当前任务的模块。
+- 匹配仓库现有风格，即使你个人会用另一种写法。
+- 发现无关死代码时可以说明，不要擅自删除。
+- 如果你的改动造成未使用 import、变量、函数，应一并清理。
 
-## Documentation
+检验标准：每一行改动都应该能解释为“为了完成本次请求”。
 
-- Update documentation when behavior, setup, architecture, or product scope
-  changes.
-- Keep docs factual and current.
-- Prefer short sections with concrete commands and examples.
-- Record decisions that future contributors would otherwise rediscover.
+## 4. 目标驱动执行
 
-## Git Hygiene
+把任务转化为可验证目标，并循环到验证通过。
 
-- Check the working tree before editing.
-- Stage only intentional files.
-- Do not use destructive commands unless explicitly requested and approved.
-- Write commit messages that explain the user-facing or developer-facing change.
-- Do not mix unrelated changes in one commit.
+示例：
 
-## Review Checklist
+- “加校验”应变成：为非法输入写测试，然后让测试通过。
+- “修 bug”应变成：写出能复现 bug 的测试，然后修到通过。
+- “重构 X”应变成：重构前后相关测试都通过。
 
-Before handing off work, check:
+多步骤任务需要先写简短计划。计划应包含：
 
-- The change matches the requested scope.
-- The code follows local patterns.
-- Relevant checks were run.
-- User-facing flows were manually verified when applicable.
-- No secrets or local-only artifacts were added.
-- Documentation is updated when needed.
-- Remaining risks or gaps are named clearly.
+- 步骤。
+- 每一步的验证方式。
+- 完成标准。
+
+不要用“让它工作”这种模糊目标推进复杂任务。
+
+## 5. 阅读上下文
+
+修改前先阅读相关上下文。
+
+通常需要检查：
+
+- `readme.md`
+- `roadmap.md`
+- `design.md`
+- 相关规格文档。
+- 相关源码和测试。
+- 当前本地改动。
+
+不要只根据文件名或记忆推断系统行为。
+
+## 6. 前端工作原则
+
+前端改动应构建真实产品界面，而不是营销页或临时 demo。
+
+要求：
+
+- 尊重既有设计方向。
+- 保持界面克制、现代、可读。
+- 遵循 `design.md` 的极简控件原则。
+- 优先使用图标按钮表达工具动作，并提供可访问名称。
+- 不增加与主流程竞争注意力的装饰元素。
+- 使用稳定尺寸，避免面板、工具栏、重复项和按钮发生布局跳动。
+- 桌面端和移动端都要检查关键流程。
+
+重要 UI 改动必须在浏览器中验证。
+
+## 7. 后端工作原则
+
+后端代码应保持边界清晰、契约明确。
+
+要求：
+
+- 不把业务规则塞进展示代码。
+- 外部输入必须在服务边界校验。
+- 数据契约使用结构化类型和 schema 表达。
+- 错误状态要可诊断，不用静默回退掩盖失败，除非回退是明确产品需求。
+- 密钥只放在环境变量或平台注入配置中，绝不提交凭证、API key 或私有 token。
+- 日志足以诊断问题，但不能泄露敏感数据。
+
+## 8. AI / LLM 工作原则
+
+模型输出永远视为不可信。
+
+要求：
+
+- 产品规则尽可能放在代码和结构化数据里，不只写在 prompt 中。
+- Prompt 必须版本化、可审查。
+- 模型输入必须明确：角色、任务、允许事实、禁止声明、响应格式。
+- 模型不能发明持久事实、用户数据或事实源状态。
+- 影响正确性、安全性或用户信任的 AI 行为必须有护栏和测试。
+
+本项目中，案件事实源只能来自 case schema、案件包文件和玩家状态，不能来自模型自由生成。
+
+## 9. 测试与验证
+
+测试是工作的一部分，不是最后的装饰。
+
+要求：
+
+- 在靠近被修改行为的位置添加或更新测试。
+- 覆盖对用户重要的正常路径、边界路径和失败路径。
+- 修复回归时，加入一个修复前会失败的测试。
+- 先跑最小相关检查；触及共享行为时，再跑更广检查。
+- 未验证前，不要声称问题已修复或工作已完成。
+
+如果无法运行某项检查，交付时必须说明原因和剩余风险。
+
+## 10. 文档
+
+行为、启动方式、架构、数据契约或产品范围变化时，同步更新文档。
+
+文档要求：
+
+- 主体使用中文。
+- 保持事实准确、当前有效。
+- 使用短章节、具体命令和示例。
+- 记录未来贡献者否则需要重新发现的决策。
+- 技术标识、schema 字段、命令和文件路径保持原样。
+
+## 11. Git 规范
+
+编辑前检查工作区状态。
+
+要求：
+
+- 保护用户已有工作，不回滚或覆盖无关改动。
+- 只暂存有意改动的文件。
+- 不使用破坏性命令，除非用户明确请求并批准。
+- commit message 应说明用户侧或开发者侧变化。
+- 不在同一个提交中混入无关改动。
+
+## 12. 交付前检查
+
+交付前确认：
+
+- 改动符合请求范围。
+- 没有做未经请求的功能或重构。
+- 每个改动都能追溯到用户请求。
+- 代码遵循本地模式。
+- 相关检查已运行。
+- 用户可见流程在需要时已手动验证。
+- 没有加入密钥或本地专属产物。
+- 文档在需要时已同步。
+- 剩余风险或缺口已说明。

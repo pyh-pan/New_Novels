@@ -1,160 +1,180 @@
-# New Novels Design
+# New Novels 设计文档
 
-## Product Feel
+## 产品气质
 
-New Novels should feel like reading an elegant detective novella while keeping a
-real investigation desk beside the text. It is not a marketing page, a generic
-chat app, or a heavy game dashboard.
+New Novels 应该像在阅读一篇优雅的侦探中篇，同时文本旁边始终放着一张真实的调查台。它不是营销页面，不是通用聊天应用，也不是厚重的游戏仪表盘。
 
-The interface should be:
+界面应当：
 
-- literary, quiet, and text-first;
-- modern, precise, and uncluttered;
-- focused on player deduction rather than system guidance;
-- explicit about high-risk actions such as restart or deletion;
-- restrained enough that the story and investigation remain the center.
+- 具有文学感，安静，并以文本为先；
+- 现代、精确、克制；
+- 聚焦玩家推理，而不是系统提示；
+- 对重新开始、删除等高风险操作给出明确确认；
+- 足够收敛，让故事和调查始终处在中心。
 
-## Layout
+## 布局
 
-The primary desktop layout has three work areas:
+桌面端主布局包含三个工作区：
 
-- Story reader.
-- Investigation desk.
-- Detective notebook drawer.
+- 故事阅读区。
+- 调查台。
+- 侦探笔记抽屉。
 
-Default desktop state:
+桌面端默认状态：
 
-- Story reader on the left.
-- Investigation desk on the right.
-- Notebook closed, represented only by a small top-right drawer entry.
+- 故事阅读区在左侧。
+- 调查台在右侧。
+- 笔记默认收起，只保留右上角的小型入口。
 
-Notebook-open state:
+笔记展开状态：
 
-- Story and investigation columns compress.
-- Notebook appears as a third work area.
-- The notebook must not leave a full-height rail when closed.
+- 故事与调查两栏压缩。
+- 笔记作为第三工作区出现。
+- 笔记收起时不能留下完整高度的侧边栏轨道。
 
-Mobile state:
+移动端状态：
 
-- Three bottom tabs: Story, Investigation, Notebook.
-- Tabs share one play state.
-- No desktop-only sidebars should leak into mobile.
+- 底部三个标签：故事、调查、笔记。
+- 三个标签共享同一份游玩状态。
+- 桌面端专属侧边栏不能泄漏到移动端。
 
-## Story Reader
+## 故事阅读区
 
-The story reader is pure prose.
+故事阅读区只呈现纯粹叙事文本。
 
-Do:
+应该：
 
-- show title, source title, chapter subtitle, and chapter text;
-- render one chapter as a continuous scrollable reading page;
-- provide previous/next chapter controls at the bottom;
-- show lightweight floating chapter controls when the user clicks the story
-  area;
-- use Pretext only as a reading/layout support layer, with DOM text remaining
-  accessible.
+- 展示标题、来源标题、章节副标题和章节正文；
+- 将一章渲染为连续可滚动阅读页；
+- 在章节底部提供前一章 / 后一章控件；
+- 用户点击故事区域时，显示轻量的浮动章节导航；
+- 只将 Pretext 用作阅读与布局辅助层，同时保持 DOM 文本可访问。
 
-Do not:
+不应该：
 
-- put investigation actions, hints, or status chips inside the story pane;
-- explain the UI inside the story text;
-- expose hidden case state in the reading area.
+- 在故事栏内放调查动作、提示或状态标签；
+- 在故事文本中解释 UI；
+- 在阅读区暴露隐藏案件状态。
 
-## Investigation Desk
+## 调查台
 
-The investigation desk is where all user action starts.
+调查台是所有用户行动的起点。
 
-Structure:
+结构：
 
-- A status header.
-- Collapsible conversation modules.
-- One global input for new questions.
+- 简洁标题。
+- 可折叠对话模块。
+- 一个全局问题输入框。
 
-Default module:
+默认模块：
 
-- The first expanded module is the general investigation assistant.
-- The general assistant can answer unlocked scene/fact questions and route the
-  player toward relevant NPCs.
+- 第一个展开模块是通用调查助手。
+- 通用助手可以回答已解锁的现场 / 事实问题，并把玩家引向相关 NPC。
 
-NPC modules:
+NPC 模块：
 
-- Each configured NPC has its own module.
-- If routing detects that a question belongs to an NPC, the answer is written to
-  that NPC module.
-- Modules should support scanning history without forcing every conversation to
-  stay open.
+- 每个已配置 NPC 都有自己的模块。
+- 用户未指定角色时，问题进入通用调查助手。
+- 用户输入 `@` 时出现角色备选，选择后问题进入对应 NPC 模块。
+- 模块应支持扫读历史，而不是强迫所有对话始终展开。
 
-The player should never need to choose from artificial action buttons to ask a
-question. Natural language is the main interaction.
+玩家不应为了提问而点击人造动作按钮。自然语言是主要交互方式。
 
-## Detective Notebook
+## 侦探笔记
 
-The notebook is player-owned.
+侦探笔记属于玩家。
 
-Required behaviors:
+必需行为：
 
-- Opened from a compact top-right entry.
-- Supports manual note creation.
-- Supports saving excerpts from agent replies.
-- Notes can be edited.
-- Notes can be filtered by tag.
-- Notes sort newest first.
-- Deleting notes requires confirmation.
+- 通过右上角紧凑入口打开。
+- 支持手动新建笔记。
+- 支持从故事正文和 agent 对话中选中文字并添加批注。
+- 批注保存后，引用内容和评论同步到侦探笔记。
+- 已批注的原文保持淡色高亮，并在悬浮或点击时展示评论预览。
+- 笔记可编辑。
+- 笔记可按标签筛选。
+- 笔记按最新优先排序。
+- 删除笔记需要确认。
 
-Tags:
+标签：
 
-- clue
-- testimony
-- doubt
-- contradiction
+- 批注。
+- 线索。
+- 证词。
+- 疑点。
+- 矛盾。
 
-The system should not decide which notes are important. Importance and meaning
-belong to the player's reasoning process.
+系统不应判断哪些笔记重要。重要性和意义属于玩家自己的推理过程。
 
-## Final Accusation
+## 最终指认
 
-The final accusation page stays deliberately simple:
+最终指认页面刻意保持简单：
 
-- A centered dialogue surface.
-- The system asks one question at a time.
-- The user answers in natural language.
-- A wrong answer clears the accusation attempt and offers a return to
-  investigation.
-- All correct answers reveal the solved state.
+- 中央对话界面。
+- 系统一次提出一个问题。
+- 用户用自然语言回答。
+- 答错会清空本次指认尝试，并提供返回调查的入口。
+- 全部答对后进入破案状态。
 
-Final accusation checking is deterministic and based on case data. The model may
-frame the experience, but it must not decide whether the player solved the case.
+最终指认校验基于案件数据确定性完成。模型可以包装体验，但不得决定玩家是否破案。
 
-## Visual Language
+## 视觉语言
 
-Use a restrained editorial palette:
+使用克制的编辑型配色：
 
-- warm paper background;
-- near-black body text;
-- soft gray dividers;
-- muted accent color for active controls;
-- tag colors that help scanning without dominating the page.
+- 温暖纸张背景；
+- 近黑正文；
+- 柔和灰色分隔线；
+- 低饱和强调色用于激活控件；
+- 标签颜色帮助扫读，但不能主导页面。
 
-Interaction details:
+交互细节：
 
-- Buttons should have clear focus and hover states.
-- Icon-only or compact controls need accessible labels.
-- Cards are only for repeated items, conversation modules, notes, and modals.
-- Avoid nested cards and decorative backgrounds.
-- Text should fit cleanly at desktop and mobile widths.
+- 按钮应具备清晰的 focus 和 hover 状态。
+- 仅图标或紧凑控件需要可访问标签。
+- 卡片只用于重复项、对话模块、笔记和弹窗。
+- 避免嵌套卡片和装饰性背景。
+- 文本在桌面与移动宽度下都应干净适配。
 
-## AI Interaction Principles
+## 极简控件原则
 
-AI NPCs should feel alive, but the UI should never pretend the model is the
-source of truth.
+所有按钮、入口、组件和视觉元素都遵循“如无必要，勿增实体”。
 
-The product should communicate through behavior:
+原则：
 
-- the user asks freely;
-- the runtime routes the question;
-- the NPC answers in character;
-- guardrails keep the answer inside the case facts;
-- the player decides what matters and records notes manually.
+- 每一个视觉元素都必须有明确用途。
+- 能用一个元素解决的问题，不增加第二个元素。
+- 能用上下文理解的内容，不额外解释。
+- 能用简单图标表达的操作，不使用“图标 + 文字”按钮。
+- 能用紧凑按钮表达的操作，不使用大按钮。
+- 能用现有布局层级表达的信息，不额外增加卡片、分隔线、徽章或说明文案。
 
-No UI copy should expose prompt mechanics, hidden rules, private facts, or
-internal runtime state.
+图标优先规则：
+
+- 右上角工具、侧边栏开关、笔记开关、关闭、返回、展开、收起、删除、筛选、上传、导入等高频工具动作，优先使用图标按钮。
+- 图标按钮必须具备 `aria-label` 或等价可访问名称。
+- 当图标含义不够通用时，用 tooltip 解释，不把解释文字常驻在按钮里。
+- 危险操作可以使用文字确认，例如“确认删除”“重新开始”，但入口本身仍应尽量克制。
+- 主要提交动作只有在需要明确承诺时才使用文字，例如“发布案件”“提交批注并生成修改”。
+
+禁用倾向：
+
+- 不为普通状态增加装饰性图标。
+- 不把每个操作都做成带文字的大按钮。
+- 不用大面积彩色按钮制造层级。
+- 不在工作台里使用营销式 hero、口号、插画或夸张视觉。
+- 不用解释性文案替代清晰的信息结构。
+
+## AI 交互原则
+
+AI NPC 应该有生命力，但 UI 不能假装模型是事实源。
+
+产品应通过行为传达：
+
+- 用户自由提问；
+- runtime 路由问题；
+- NPC 以角色口吻回答；
+- 护栏让回答停留在案件事实内；
+- 玩家自行判断什么重要，并手动记录笔记。
+
+任何 UI 文案都不应暴露 prompt 机制、隐藏规则、私有事实或内部 runtime 状态。

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "case-package/v1",
+  "caseId": "hunters-lodge",
+  "title": "猎人小屋疑案",
+  "language": "zh-CN",
+  "entryChapterId": "chapter-1",
+  "createdBy": "new-novels-case-adapter",
+  "source": {
+    "title": "The Mystery of Hunter's Lodge",
+    "author": "Agatha Christie",
+    "rightsNote": "Adapted from user-provided source text. Confirm copyright status in the target jurisdiction before public distribution."
+  }
+}

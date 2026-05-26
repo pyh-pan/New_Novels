@@ -1,0 +1,36 @@
+[
+  {
+    "from": "roger",
+    "to": "zoe",
+    "attitude": "protective",
+    "knownFactsAboutOther": ["fact-telegram-from-zoe", "fact-haverings-motive"]
+  },
+  {
+    "from": "zoe",
+    "to": "roger",
+    "attitude": "protective",
+    "knownFactsAboutOther": ["fact-roger-train-alibi", "fact-roger-debts"]
+  },
+  {
+    "from": "japp",
+    "to": "roger",
+    "attitude": "hostile",
+    "knownFactsAboutOther": ["fact-roger-debts", "fact-roger-train-alibi"]
+  },
+  {
+    "from": "poirot",
+    "to": "zoe",
+    "attitude": "indifferent",
+    "knownFactsAboutOther": ["fact-zoe-actress", "fact-no-one-saw-both-women"]
+  },
+  {
+    "from": "poirot",
+    "to": "middleton",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-agency-denies-middleton",
+      "fact-middleton-no-transport",
+      "fact-dim-hall-housekeeper"
+    ]
+  }
+]

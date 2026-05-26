@@ -1,21 +1,19 @@
-# Case Package v1
+# 案件包 v1
 
-Case packages are the content boundary between a mystery story and the New
-Novels runtime. A package contains readable prose plus structured facts, NPCs,
-rules, and final accusation data.
+案件包是推理故事与 New Novels runtime 之间的内容边界。一个案件包同时包含可读小说正文，以及结构化事实、NPC、规则和最终指认数据。
 
-The authoritative schema is in:
+权威 schema 位于：
 
 - `lib/case/schema.ts`
 - `lib/case-package/schema.ts`
 
-The local skill reference is in:
+本地 skill 参考文档位于：
 
 - `skills/new-novels-case-adapter/references/case-package-v1.md`
 
-## Filesystem Layout
+## 文件系统布局
 
-A runnable package directory must include:
+可运行案件包目录必须包含：
 
 ```text
 manifest.json
@@ -37,56 +35,57 @@ victims/victims.json
 accusation/questions.json
 ```
 
-`case.json` is an aggregate review snapshot. The loader reads split files, and
-chapter bodies come from `story/*.md`.
+`case.json` 是聚合审查快照。加载器读取拆分文件，章节正文来自 `story/*.md`。
 
-## Built-In Example
+## 内置示例
 
-The built-in package is:
+当前默认内置包是：
+
+```text
+cases/hunters-lodge/
+```
+
+它由 `getDefaultCase()` 加载，并驱动默认应用体验。较早的参考包保留在：
 
 ```text
 cases/hammer-of-god/
 ```
 
-It is loaded by `getDefaultCase()` and powers the default app experience.
+## 重要部分
 
-## Important Sections
+### 清单（Manifest）
 
-### Manifest
+`manifest.json` 标识案件包：
 
-`manifest.json` identifies the package:
+- `schemaVersion`：必须是 `case-package/v1`；
+- `caseId`：必须匹配 `caseFile.id`；
+- `title`；
+- `language`；
+- `entryChapterId`；
+- 来源标题、作者和版权说明。
 
-- `schemaVersion`: must be `case-package/v1`;
-- `caseId`: must match `caseFile.id`;
-- `title`;
-- `language`;
-- `entryChapterId`;
-- source title, author, and rights note.
+### 故事正文（Story）
 
-### Story
+`story/chapters.json` 包含章节元数据。每章的 `body` 指向 `story/` 下的 Markdown 文件。
 
-`story/chapters.json` contains chapter metadata. Each chapter `body` points to a
-markdown file under `story/`.
+故事正文应保持文学性。不要把 UI 指令、隐藏事实或最终解答文本放入早期章节。
 
-Story prose should remain literary. Do not put UI instructions, hidden facts, or
-final solution text into early chapters.
+### 事实账本（Facts）
 
-### Facts
+`facts/facts.json` 是事实账本。事实是以下内容的稳定来源：
 
-`facts/facts.json` is the fact ledger. Facts are the stable source for:
+- 场景观察；
+- 线索支撑；
+- NPC 揭示规则；
+- 矛盾；
+- 指认答案；
+- 隐藏真相。
 
-- scene observations;
-- clue support;
-- NPC reveal rules;
-- contradictions;
-- accusation answers;
-- hidden truth.
+事实可见性可以是 `public`、`unlocked`、`private` 或 `truth`。
 
-Fact visibility can be `public`, `unlocked`, `private`, or `truth`.
+### Agent 配置（Agents）
 
-### Agents
-
-Every case must include one general agent:
+每个案件都必须包含一个通用 agent：
 
 ```json
 {
@@ -95,122 +94,121 @@ Every case must include one general agent:
 }
 ```
 
-NPC files define:
+NPC 文件定义：
 
-- aliases;
-- personality;
-- knowledge;
-- boundaries;
-- lie strategies;
-- reveal rules;
-- pressure profiles;
-- emotional arcs;
-- style anchors.
+- 别名；
+- 性格；
+- 知识；
+- 边界；
+- 撒谎策略；
+- 揭示规则；
+- 压力模型；
+- 情绪弧；
+- 风格锚点。
 
-NPC private facts affect behavior but are not automatically allowed as spoken
-facts.
+NPC 私有事实会影响行为，但不会自动变成允许说出口的事实。
 
-### Acts and Act Gates
+### Acts 与 Act Gates
 
-`acts/acts.json` defines playable investigation phases.
+`acts/acts.json` 定义可玩的调查阶段。
 
-`acts/gates.json` defines how the player unlocks the next phase. Gates can
-require:
+`acts/gates.json` 定义玩家如何解锁下一阶段。门槛可以要求：
 
-- clue ids;
-- fact ids;
-- contradiction ids;
-- NPC interactions;
-- scene interactions.
+- 线索 id；
+- 事实 id；
+- 矛盾 id；
+- NPC 交互；
+- 场景交互。
 
-Act gates should prove investigation progress. They should not depend on vague
-keyword guessing alone.
+Act gate 应证明玩家完成了调查进展，不应只依赖模糊关键词猜测。
 
-### Accusation
+### 最终指认（Accusation）
 
-`accusation/questions.json` defines final questions and accepted answers.
+`accusation/questions.json` 定义最终问题和可接受答案。
 
-Final accusation checking is deterministic. Keep accepted answers broad enough
-for reasonable human phrasing, but grounded in the canonical truth.
+最终指认校验是确定性的。可接受答案应足够宽容，覆盖合理的人类表达，但必须基于标准真相。
 
-## Validation
+## 校验
 
-Run:
+运行：
 
 ```bash
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hammer-of-god
 ```
 
-The same checker accepts aggregate package JSON, split package directories, and
-zip files:
+同一个检查器支持聚合 package JSON、拆分包目录和 zip 文件：
 
 ```bash
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs case-package.zip
 ```
 
-The loader can also return structured validation reports:
+加载器也可以返回结构化校验报告：
 
 ```ts
-validateCasePackageDirectory("cases/hammer-of-god")
+validateCasePackageDirectory("cases/hunters-lodge")
 ```
 
-Reports use:
+报告字段：
 
-- `severity`;
-- `code`;
-- `filePath`;
-- optional `fieldPath`;
-- `message`;
-- `suggestion`.
+- `severity`；
+- `code`；
+- `filePath`；
+- 可选 `fieldPath`；
+- `message`；
+- `suggestion`。
 
-## Content Adaptation
+## 内容改写
 
-Use `skills/new-novels-case-adapter/` when converting a detective story into a
-case package. The skill is responsible for producing runtime-ready data, not only
-rewritten prose.
+将推理故事转换为案件包时，使用 `skills/new-novels-case-adapter/`。该 skill 负责生成可运行数据，而不只是重写正文。
 
-Minimum useful output:
+最低有效输出：
 
-- chapters;
-- facts;
-- clues;
-- contradictions;
-- agents;
-- pressure profiles;
-- reveal rules;
-- acts and act gates;
-- final accusation questions.
+- 章节；
+- 事实；
+- 线索；
+- 矛盾；
+- agent；
+- 压力模型；
+- 揭示规则；
+- 剧情幕和 act gate；
+- 最终指认问题。
 
-## Zip Preview
+## Zip 预览
 
-The web app exposes a preview-only import path:
+网页应用提供仅预览的导入路径：
 
 ```text
 POST /api/cases/preview
 ```
 
-Send a multipart `file` field containing a package zip. The endpoint accepts
-both zips whose files live at the root and zips with one top-level folder. On
-success it returns:
+发送包含案件包 zip 的 multipart `file` 字段。端点既接受文件直接位于根目录的 zip，也接受带单个顶层文件夹的 zip。成功后返回：
 
-- manifest data;
-- case id and title;
-- counts for chapters, agents, acts, clues, and accusation questions;
-- structured issues.
+- manifest 数据；
+- 案件 id 和标题；
+- 章节、agent、剧情幕、线索和指认问题数量；
+- 结构化问题。
 
-The toolbar import UI uses this endpoint to validate a package before a future
-runtime activation flow.
+Studio 入口使用该端点。用户从 `/studio` 导入案件包后，系统先展示结构摘要和校验问题，再进入 `/studio/cases/<case-id>` 的审阅工作台。
 
-## Quality Checks
+## Studio 审阅视图
 
-`check_case_package_refs.mjs` now checks both reference integrity and minimum
-runtime readiness:
+Studio 不直接编辑原始 zip。它先把案件包映射为 `StudioDraftView`，让创作者审查完整设计：
 
-- exactly one `general` agent;
-- unique ids;
-- valid references for facts, clues, acts, gates, scenes, relationships,
-  propagation rules, contradictions, pressure rules, and reveal rules;
-- at least three accusation questions;
-- non-final acts have unlock gates;
-- NPCs include source-specific pressure rules, emotional arcs, confrontation
-  triggers, and style anchors.
+- 故事章节：正文、所属幕、玩家可见事实、隐藏调查内容、关联线索、关联矛盾和下一幕条件；
+- 角色：性格语气、公开知识、私有事实、边界、揭示规则和章节约束矩阵；
+- 线索、矛盾、多幕推进、最终指认和校验报告；
+- 右侧改写助手工作区：收集针对当前节点的批注，并生成后续 diff 建议。
+
+这一层的目标是让创作者知道当前故事在每一章、每个 agent 和每个解锁条件下会如何运行。
+
+## 质量检查
+
+`check_case_package_refs.mjs` 同时检查引用完整性和最低 runtime 就绪度：
+
+- 恰好一个 `general` agent；
+- id 唯一；
+- facts、clues、acts、gates、scenes、relationships、propagation rules、contradictions、pressure rules 和 reveal rules 引用有效；
+- 至少三个指认问题；
+- 非最终幕具备解锁门槛；
+- NPC 包含来源特定的压力规则、情绪弧、对质触发器和风格锚点。

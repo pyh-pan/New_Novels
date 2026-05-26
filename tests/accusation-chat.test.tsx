@@ -39,10 +39,10 @@ describe("AccusationChat", () => {
 
     render(<AccusationChat />);
 
-    fireEvent.change(await screen.findByLabelText("回答当前问题"), {
+    fireEvent.change(await screen.findByLabelText("回答"), {
       target: { value: "错误答案" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "提交回答" }));
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
     await waitFor(() => {
       expect(screen.getByText("回答错误")).toBeInTheDocument();
@@ -69,10 +69,10 @@ describe("AccusationChat", () => {
 
     render(<AccusationChat />);
 
-    fireEvent.change(await screen.findByLabelText("回答当前问题"), {
+    fireEvent.change(await screen.findByLabelText("回答"), {
       target: { value: "威尔弗里德牧师" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "提交回答" }));
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
     expect(await screen.findByText("作案手法是什么？")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith("/api/accuse", {
@@ -101,7 +101,7 @@ describe("AccusationChat", () => {
 
     render(<AccusationChat />);
 
-    const input = await screen.findByLabelText("回答当前问题");
+    const input = await screen.findByLabelText("回答");
     fireEvent.change(input, { target: { value: "威尔弗里德牧师" } });
 
     const form = input.closest("form");
@@ -151,16 +151,16 @@ describe("AccusationChat", () => {
 
     render(<AccusationChat />);
 
-    fireEvent.change(await screen.findByLabelText("回答当前问题"), {
+    fireEvent.change(await screen.findByLabelText("回答"), {
       target: { value: "待重试答案" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "提交回答" }));
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
     expect(await screen.findByText("回答提交失败。请稍后再试。")).toBeInTheDocument();
-    expect(screen.getByLabelText("回答当前问题")).toHaveValue("待重试答案");
+    expect(screen.getByLabelText("回答")).toHaveValue("待重试答案");
     expect(screen.queryByText("回答错误")).not.toBeInTheDocument();
     expect(screen.queryAllByText("待重试答案")).toHaveLength(1);
-    expect(screen.getByRole("button", { name: "提交回答" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "提交" })).toBeEnabled();
   });
 
   it("shows truth revealed and end game when all answers are correct", async () => {
@@ -186,10 +186,10 @@ describe("AccusationChat", () => {
 
     render(<AccusationChat />);
 
-    fireEvent.change(await screen.findByLabelText("回答当前问题"), {
+    fireEvent.change(await screen.findByLabelText("回答"), {
       target: { value: "正确答案" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "提交回答" }));
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
     expect(await screen.findByText("真相大白")).toBeInTheDocument();
     expect(screen.getByText("威尔弗里德牧师")).toBeInTheDocument();

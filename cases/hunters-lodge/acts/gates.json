@@ -1,0 +1,45 @@
+[
+  {
+    "id": "gate-opening-to-testimony",
+    "fromActId": "act-opening",
+    "toActId": "act-testimony",
+    "requiredClueIds": [
+      "clue-middleton-testimony",
+      "clue-locked-door-window",
+      "clue-missing-revolver",
+      "clue-close-shot"
+    ],
+    "requiredFactIds": [
+      "fact-middleton-visitor-story",
+      "fact-locked-door-open-window",
+      "fact-missing-revolver",
+      "fact-close-shot-behind"
+    ],
+    "requiredContradictionIds": [],
+    "requiredNpcInteractions": ["zoe", "middleton", "japp"],
+    "requiredSceneInteractions": ["scene-gun-room:尸体", "scene-gun-room:左轮手枪"],
+    "unlockNarrative": "你已经掌握现场、访客证词、左轮和枪伤方向。案件进入证词核查阶段：女管家、罗杰的不在场证明与伦敦线索都需要重新比对。"
+  },
+  {
+    "id": "gate-testimony-to-confrontation",
+    "fromActId": "act-testimony",
+    "toActId": "act-confrontation",
+    "requiredClueIds": [
+      "clue-agency-denial",
+      "clue-transport-gap",
+      "clue-middleton-vanished",
+      "clue-zoe-actress",
+      "clue-never-seen-together"
+    ],
+    "requiredFactIds": [
+      "fact-agency-denies-middleton",
+      "fact-middleton-no-transport",
+      "fact-zoe-actress",
+      "fact-no-one-saw-both-women"
+    ],
+    "requiredContradictionIds": ["contradiction-middleton-existence"],
+    "requiredNpcInteractions": ["japp", "poirot", "zoe"],
+    "requiredSceneInteractions": ["scene-selbourne-agency:登记簿"],
+    "unlockNarrative": "米德尔顿太太的身份已经无法独立成立。现在可以把佐伊的演员经历、女管家的消失和罗杰的伦敦左轮放在一起对质。"
+  }
+]

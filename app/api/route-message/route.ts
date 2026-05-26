@@ -3,39 +3,43 @@ import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
 import { getModelName, getOpenAIClient } from "../../../lib/ai/openai";
-import { getDefaultRuntime } from "../../../lib/case/default-case";
+import { getDefaultCaseId, getRuntimeForCase } from "../../../lib/case/default-case";
 import {
+  getRouteableTargets,
+  isRouteableTarget,
   labelForTarget,
-  routeMessage,
-  routeableTargets
+  routeMessage
 } from "../../../lib/game/routing";
 import type { ConversationTarget, RoutedMessage } from "../../../lib/game/types";
 
 const requestSchema = z.object({
+  caseId: z.string().trim().min(1).optional(),
   message: z.string().trim().min(1)
 });
 
 const semanticRouteSchema = z.object({
-  targetId: z.enum(["general", "wilfred", "simeon", "elizabeth", "joe", "unsupported"]),
+  targetId: z.string().trim().min(1),
   confidence: z.number().min(0).max(1),
   reason: z.string().trim().min(1)
 });
 
 const semanticConfidenceThreshold = 0.65;
-const runtime = getDefaultRuntime();
 
-function routingPrompt(message: string) {
+function routingPrompt(message: string, runtime: ReturnType<typeof getRuntimeForCase>) {
+  const targetDescriptions = runtime.caseFile.agents
+    .map((agent) => {
+      const aliases = agent.aliases.length ? `；别名：${agent.aliases.join("、")}` : "";
+      return `- ${agent.id}：${agent.name}，${agent.role}${aliases}`;
+    })
+    .join("\n");
+
   return [
     {
       role: "system" as const,
       content: `你是互动推理游戏的语义路由器。只输出 JSON，不要输出解释文本。
 
 可选 targetId：
-- general：现场、线索、物证、关系、推理方向、整理已知信息
-- wilfred：威尔弗里德、牧师、神职人员、死者弟弟
-- simeon：铁匠、西米恩
-- elizabeth：伊丽莎白、铁匠妻子
-- joe：疯乔
+${targetDescriptions}
 - unsupported：没有配置的对象或无法识别的调查对象
 
 输出格式：
@@ -64,20 +68,26 @@ function extractJson(content: string | null | undefined): unknown {
   }
 }
 
-function withLabel(route: z.infer<typeof semanticRouteSchema>): RoutedMessage {
+function withLabel(
+  route: z.infer<typeof semanticRouteSchema>,
+  runtime: ReturnType<typeof getRuntimeForCase>
+): RoutedMessage {
   return {
     targetId: route.targetId as ConversationTarget,
-    label: labelForTarget(route.targetId as ConversationTarget),
+    label: labelForTarget(route.targetId as ConversationTarget, runtime),
     confidence: route.confidence,
     reason: route.reason
   };
 }
 
-async function semanticRouteMessage(message: string): Promise<RoutedMessage | undefined> {
+async function semanticRouteMessage(
+  message: string,
+  runtime: ReturnType<typeof getRuntimeForCase>
+): Promise<RoutedMessage | undefined> {
   try {
     const completion = await getOpenAIClient().chat.completions.create({
       model: getModelName(),
-      messages: routingPrompt(message),
+      messages: routingPrompt(message, runtime),
       temperature: 0
     });
     const parsed = semanticRouteSchema.safeParse(
@@ -89,13 +99,13 @@ async function semanticRouteMessage(message: string): Promise<RoutedMessage | un
     }
 
     if (
-      !routeableTargets.includes(parsed.data.targetId) ||
-      (parsed.data.targetId !== "unsupported" && !runtime.getAgent(parsed.data.targetId))
+      !getRouteableTargets(runtime).includes(parsed.data.targetId) ||
+      !isRouteableTarget(parsed.data.targetId, runtime)
     ) {
       return undefined;
     }
 
-    return withLabel(parsed.data);
+    return withLabel(parsed.data, runtime);
   } catch {
     return undefined;
   }
@@ -108,7 +118,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const semanticRoute = await semanticRouteMessage(parsed.data.message);
+  let runtime: ReturnType<typeof getRuntimeForCase>;
+  try {
+    runtime = getRuntimeForCase(parsed.data.caseId ?? getDefaultCaseId());
+  } catch {
+    return NextResponse.json({ error: "Unknown case." }, { status: 404 });
+  }
 
-  return NextResponse.json(semanticRoute ?? routeMessage(parsed.data.message));
+  const semanticRoute = await semanticRouteMessage(parsed.data.message, runtime);
+
+  return NextResponse.json(semanticRoute ?? routeMessage(parsed.data.message, runtime));
 }
