@@ -47,17 +47,30 @@ cases/<case-id>/
 - `POST /api/cases/preview`
   - 输入：包含 `case-package/v1` zip 的 multipart `file`。
   - 规范化单根目录 zip 包，并校验 split filesystem 布局。
-  - 返回 manifest 数据、案件摘要和结构化问题。
+  - 校验通过后注册为 Studio `draft`，返回 `draftCaseId`、manifest 数据、案件摘要和结构化问题。
+  - 如果导入包 id 与内置案件冲突，会使用 `import-<caseId>` 作为草稿 id，避免覆盖内置案件。
 
 - `GET /api/cases`
   - 返回可展示在书架上的内置案件摘要。
 
 - `POST /api/studio/source-jobs`
-  - 输入：`.txt` 或 `.md` 原文文件。
-  - Studio v1 创建可审阅草稿任务，并返回进度步骤。
+  - 输入：`.txt`、`.md` 或 `.pdf` 原文文件。
+  - 先提取纯文本；PDF 使用 `pdf-parse` 读取可选择文本，扫描件需要另行 OCR。
+  - 调用平台 AI，按 `new-novels-case-adapter` 的工作流生成 `sourceProfile`、`segmentation`、`qualityReport` 和 schema-valid `caseFile`。
+  - 生成结果会注册为内存中的 Studio 动态草稿，并返回进度步骤与 `draftCaseId`。
+
+- `POST /api/studio/cases/[caseId]/save`
+  - 将运行期 Studio 草稿状态从 `draft` 更新为 `saved`。
+  - 保存会写入 `.data/studio-drafts/<caseId>/draft.json`。
+  - 保存后仍不会出现在书架，也不能作为正式案件游玩。
+
+- `POST /api/studio/cases/[caseId]/publish`
+  - 将运行期 Studio 草稿状态更新为 `published`。
+  - 发布会把案件写为 `.data/published-cases/<caseId>/` 下的完整 `case-package/v1` split package。
+  - 发布后案件会进入书架，并可通过 `/cases/[caseId]`、调查 API 和最终指认 API 正式游玩。
 
 - `GET /api/studio/jobs/[jobId]`
-  - 返回原文生成任务状态。当前原型使用内置案件作为可审阅草稿。
+  - 返回原文生成任务状态。当前版本使用进程内任务表保存最近生成的临时草稿状态。
 
 - `GET /api/accuse`
   - 按可选 `caseId` 返回第一个最终指认问题。
@@ -171,10 +184,14 @@ ai.api_key=<Runway API key>
 
 当前产品支持两条 Studio 入口：
 
-- 上传 `.txt` / `.md` 原文，创建可审阅草稿任务；
-- 上传 `case-package/v1` zip，执行结构校验和摘要预览。
+- 上传 `.txt` / `.md` / `.pdf` 原文，创建可审阅草稿任务；
+- 上传 `case-package/v1` zip，执行结构校验并生成 Studio 草稿。
 
-Studio 审阅工作台按故事章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织内容。创作者可以在右侧改写助手区域添加批注并生成修改建议。预览成功不会替换当前运行中的案件。激活外部包是下一阶段导入里程碑。
+原文上传链路不是固定模板：系统先分析原文画像，再把文本分为 `story-keep`、`investigation-hide`、`deduction-hide`、`solution-lock` 和 `bridge-rewrite`，最后根据原文特征自适应生成章节、幕、agent、线索、矛盾、压力机制和最终指认问题。
+
+Studio 审阅工作台按原文画像、改写分段、故事章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织内容。创作者可以在右侧改写助手区域添加批注并生成修改建议。状态机包含 `draft`、`saved` 和 `published`：草稿保存在 `.data/studio-drafts`，发布案件保存在 `.data/published-cases`，只有发布后的动态案件会出现在书架并进入正式游玩 runtime。原文上传和 zip 导入会在“生成 Studio draft”这一步交汇，之后共用同一套审阅、保存、发布、书架和游玩链路。后续在平台发布时可将文件系统 store 替换为数据库 store。
+
+`lib/case-package/writer.ts` 负责把 `CaseFile` 反向拆成 `case-package/v1` 目录；`lib/studio/case-persistence.ts` 负责读写 `.data` 下的草稿和已发布案件。书架和游玩 runtime 的加载顺序是：内置案件、运行期发布案件、文件系统发布案件。
 
 ## Guard 打包
 
@@ -184,7 +201,7 @@ Studio 审阅工作台按故事章节、角色、线索、矛盾、多幕推进�
 - `install.sh` 只在缺少 standalone 产物时安装运行时依赖；它不执行构建。
 - `start.sh` 期待 `.next/standalone/server.js`，将生成的 `HOSTNAME` / `PORT` 引用改写为 `APP_HOSTNAME` / `APP_PORT`，并以 `exec node .next/standalone/server.js` 结束。
 - `health.sh` 检查 `http://127.0.0.1:3000/health`。
-- `npm run guard:package` 构建干净临时副本，并输出 `dist/new-novels-guard.zip`。
+- `npm run guard:package` 默认在项目父目录生成干净副本 `../New_Novels-guard/` 和压缩包 `../New_Novels-guard.zip`，避免打包产物污染源码目录。
 
 ## 验证
 

@@ -3,6 +3,8 @@ import JSZip from "jszip";
 import { ZodError } from "zod";
 
 import { loadCasePackageFromFiles } from "../../../../lib/case-package/loader";
+import { isBundledCaseId } from "../../../../lib/case/catalog";
+import { storeGeneratedStudioCase } from "../../../../lib/studio/generated-cases";
 
 function normalizeZipPath(path: string): string {
   const parts = path.split("/").filter(Boolean);
@@ -67,12 +69,41 @@ export async function POST(request: Request) {
     );
 
     const loaded = loadCasePackageFromFiles(files);
+    const draftCaseId = isBundledCaseId(loaded.caseFile.id)
+      ? `import-${loaded.caseFile.id}`
+      : loaded.caseFile.id;
+    const caseFile = {
+      ...loaded.caseFile,
+      id: draftCaseId
+    };
+
+    storeGeneratedStudioCase({
+      caseFile,
+      sourceProfile: {
+        title: loaded.caseFile.source.title,
+        author: loaded.caseFile.source.author,
+        language: loaded.manifest.language,
+        narrativeForm: "已导入 case-package/v1",
+        structureNotes: [
+          `导入包包含 ${loaded.caseFile.chapters.length} 个章节、${loaded.caseFile.agents.length} 个 agent、${loaded.caseFile.acts.length} 个剧情幕。`
+        ],
+        adaptationStrategy: [
+          "该草稿来自上传的结构化案件包，不再重新执行原文改写。",
+          "后续保存、发布、书架展示和正式游玩与原文生成草稿使用同一条状态机。"
+        ],
+        rightsNote: loaded.manifest.source.rightsNote
+      },
+      segmentation: [],
+      qualityReport: []
+    });
 
     return NextResponse.json({
       ok: true,
       manifest: loaded.manifest,
+      draftCaseId,
+      status: "draft",
       caseSummary: {
-        id: loaded.caseFile.id,
+        id: caseFile.id,
         title: loaded.caseFile.title,
         chapters: loaded.caseFile.chapters.length,
         agents: loaded.caseFile.agents.length,

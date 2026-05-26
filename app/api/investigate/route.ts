@@ -15,9 +15,9 @@ import {
 } from "../../../lib/agent-runtime";
 import {
   getDefaultCaseId,
-  getRuntimeForCase,
   loadBundledCase
 } from "../../../lib/case/default-case";
+import { getRuntimeForPlayableCase, loadPlayableCase } from "../../../lib/case/playable-case";
 import { playerKnowledgeStateSchema } from "../../../lib/case/schema";
 
 const historyMessageSchema = z.object({
@@ -63,11 +63,11 @@ export async function POST(request: Request) {
 
   const { caseId, targetId, message, history, playerState, agentSession } = parsed.data;
   let caseFile: ReturnType<typeof loadBundledCase>;
-  let runtime: ReturnType<typeof getRuntimeForCase>;
+  let runtime: ReturnType<typeof getRuntimeForPlayableCase>;
   try {
     const resolvedCaseId = caseId ?? getDefaultCaseId();
-    caseFile = loadBundledCase(resolvedCaseId);
-    runtime = getRuntimeForCase(resolvedCaseId);
+    caseFile = loadPlayableCase(resolvedCaseId);
+    runtime = getRuntimeForPlayableCase(resolvedCaseId);
   } catch {
     return NextResponse.json({ error: "Unknown case." }, { status: 404 });
   }

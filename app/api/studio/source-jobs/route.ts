@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { createSourceDraftJob } from "../../../../lib/studio/jobs";
+import { extractSourceDocument } from "../../../../lib/studio/source-adaptation";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const formData = await request.formData().catch(() => undefined);
@@ -15,9 +18,16 @@ export async function POST(request: Request) {
   }
 
   const fileName = (file as File).name;
-  if (!/\.(txt|md)$/i.test(fileName)) {
-    return NextResponse.json({ error: "Only .txt and .md files are supported." }, { status: 400 });
+  if (!/\.(txt|md|pdf)$/i.test(fileName)) {
+    return NextResponse.json({ error: "Only .txt, .md and .pdf files are supported." }, { status: 400 });
   }
 
-  return NextResponse.json(createSourceDraftJob(fileName));
+  try {
+    const source = await extractSourceDocument(file as File);
+    return NextResponse.json(await createSourceDraftJob(source));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Source file could not be parsed.";
+
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
 }

@@ -1,4 +1,9 @@
 import type { CaseAgent, CaseFile } from "../case/schema";
+import type {
+  AdaptationQualityItem,
+  SourceProfile,
+  SourceSegmentationItem
+} from "./source-adaptation";
 
 export type StudioNodeType =
   | "dashboard"
@@ -22,6 +27,9 @@ export type StudioDraftView = {
   caseId: string;
   title: string;
   sourceTitle: string;
+  lifecycleStatus?: "draft" | "saved" | "published";
+  sourceProfile?: SourceProfile;
+  segmentation?: SourceSegmentationItem[];
   tree: StudioTreeNode[];
   stats: {
     chapters: number;
@@ -115,20 +123,50 @@ function hiddenFactsForChapter(caseFile: CaseFile, actId?: string) {
 }
 
 export function createStudioDraftView(caseFile: CaseFile): StudioDraftView {
+  return createStudioDraftViewWithAdaptation(caseFile);
+}
+
+export function createStudioDraftViewWithAdaptation(
+  caseFile: CaseFile,
+  adaptation?: {
+    lifecycleStatus?: StudioDraftView["lifecycleStatus"];
+    sourceProfile?: SourceProfile;
+    segmentation?: SourceSegmentationItem[];
+    qualityReport?: AdaptationQualityItem[];
+  }
+): StudioDraftView {
   const factText = new Map(caseFile.facts.map((fact) => [fact.id, fact.text]));
   const clueTitle = new Map(caseFile.clues.map((clue) => [clue.id, clue.title]));
   const agentName = new Map(caseFile.agents.map((agent) => [agent.id, agent.name]));
+  const adaptationTree: StudioTreeNode[] = adaptation?.sourceProfile
+    ? [
+        {
+          id: "source-profile",
+          type: "validation",
+          label: "原文画像"
+        },
+        {
+          id: "segmentation",
+          type: "validation",
+          label: "改写分段"
+        }
+      ]
+    : [];
 
   return {
     caseId: caseFile.id,
     title: caseFile.title,
     sourceTitle: caseFile.source.title,
+    lifecycleStatus: adaptation?.lifecycleStatus,
+    sourceProfile: adaptation?.sourceProfile,
+    segmentation: adaptation?.segmentation,
     tree: [
       {
         id: "dashboard",
         type: "dashboard",
         label: "案件控制台"
       },
+      ...adaptationTree,
       {
         id: "chapters",
         type: "chapter",
@@ -255,6 +293,11 @@ export function createStudioDraftView(caseFile: CaseFile): StudioDraftView {
       supportingEvidence: textForIds(caseFile.truth.decisiveEvidence, factText)
     })),
     validation: [
+      ...(adaptation?.qualityReport ?? []).map((item) => ({
+        severity: item.severity,
+        title: item.title,
+        detail: item.detail
+      })),
       {
         severity: "suggestion",
         title: "封面资源",

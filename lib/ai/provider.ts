@@ -9,6 +9,7 @@ export type AIMessage = {
 type CreateChatCompletionInput = {
   messages: AIMessage[];
   temperature?: number;
+  maxTokens?: number;
 };
 
 type RunwayRequestInput = {
@@ -149,7 +150,12 @@ async function callRunway(config: AIProviderConfig, input: CreateChatCompletionI
       token: config.apiKey,
       "api-key": config.apiKey
     },
-    body: JSON.stringify(buildRunwayAnthropicRequest({ messages: input.messages }))
+    body: JSON.stringify(
+      buildRunwayAnthropicRequest({
+        messages: input.messages,
+        maxTokens: input.maxTokens
+      })
+    )
   });
 
   const payload = await response.json().catch(() => undefined);

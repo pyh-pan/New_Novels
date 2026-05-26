@@ -1267,6 +1267,11 @@ a {
   transform: translateY(-1px);
 }
 
+button.icon-action {
+  cursor: pointer;
+  font: inherit;
+}
+
 .text-action {
   display: inline-flex;
   width: auto;
@@ -1572,6 +1577,34 @@ a {
 .studio-workbench-topbar {
   grid-column: 1 / -1;
   margin-bottom: 0;
+}
+
+.studio-workbench-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.studio-status-pill {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.studio-action-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  border: 1px solid rgba(143, 63, 56, 0.28);
+  border-radius: 8px;
+  background: rgba(143, 63, 56, 0.08);
+  padding: 10px 12px;
+  color: var(--danger);
 }
 
 .studio-tree,

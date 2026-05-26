@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
-import { getDefaultCaseId, loadBundledCase } from "../../../lib/case/default-case";
+import { getDefaultCaseId } from "../../../lib/case/default-case";
+import { loadPlayableCase } from "../../../lib/case/playable-case";
 import { checkAccusationAnswer } from "../../../lib/game/accusation";
 
 const requestSchema = z.object({
@@ -12,12 +13,12 @@ const requestSchema = z.object({
 });
 
 function getCaseFromId(caseId?: string) {
-  return loadBundledCase(caseId ?? getDefaultCaseId());
+  return loadPlayableCase(caseId ?? getDefaultCaseId());
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  let caseFile: ReturnType<typeof loadBundledCase>;
+  let caseFile: ReturnType<typeof loadPlayableCase>;
   try {
     caseFile = getCaseFromId(searchParams.get("caseId") ?? undefined);
   } catch {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   const { caseId, questionIndex, answer } = parsed.data;
-  let caseFile: ReturnType<typeof loadBundledCase>;
+  let caseFile: ReturnType<typeof loadPlayableCase>;
   try {
     caseFile = getCaseFromId(caseId);
   } catch {

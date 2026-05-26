@@ -19,16 +19,16 @@ New Novels 是一个文字优先的网页原型，用于把推理小说转化为
 - 基于真相数据的确定性最终指认校验，成功后展示真相摘要。
 - 本地浏览器持久化章节进度、对话、批注式侦探笔记和 UI 状态，包括每个 agent session 与玩家已知状态。
 - 原文和 agent 对话均支持选中文字后批注；批注会同步到侦探笔记，并在原文高亮处提供悬浮预览。
-- 案件包 zip 预览 API 与 Studio 导入入口。
-- Studio v1 提供原文上传入口、案件包导入入口，以及按章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织的审阅工作台。
+- 案件包 zip 导入 API 与 Studio 导入入口；导入成功后会生成同样的 Studio 草稿，进入同一套保存 / 发布状态机。
+- Studio v1 提供原文上传入口、案件包导入入口，以及按章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织的审阅工作台。原文上传支持 `.txt`、`.md`、`.pdf`，会先提取文本，再调用平台 AI 按改写 skill 的流程生成临时案件草稿。
+- Studio 原文草稿支持状态流转：生成后进入审阅工作台，创作者可以保存为草稿，也可以发布为正式案件；草稿和发布案件会写入 `.data/`，发布后会出现在书架，并可进入正式游玩。
 - Guard 兼容的 `install.sh`、`start.sh`、`health.sh`、`/health` 和独立构建配置。
 - `new-novels-case-adapter` skill，用于把推理小说改写为案件包。
 
 尚未实现：
 
-- 将上传案件激活为当前可玩 runtime。
+- 让 Studio 批注真实生成并应用案件包 diff。
 - 服务端持久化存档 / 继续游玩。
-- Studio 批注被真实改写 agent 应用为案件包 diff。
 - 护栏拒绝后的模型重试 / 修复流程。
 
 ## 快速开始
@@ -75,7 +75,7 @@ npm run build
 npm run guard:package
 ```
 
-生成产物位于 `dist/new-novels-guard.zip`。
+默认生成干净副本 `../New_Novels-guard/`，并在项目父目录输出 `../New_Novels-guard.zip`，避免污染源码目录。
 
 校验内置案件包：
 
@@ -93,7 +93,7 @@ node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/ha
 - `lib/agent-runtime/`：路由、runtime context、揭示规则、压力状态、剧情幕门槛和输出校验。
 - `lib/ai/`：平台 AI provider 适配器和 prompt builder。
 - `lib/game/`：游玩状态、路由包装、故事视图辅助、ID 和最终指认校验。
-- `lib/studio/`：Studio 草稿视图与原文上传任务原型。
+- `lib/studio/`：Studio 草稿视图、原文提取、AI 改写、草稿状态机、文件系统持久化和原文上传任务。
 - `cases/hunters-lodge/`：当前内置默认可玩案件包。
 - `cases/hammer-of-god/`：较早的内置参考案件包。
 - `skills/new-novels-case-adapter/`：把推理小说改写为可玩案件包的本地 skill。

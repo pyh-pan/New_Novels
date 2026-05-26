@@ -174,9 +174,9 @@ validateCasePackageDirectory("cases/hunters-lodge")
 - 剧情幕和 act gate；
 - 最终指认问题。
 
-## Zip 预览
+## Zip 导入
 
-网页应用提供仅预览的导入路径：
+网页应用提供统一的案件包导入路径：
 
 ```text
 POST /api/cases/preview
@@ -188,8 +188,9 @@ POST /api/cases/preview
 - 案件 id 和标题；
 - 章节、agent、剧情幕、线索和指认问题数量；
 - 结构化问题。
+- Studio 草稿 id。
 
-Studio 入口使用该端点。用户从 `/studio` 导入案件包后，系统先展示结构摘要和校验问题，再进入 `/studio/cases/<case-id>` 的审阅工作台。
+Studio 入口使用该端点。用户从 `/studio` 导入案件包后，系统会把 zip 内容注册为 `draft` 状态的 Studio 草稿，并进入 `/studio/cases/<draft-case-id>` 审阅工作台。此后 zip 导入和原文上传生成进入同一条链路：创作者可以保存草稿，也可以发布为正式可玩案件。
 
 ## Studio 审阅视图
 

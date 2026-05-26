@@ -22,6 +22,7 @@ describe("StudioHome", () => {
   });
 
   it("creates a source generation job from a text file", async () => {
+    const navigateTo = vi.fn();
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({
@@ -48,7 +49,7 @@ describe("StudioHome", () => {
       });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<StudioHome />);
+    render(<StudioHome navigateTo={navigateTo} />);
 
     fireEvent.click(screen.getByRole("button", { name: /上传原文/ }));
     fireEvent.change(screen.getByLabelText("选择原文文件"), {
@@ -60,13 +61,17 @@ describe("StudioHome", () => {
       "/api/studio/source-jobs",
       expect.objectContaining({ method: "POST", body: expect.any(FormData) })
     );
+    expect(navigateTo).toHaveBeenCalledWith("/studio/cases/hunters-lodge");
   });
 
   it("previews a case package before entering the workbench", async () => {
+    const navigateTo = vi.fn();
     const fetchMock = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         ok: true,
+        draftCaseId: "custom-case",
+        status: "draft",
         manifest: {
           schemaVersion: "case-package/v1",
           caseId: "custom-case",
@@ -86,7 +91,7 @@ describe("StudioHome", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<StudioHome />);
+    render(<StudioHome navigateTo={navigateTo} />);
 
     fireEvent.click(screen.getByRole("button", { name: /导入案件包/ }));
     fireEvent.change(screen.getByLabelText("选择案件包 zip"), {
@@ -99,6 +104,7 @@ describe("StudioHome", () => {
       "/api/cases/preview",
       expect.objectContaining({ method: "POST", body: expect.any(FormData) })
     );
+    expect(navigateTo).toHaveBeenCalledWith("/studio/cases/custom-case");
   });
 });
 

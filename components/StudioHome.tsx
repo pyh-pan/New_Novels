@@ -31,6 +31,8 @@ type CasePreviewIssue = {
 type CasePreviewResponse =
   | {
       ok: true;
+      draftCaseId: string;
+      status: "draft";
       manifest: {
         schemaVersion: string;
         caseId: string;
@@ -55,14 +57,24 @@ type CasePreviewResponse =
 type Modal = "source" | "package" | null;
 
 async function readJson<T>(response: Response): Promise<T> {
-  const payload = (await response.json().catch(() => undefined)) as T | undefined;
+  const payload = (await response.json().catch(() => undefined)) as
+    | (T & { error?: string })
+    | undefined;
   if (!response.ok || !payload) {
-    throw new Error("请求失败。");
+    throw new Error(payload?.error ?? "请求失败。");
   }
   return payload;
 }
 
-export default function StudioHome() {
+type StudioHomeProps = {
+  navigateTo?: (href: string) => void;
+};
+
+export default function StudioHome({
+  navigateTo = (href: string) => {
+    window.location.href = href;
+  }
+}: StudioHomeProps = {}) {
   const [modal, setModal] = useState<Modal>(null);
   const [sourceJob, setSourceJob] = useState<StudioJob | null>(null);
   const [sourceError, setSourceError] = useState("");
@@ -98,8 +110,15 @@ export default function StudioHome() {
         readJson<StudioJob>(response)
       );
       setSourceJob(completed);
-    } catch {
-      setSourceError("原文生成任务创建失败。请检查文件格式后重试。");
+      if (completed.draftCaseId) {
+        navigateTo(`/studio/cases/${completed.draftCaseId}`);
+      }
+    } catch (error) {
+      setSourceError(
+        error instanceof Error
+          ? error.message
+          : "原文生成任务创建失败。请检查文件格式后重试。"
+      );
     } finally {
       setIsLoading(false);
       if (sourceInputRef.current) {
@@ -125,6 +144,8 @@ export default function StudioHome() {
       setPackagePreview(payload);
       if (!response.ok || !payload.ok) {
         setPackageError("案件包存在校验问题，可以进入工作台审阅，但发布前必须修复 fatal 问题。");
+      } else {
+        navigateTo(`/studio/cases/${payload.draftCaseId}`);
       }
     } catch {
       setPackageError("案件包预览失败，请检查 zip 文件。");
@@ -178,18 +199,18 @@ export default function StudioHome() {
           onCancel={() => setModal(null)}
           onConfirm={() => {
             if (sourceJob?.draftCaseId) {
-              window.location.href = `/studio/cases/${sourceJob.draftCaseId}`;
+              navigateTo(`/studio/cases/${sourceJob.draftCaseId}`);
             } else {
               setModal(null);
             }
           }}
         >
           <label className="studio-dropzone">
-            <span>.txt / .md</span>
+            <span>.txt / .md / .pdf</span>
             <input
               ref={sourceInputRef}
               type="file"
-              accept=".txt,.md,text/plain,text/markdown"
+              accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
               aria-label="选择原文文件"
               onChange={sourceChanged}
             />
@@ -223,7 +244,7 @@ export default function StudioHome() {
           onCancel={() => setModal(null)}
           onConfirm={() => {
             if (packagePreview?.ok) {
-              window.location.href = `/studio/cases/${packagePreview.manifest.caseId}`;
+              navigateTo(`/studio/cases/${packagePreview.draftCaseId}`);
             } else {
               setModal(null);
             }
@@ -284,6 +305,7 @@ export default function StudioHome() {
 
 const defaultSourceSteps: StudioJob["steps"] = [
   { id: "parse", label: "解析文件与元数据", status: "pending" },
+  { id: "profile", label: "原文画像", status: "pending" },
   { id: "segment", label: "源文本分段", status: "pending" },
   { id: "chapters", label: "生成章节文本", status: "pending" },
   { id: "agents", label: "生成 agents 与线索结构", status: "pending" },

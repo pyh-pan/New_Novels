@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import type { StudioDraftView, StudioNodeType, StudioTreeNode } from "../lib/studio/draft";
+import ConfirmDialog from "./ConfirmDialog";
 
 type StudioWorkbenchProps = {
   draft: StudioDraftView;
@@ -38,6 +39,9 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
   const [commentDraft, setCommentDraft] = useState("");
   const [comments, setComments] = useState<ReviewComment[]>([]);
   const [patchSummary, setPatchSummary] = useState("");
+  const [lifecycleStatus, setLifecycleStatus] = useState(draft.lifecycleStatus ?? "published");
+  const [publishConfirmOpen, setPublishConfirmOpen] = useState(false);
+  const [studioActionError, setStudioActionError] = useState("");
   const activeNode = flatNodes.find((node) => node.id === activeNodeId) ?? draft.tree[0];
   const activeComments = comments.filter((comment) => comment.targetId === activeNode.id);
   const selectableNodes = flatNodes.map((node) => ({
@@ -69,6 +73,30 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
     );
   }
 
+  async function runStudioAction(action: "save" | "publish") {
+    setStudioActionError("");
+
+    try {
+      const response = await fetch(`/api/studio/cases/${draft.caseId}/${action}`, {
+        method: "POST"
+      });
+      const payload = (await response.json().catch(() => undefined)) as
+        | { status?: typeof lifecycleStatus; playHref?: string; error?: string }
+        | undefined;
+
+      if (!response.ok || !payload?.status) {
+        throw new Error(payload?.error ?? "操作失败。");
+      }
+
+      setLifecycleStatus(payload.status);
+      if (action === "publish") {
+        window.location.href = payload.playHref ?? `/cases/${draft.caseId}`;
+      }
+    } catch (error) {
+      setStudioActionError(error instanceof Error ? error.message : "操作失败。");
+    }
+  }
+
   return (
     <main className="studio-workbench">
       <header className="studio-workbench-topbar">
@@ -78,10 +106,48 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
         <div>
           <h1>{draft.title}</h1>
         </div>
-        <Link className="icon-action" href={`/cases/${draft.caseId}`} aria-label="试玩案件" title="试玩案件">
-          ▶
-        </Link>
+        <div className="studio-workbench-actions">
+          <span className="studio-status-pill">{statusLabel(lifecycleStatus)}</span>
+          {draft.lifecycleStatus ? (
+            <>
+              <button
+                type="button"
+                className="icon-action"
+                aria-label="保存草稿"
+                title="保存草稿"
+                onClick={() => void runStudioAction("save")}
+              >
+                ✓
+              </button>
+              <button
+                type="button"
+                className="icon-action"
+                aria-label="发布案件"
+                title="发布案件"
+                onClick={() => setPublishConfirmOpen(true)}
+              >
+                ↑
+              </button>
+            </>
+          ) : null}
+          <Link className="icon-action" href={`/cases/${draft.caseId}`} aria-label="试玩案件" title="试玩案件">
+            ▶
+          </Link>
+        </div>
       </header>
+      {studioActionError ? <p className="studio-action-error">{studioActionError}</p> : null}
+      {publishConfirmOpen ? (
+        <ConfirmDialog
+          title="发布案件"
+          description="发布后会出现在书架，并可进入正式游玩。"
+          confirmLabel="发布"
+          onCancel={() => setPublishConfirmOpen(false)}
+          onConfirm={() => {
+            setPublishConfirmOpen(false);
+            void runStudioAction("publish");
+          }}
+        />
+      ) : null}
 
       <label className="studio-mobile-selector">
         <span className="sr-only">审阅内容</span>
@@ -183,6 +249,16 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
       </aside>
     </main>
   );
+}
+
+function statusLabel(status: "draft" | "saved" | "published") {
+  if (status === "draft") {
+    return "草稿";
+  }
+  if (status === "saved") {
+    return "已保存";
+  }
+  return "已发布";
 }
 
 function Inspector({
@@ -290,6 +366,40 @@ function Inspector({
   }
 
   if (nodeType === "validation") {
+    if (nodeId === "source-profile" && draft.sourceProfile) {
+      return (
+        <CollectionPage
+          title="原文画像"
+          items={[
+            {
+              title: draft.sourceProfile.title,
+              meta: draft.sourceProfile.narrativeForm,
+              details: [
+                `作者：${draft.sourceProfile.author}`,
+                `语言：${draft.sourceProfile.language}`,
+                `权利说明：${draft.sourceProfile.rightsNote}`,
+                ...draft.sourceProfile.structureNotes,
+                ...draft.sourceProfile.adaptationStrategy
+              ]
+            }
+          ]}
+        />
+      );
+    }
+
+    if (nodeId === "segmentation" && draft.segmentation) {
+      return (
+        <CollectionPage
+          title="改写分段"
+          items={draft.segmentation.map((item) => ({
+            title: item.sourceExcerpt,
+            meta: item.label,
+            details: [item.reason, `去向：${item.destination}`, `玩家发现路径：${item.playerDiscoveryRoute}`]
+          }))}
+        />
+      );
+    }
+
     return (
       <CollectionPage title="校验报告" items={draft.validation.map((item) => ({
         title: item.title,

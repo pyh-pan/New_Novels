@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import CaseExperience from "../../../components/CaseExperience";
 import { bundledCaseIds, isBundledCaseId } from "../../../lib/case/catalog";
-import { loadBundledCase } from "../../../lib/case/default-case";
+import { loadPlayableCase } from "../../../lib/case/playable-case";
 import { toStoryChapters } from "../../../lib/game/story";
 
 type CasePageProps = {
@@ -15,14 +15,24 @@ export function generateStaticParams() {
   return bundledCaseIds.map((caseId) => ({ caseId }));
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function CasePage({ params }: CasePageProps) {
   const { caseId } = await params;
 
   if (!isBundledCaseId(caseId)) {
-    notFound();
+    try {
+      loadPlayableCase(caseId);
+    } catch {
+      notFound();
+    }
   }
 
-  const caseFile = loadBundledCase(caseId);
+  const caseFile = loadPlayableCase(caseId);
+
+  if (!isBundledCaseId(caseId) && caseFile.id !== caseId) {
+    notFound();
+  }
 
   return (
     <CaseExperience

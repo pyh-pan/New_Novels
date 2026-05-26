@@ -3,7 +3,8 @@ import { z } from "zod";
 
 import { parseJsonRequest } from "../../../lib/api/request";
 import { getModelName, getOpenAIClient } from "../../../lib/ai/openai";
-import { getDefaultCaseId, getRuntimeForCase } from "../../../lib/case/default-case";
+import { getDefaultCaseId } from "../../../lib/case/default-case";
+import { getRuntimeForPlayableCase } from "../../../lib/case/playable-case";
 import {
   getRouteableTargets,
   isRouteableTarget,
@@ -25,7 +26,7 @@ const semanticRouteSchema = z.object({
 
 const semanticConfidenceThreshold = 0.65;
 
-function routingPrompt(message: string, runtime: ReturnType<typeof getRuntimeForCase>) {
+function routingPrompt(message: string, runtime: ReturnType<typeof getRuntimeForPlayableCase>) {
   const targetDescriptions = runtime.caseFile.agents
     .map((agent) => {
       const aliases = agent.aliases.length ? `；别名：${agent.aliases.join("、")}` : "";
@@ -70,7 +71,7 @@ function extractJson(content: string | null | undefined): unknown {
 
 function withLabel(
   route: z.infer<typeof semanticRouteSchema>,
-  runtime: ReturnType<typeof getRuntimeForCase>
+  runtime: ReturnType<typeof getRuntimeForPlayableCase>
 ): RoutedMessage {
   return {
     targetId: route.targetId as ConversationTarget,
@@ -82,7 +83,7 @@ function withLabel(
 
 async function semanticRouteMessage(
   message: string,
-  runtime: ReturnType<typeof getRuntimeForCase>
+  runtime: ReturnType<typeof getRuntimeForPlayableCase>
 ): Promise<RoutedMessage | undefined> {
   try {
     const completion = await getOpenAIClient().chat.completions.create({
@@ -118,9 +119,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  let runtime: ReturnType<typeof getRuntimeForCase>;
+  let runtime: ReturnType<typeof getRuntimeForPlayableCase>;
   try {
-    runtime = getRuntimeForCase(parsed.data.caseId ?? getDefaultCaseId());
+    runtime = getRuntimeForPlayableCase(parsed.data.caseId ?? getDefaultCaseId());
   } catch {
     return NextResponse.json({ error: "Unknown case." }, { status: 404 });
   }

@@ -1,5 +1,6 @@
 import type { CaseFile } from "./schema";
 import { loadBundledCase } from "./default-case";
+import { getPublishedStudioCases } from "../studio/generated-cases";
 
 export type CaseShelfItem = {
   id: string;
@@ -86,7 +87,14 @@ export function caseToShelfItem(caseFile: CaseFile): CaseShelfItem {
 }
 
 export function getCaseShelfItems(): CaseShelfItem[] {
-  return bundledCaseIds.map((caseId) => caseToShelfItem(loadBundledCase(caseId)));
+  return [
+    ...bundledCaseIds.map((caseId) => caseToShelfItem(loadBundledCase(caseId))),
+    ...getPublishedCaseShelfItems()
+  ];
+}
+
+export function getPublishedCaseShelfItems(): CaseShelfItem[] {
+  return getPublishedStudioCases().map((draft) => caseToShelfItem(draft.caseFile));
 }
 
 export function isBundledCaseId(caseId: string): caseId is BundledCaseId {

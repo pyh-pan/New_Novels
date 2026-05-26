@@ -115,7 +115,7 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 - `CaseLoader`：从本地目录读取 split package，并组装为 `CaseFile`。
 - `validateCasePackageDirectory`：输出统一校验报告，包含错误级别、文件路径、字段路径、原因和修复建议。
 
-上传 zip 后的产品化导入预览已收敛到 Studio；仍未完成的是将上传包持久化发布为新的可玩案件。
+上传 zip 后的产品化导入已收敛到 Studio；原文生成草稿和 zip 导入草稿都支持发布为可玩案件，并写入 `.data/` 文件系统，服务重启后仍可恢复。后续需要在平台发布时评估是否切换为数据库 store。
 
 ### 6. 小说改写 Skill
 
@@ -160,7 +160,7 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 - 原游玩页工具栏不再承担案件导入，案件导入统一进入 Studio。
 - `/studio` 保持极简：只保留“上传原文”和“导入案件包”两个主入口。
 - 上传原文弹窗采用安装器式交互：拖拽/选择文件、进度条、当前步骤、步骤列表。
-- 导入案件包弹窗先校验 `case-package/v1` zip，并展示案件摘要和错误报告。
+- 导入案件包弹窗先校验 `case-package/v1` zip；校验通过后自动进入同一个 Studio 审阅工作台。
 - `/studio/cases/[caseId]` 已落地审阅工作台：
   - 左侧文件树按故事章节、角色、线索、矛盾、多幕推进、最终指认、校验报告组织。
   - 中间审阅区展示创作者必须掌握的全部故事设计细节。
@@ -170,9 +170,12 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 
 当前边界：
 
-- 上传原文目前是 Studio v1 的任务壳，使用内置样章作为可审阅草稿；真正调用改写 skill / 平台 AI 的执行器尚未接入。
+- 上传原文已从任务壳升级为真实生成链路：支持 `.txt`、`.md`、`.pdf`，完成文本提取、平台 AI 改写、`sourceProfile`、`segmentation`、`qualityReport`、schema-valid `caseFile` 生成和动态 Studio 草稿预览。
+- Studio 草稿已新增状态机：`draft`、`saved`、`published`。上传生成后自动进入审阅工作台；保存后仍是草稿；发布后进入书架并可正式游玩。
+- 原文生成草稿已持久化到 `.data/studio-drafts/<caseId>/draft.json`；发布案件已写为 `.data/published-cases/<caseId>/` 下的完整 `case-package/v1` split package。
+- zip 导入已纳入同一条状态机：zip 校验通过后注册为 Studio draft，之后与原文生成草稿共用保存、发布、书架和正式游玩链路。
 - 批注提交目前生成修改建议摘要，还没有自动改写并写回案件包。
-- 导入案件包目前支持预览和校验，尚未把上传 zip 持久化为新的书架案件。
+- 当前文件系统 store 适合本地和单实例，平台多实例或长期运营仍需要数据库 store。
 
 ### 9. 工程与发布准备
 
@@ -186,10 +189,10 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 
 当前验证基线：
 
-- `npm test`：25 个测试文件，109 个测试通过。
+- `npm test`：28 个测试文件，117 个测试通过。
 - `npm run lint`：通过。
 - `npm run build`：通过。
-- `npm run guard:package`：通过，生成 `dist/new-novels-guard.zip`。
+- `npm run guard:package`：通过，生成项目父目录下的 `New_Novels-guard.zip`。
 - `npm audit --omit=dev --audit-level=high --registry=https://registry.npmjs.org`：高危审计通过，仍有 npm 报告的 PostCSS moderate 链路；`npm audit fix --force` 会错误降级 Next 到 9.x，暂不执行。
 
 ## 三、当前判断：暂缓或不需要优先做的事
@@ -254,7 +257,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - `casePackageSchema`、文件系统结构、示例目录和本地目录 loader 已完成第一版。
 - `new-novels-case-adapter` skill 已更新为输出 split package，并提供目录校验脚本。
 - 默认运行案件已切换为从 `cases/hunters-lodge/` 加载，`cases/hammer-of-god/` 保留为参考包。
-- zip 上传预览已落地。还没落地的是 **通过上传包切换当前可玩案件** 和更完整的质量报告 UI。
+- zip 上传已从预览链路升级为 Studio 草稿链路；原文生成草稿和 zip 导入草稿均可保存、发布，并在发布后成为可玩案件。
 
 已完成：
 
@@ -295,19 +298,22 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - 新增 `POST /api/cases/preview`：
   - 支持 multipart zip 上传。
   - 支持单顶层目录 zip 自动归一。
-  - 返回 manifest、案件摘要和结构化 issues。
-- 新增页面工具栏中的“导入案件包”预览入口。
+  - 返回 manifest、案件摘要、结构化 issues 和 Studio 草稿 id。
+- 新增 `/studio` 中的“导入案件包”入口，校验通过后直接进入 Studio 审阅工作台。
+- 新增 Studio 草稿状态机：
+  - `draft` 可继续审阅。
+  - `saved` 写入 `.data/studio-drafts`。
+  - `published` 写入 `.data/published-cases`，并进入书架和正式游玩 runtime。
 
 下一步：
 
-- 将预览通过的外部案件切换为当前运行案件。
 - 增加更完整的导入质量报告 UI，展示 fatal error、warning、quality suggestion。
 - 增加指认题是否覆盖关键真相、agent 是否缺少 personality / boundaries / permissions 的更细质量检查。
 
 成功标准：
 
 - 任意符合规范的本地案件目录可以被解析和验证。已完成。
-- 符合规范的 zip 可以被 API 与前端预览。已完成第一版。
+- 符合规范的 zip 可以被 API 与前端导入为 Studio 草稿，并在发布后进入正式 runtime。已完成第一版。
 - `new-novels-case-adapter` skill 生成的目录可以直接被 `CaseLoader` 加载。已完成第一版。
 - 前端和 API 的默认运行案件不再直接依赖 `lib/case/hammer-of-god.ts` 手写大对象。已完成。
 - 修改 `cases/hunters-lodge/` 或 `cases/hammer-of-god/` 中的案件内容不需要改应用代码。已完成第一版。
@@ -506,31 +512,31 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 - 新增 `/studio` 创作者入口，游玩页不再承载导入流程。
 - 解压 zip 后执行 `CaseLoader` 底层能力。
-- `POST /api/cases/preview` 返回导入校验报告和案件摘要。
+- `POST /api/cases/preview` 返回导入校验报告、案件摘要和 Studio 草稿 id。
 - 校验失败时明确指出错误路径和修复建议。
 - 保留当前内置案件作为默认示例。
 - 首页故事书架展示多个内置案件。
 - Studio 审阅工作台展示章节、agent、线索、矛盾、act gate、最终答案和校验报告。
 - 评论模式已完成第一版，支持围绕当前节点添加批注并生成修改建议边界。
+- 接入真实改写链路：上传 `.txt` / `.md` / `.pdf` 后生成新的案件包草稿，而不是复用内置样章。
+- 接入 cowork 平台 AI API，让 Studio 任务可以调用平台模型能力，复用 `ai.properties` / `APP_AI_*` provider。
+- 校验通过后的 zip 导入和原文生成会汇合为同一种 Studio 草稿；草稿可保存，也可发布为当前可玩 runtime 并出现在故事书架。
 
 下一步：
 
-- 接入真实改写 skill runner：上传 `.txt` / `.md` 后生成新的案件包草稿，而不是复用内置样章。
-- 接入 cowork 平台 AI API，让 Studio 任务可以调用平台模型能力。
 - 批注提交后生成结构化 diff，并允许创作者确认后写回案件包。
-- 校验通过后将上传案件持久化为当前可玩 runtime，并出现在故事书架。
 - 增加导入报告的 warning / suggestion 分层展示和质量评分。
 - 增加本地案件草稿列表，暂不做公开案件市场。
 
 成功标准：
 
-- 用户可以上传符合规范的案件包并看到预览摘要。已完成。
+- 用户可以上传符合规范的案件包并进入 Studio 草稿。已完成。
 - 用户可以看到导入失败的具体原因。已完成。
-- 创作者可以上传 `.txt` / `.md` 原文并看到安装器式任务进度。已完成第一版。
+- 创作者可以上传 `.txt` / `.md` / `.pdf` 原文并看到安装器式任务进度。已完成第一版真实生成链路。
 - 创作者能看清每章、每个 agent、每条线索、每个 act gate 和最终答案的完整设计细节。已完成第一版。
 - 创作者可以用批注驱动局部改写，而不是只能接受一次性生成结果。已完成第一版交互边界。
-- 内置案件和动态案件走同一套 runtime。部分完成，内置多案件已完成，上传案件持久化待做。
-- 用户可以直接进入上传案件游戏。下一步。
+- 内置案件和动态案件走同一套 Studio 审阅视图。动态原文草稿和 zip 导入草稿均可发布为正式案件，并能跨重启从 `.data` 恢复。
+- 用户可以直接进入已发布的上传案件游戏。已完成文件系统持久化版本。
 
 ## Phase 5.5：从零创建故事设计（暂缓）
 
@@ -671,8 +677,8 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 下一步：
 
-- 增加通过上传包切换当前可玩案件的激活入口。
-- 增加多案件选择入口和当前案件元信息展示。
+- 增加 Studio 草稿列表，方便创作者回到未发布案件继续审阅。
+- 增加已发布动态案件的管理入口，用于下架、重命名或重新进入 Studio 修订。
 
 ### 第二步：把 Runtime v2 session patch 接到前端状态
 

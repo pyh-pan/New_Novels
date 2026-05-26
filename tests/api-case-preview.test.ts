@@ -1,9 +1,26 @@
+import { mkdtempSync, rmSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { POST } from "../app/api/cases/preview/route";
+import { clearGeneratedStudioCases, getGeneratedStudioCase } from "../lib/studio/generated-cases";
+
+let dataDir = "";
+
+beforeEach(() => {
+  dataDir = mkdtempSync(join(tmpdir(), "new-novels-preview-"));
+  process.env.NEW_NOVELS_DATA_DIR = dataDir;
+  clearGeneratedStudioCases();
+});
+
+afterEach(() => {
+  clearGeneratedStudioCases();
+  delete process.env.NEW_NOVELS_DATA_DIR;
+  rmSync(dataDir, { recursive: true, force: true });
+});
 
 async function hammerZip(): Promise<File> {
   const root = join(process.cwd(), "cases", "hammer-of-god");
@@ -71,14 +88,23 @@ describe("/api/cases/preview", () => {
         schemaVersion: "case-package/v1",
         caseId: "hammer-of-god"
       },
+      draftCaseId: "import-hammer-of-god",
+      status: "draft",
       caseSummary: {
-        id: "hammer-of-god",
+        id: "import-hammer-of-god",
         title: "钟楼下的锤击案",
         chapters: 3,
         agents: 5,
         acts: 3
       },
       issues: []
+    });
+    expect(getGeneratedStudioCase("import-hammer-of-god")).toMatchObject({
+      status: "draft",
+      caseFile: {
+        id: "import-hammer-of-god",
+        title: "钟楼下的锤击案"
+      }
     });
   });
 
