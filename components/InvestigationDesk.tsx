@@ -2,8 +2,10 @@
 
 import {
   ChangeEvent,
+  CSSProperties,
   FormEvent,
   KeyboardEvent,
+  PointerEvent as ReactPointerEvent,
   ReactNode,
   useEffect,
   useMemo,
@@ -28,8 +30,7 @@ import {
   PLAY_STATE_STORAGE_KEY,
   serializePlayState,
   type ConversationTarget,
-  type LocalPlayState,
-  type MobileTab
+  type LocalPlayState
 } from "../lib/game/play-state";
 
 type InvestigationResponse = {
@@ -125,9 +126,12 @@ function stripMention(message: string, agentName: string) {
     .trim();
 }
 
+function clampSidebarWidth(width: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, Math.round(width)));
+}
+
 export default function InvestigationDesk({
   caseId,
-  caseTitle = "猎人小屋疑案",
   agents,
   entryChapterId,
   storySlot
@@ -153,11 +157,21 @@ export default function InvestigationDesk({
   const playerState = playState.playerState;
   const agentSessions = playState.agentSessions;
   const activeTag = playState.ui.activeNotebookFilter;
+  const investigationOpen = Boolean(playState.ui.investigationOpen);
+  const investigationWidth = playState.ui.investigationWidth ?? 380;
   const notebookOpen = Boolean(playState.ui.notebookOpen);
-  const mobileTab = playState.ui.mobileTab ?? "story";
-  const notebookVisible = notebookOpen || mobileTab === "notebook";
+  const notebookWidth = playState.ui.notebookWidth ?? 340;
+  const notebookVisible = notebookOpen;
 
-  const openClass = notebookVisible ? "notebook-open" : "notebook-closed";
+  const shellClass = [
+    "case-shell",
+    investigationOpen ? "investigation-open" : "investigation-closed",
+    notebookVisible ? "notebook-open" : "notebook-closed"
+  ].join(" ");
+  const shellStyle = {
+    "--investigation-width": `${investigationWidth}px`,
+    "--notebook-width": `${notebookWidth}px`
+  } as CSSProperties;
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -255,10 +269,38 @@ export default function InvestigationDesk({
     }));
   };
 
-  const setMobileTab = (mobileTab: MobileTab) => {
+  const setInvestigationOpen = (
+    investigationOpen: boolean | ((current: boolean) => boolean)
+  ) => {
     setPlayState((current) => ({
       ...current,
-      ui: { ...current.ui, mobileTab }
+      ui: {
+        ...current.ui,
+        investigationOpen:
+          typeof investigationOpen === "function"
+            ? investigationOpen(Boolean(current.ui.investigationOpen))
+            : investigationOpen
+      }
+    }));
+  };
+
+  const setInvestigationWidth = (investigationWidth: number) => {
+    setPlayState((current) => ({
+      ...current,
+      ui: {
+        ...current.ui,
+        investigationWidth: clampSidebarWidth(investigationWidth, 300, 560)
+      }
+    }));
+  };
+
+  const setNotebookWidth = (notebookWidth: number) => {
+    setPlayState((current) => ({
+      ...current,
+      ui: {
+        ...current.ui,
+        notebookWidth: clampSidebarWidth(notebookWidth, 300, 520)
+      }
     }));
   };
 
@@ -330,6 +372,7 @@ export default function InvestigationDesk({
     ]);
     setActiveTag("all");
     setExcerptNotice("批注已同步到侦探笔记。");
+    setNotebookOpen(true);
     window.setTimeout(() => setExcerptNotice(null), 1800);
   };
 
@@ -413,6 +456,7 @@ export default function InvestigationDesk({
     };
 
     appendMessages(conversation.id, [userMessage]);
+    setInvestigationOpen(true);
 
     try {
       const response = await postJson<InvestigationResponse>("/api/investigate", {
@@ -508,29 +552,81 @@ export default function InvestigationDesk({
     }
   };
 
+  const beginSidebarResize = (side: "investigation" | "notebook") => {
+    return (event: ReactPointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const startX = event.clientX;
+      const startWidth = side === "investigation" ? investigationWidth : notebookWidth;
+
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+
+      const move = (moveEvent: globalThis.PointerEvent) => {
+        const delta =
+          side === "investigation"
+            ? moveEvent.clientX - startX
+            : startX - moveEvent.clientX;
+        const nextWidth = startWidth + delta;
+        if (side === "investigation") {
+          setInvestigationWidth(nextWidth);
+        } else {
+          setNotebookWidth(nextWidth);
+        }
+      };
+
+      const stop = () => {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", stop);
+      };
+
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", stop, { once: true });
+    };
+  };
+
   return (
-    <main className={`case-shell ${openClass}`}>
-      <header className="case-topbar">
-        <div>
-          <h1>{caseTitle}</h1>
-        </div>
-        <div className="case-actions" aria-label="案件操作">
-          {!notebookVisible ? (
-            <button
-              type="button"
-              className="utility-button"
-              onClick={() => setResetOpen(true)}
-            >
-              重新开始
-            </button>
-          ) : null}
-        </div>
-      </header>
-      <div
-        className={`workspace workspace-story ${
-          mobileTab === "story" ? "is-mobile-active" : ""
-        }`}
-      >
+    <main className={shellClass} style={shellStyle}>
+      <div className="workspace workspace-story">
+        <button
+          type="button"
+          className="sidebar-toggle sidebar-toggle-left"
+          aria-label={investigationOpen ? "收起调查台" : "打开调查台"}
+          aria-pressed={investigationOpen}
+          onClick={() => setInvestigationOpen((current) => !current)}
+        >
+          <svg
+            className={`sidebar-glyph ${
+              investigationOpen ? "sidebar-glyph-left" : "sidebar-glyph-right"
+            }`}
+            viewBox="0 0 28 28"
+            aria-hidden="true"
+          >
+            <path className="sidebar-glyph-lines" d="M5 7.5H21M5 14H21M5 20.5H21" />
+            <path className="sidebar-glyph-arrow" d="M18.5 10.5L24 14L18.5 17.5" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          className="sidebar-toggle sidebar-toggle-right"
+          aria-label={notebookVisible ? "收起侦探笔记" : "打开侦探笔记"}
+          aria-pressed={notebookVisible}
+          onClick={() => setNotebookOpen((current) => !current)}
+        >
+          <svg
+            className={`sidebar-glyph ${
+              notebookVisible ? "sidebar-glyph-right" : "sidebar-glyph-left"
+            }`}
+            viewBox="0 0 28 28"
+            aria-hidden="true"
+          >
+            <path className="sidebar-glyph-lines" d="M5 7.5H21M5 14H21M5 20.5H21" />
+            <path className="sidebar-glyph-arrow" d="M18.5 10.5L24 14L18.5 17.5" />
+          </svg>
+        </button>
+
         {storySlot({
           currentChapterId: playState.currentChapterId,
           onChapterChange: (currentChapterId) =>
@@ -540,13 +636,19 @@ export default function InvestigationDesk({
       </div>
 
       <section
-        className={`investigation-desk workspace workspace-investigation ${
-          mobileTab === "investigation" ? "is-mobile-active" : ""
-        }`}
+        className="investigation-desk workspace workspace-investigation"
         aria-labelledby="desk-title"
+        aria-hidden={!investigationOpen}
       >
         <div className="desk-header">
           <h2 id="desk-title">调查台</h2>
+          <button
+            type="button"
+            className="utility-button desk-reset"
+            onClick={() => setResetOpen(true)}
+          >
+            重新开始
+          </button>
         </div>
 
         <div className="conversation-stack">
@@ -605,13 +707,16 @@ export default function InvestigationDesk({
             </button>
           </div>
         </form>
+        <div
+          className="sidebar-resizer sidebar-resizer-left"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="调整调查台宽度"
+          onPointerDown={beginSidebarResize("investigation")}
+        />
       </section>
 
-      <div
-        className={`workspace workspace-notebook ${
-          mobileTab === "notebook" ? "is-mobile-active" : ""
-        }`}
-      >
+      <div className="workspace workspace-notebook" aria-hidden={!notebookVisible}>
         <NotebookDrawer
           isOpen={notebookVisible}
           notes={notes}
@@ -622,6 +727,14 @@ export default function InvestigationDesk({
           onCreateNote={createNote}
           onDeleteNote={deleteNote}
           accusationHref={caseId ? `/cases/${caseId}/accuse` : "/accuse"}
+          showCloseButton={false}
+        />
+        <div
+          className="sidebar-resizer sidebar-resizer-right"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="调整侦探笔记宽度"
+          onPointerDown={beginSidebarResize("notebook")}
         />
       </div>
       {resetOpen ? (
@@ -634,32 +747,6 @@ export default function InvestigationDesk({
         />
       ) : null}
       <SelectionAnnotationPreview />
-      <nav className="mobile-tabbar" role="tablist" aria-label="移动端工作区">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mobileTab === "story"}
-          onClick={() => setMobileTab("story")}
-        >
-          故事
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mobileTab === "investigation"}
-          onClick={() => setMobileTab("investigation")}
-        >
-          调查
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mobileTab === "notebook"}
-          onClick={() => setMobileTab("notebook")}
-        >
-          笔记
-        </button>
-      </nav>
     </main>
   );
 }

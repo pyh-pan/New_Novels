@@ -18,6 +18,10 @@ describe("play state persistence", () => {
     expect(state.agentSessions).toEqual({});
     expect(state.notes).toEqual([]);
     expect(state.ui.activeNotebookFilter).toBe("all");
+    expect(state.ui.investigationOpen).toBe(false);
+    expect(state.ui.investigationWidth).toBe(380);
+    expect(state.ui.notebookOpen).toBe(false);
+    expect(state.ui.notebookWidth).toBe(340);
     expect(PLAY_STATE_STORAGE_KEY).toBe("new-novels.play-state.v1");
   });
 
@@ -84,7 +88,14 @@ describe("play state persistence", () => {
           source: "调查助手"
         }
       ],
-      ui: { activeNotebookFilter: "clue", mobileTab: "notebook" }
+      ui: {
+        activeNotebookFilter: "clue",
+        investigationOpen: true,
+        investigationWidth: 999,
+        notebookOpen: true,
+        notebookWidth: 120,
+        mobileTab: "notebook"
+      }
     });
 
     expect(normalized.currentChapterId).toBe("chapter-2");
@@ -97,6 +108,10 @@ describe("play state persistence", () => {
     });
     expect(normalized.notes[0]?.createdAt).toEqual(expect.any(String));
     expect(normalized.ui.activeNotebookFilter).toBe("clue");
+    expect(normalized.ui.investigationOpen).toBe(true);
+    expect(normalized.ui.investigationWidth).toBe(560);
+    expect(normalized.ui.notebookOpen).toBe(true);
+    expect(normalized.ui.notebookWidth).toBe(300);
     expect(normalized.ui.mobileTab).toBe("notebook");
   });
 

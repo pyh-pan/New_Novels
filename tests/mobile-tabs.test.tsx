@@ -2,27 +2,22 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import InvestigationDesk from "../components/InvestigationDesk";
 
-test("mobile bottom tabs switch primary workspace without losing state", () => {
+test("compact sidebar toggles reveal side workspaces without losing story state", () => {
   window.localStorage.clear();
   render(<InvestigationDesk storySlot={() => <section>Story workspace</section>} />);
 
   expect(screen.getByText("Story workspace")).toBeInTheDocument();
-  expect(screen.getByRole("tab", { name: "故事" })).toHaveAttribute(
-    "aria-selected",
-    "true"
-  );
+  expect(screen.getByRole("button", { name: "打开调查台" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "打开侦探笔记" })).toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole("tab", { name: "调查" }));
-  expect(screen.getByRole("tab", { name: "调查" })).toHaveAttribute(
-    "aria-selected",
-    "true"
-  );
+  fireEvent.click(screen.getByRole("button", { name: "打开调查台" }));
   expect(screen.getByRole("heading", { name: "调查台" })).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("tab", { name: "笔记" }));
-  expect(screen.getByRole("tab", { name: "笔记" })).toHaveAttribute(
-    "aria-selected",
+  expect(screen.getByRole("button", { name: "收起调查台" })).toHaveAttribute(
+    "aria-pressed",
     "true"
   );
+
+  fireEvent.click(screen.getByRole("button", { name: "打开侦探笔记" }));
   expect(screen.getByRole("heading", { name: "侦探笔记" })).toBeInTheDocument();
+  expect(screen.getByText("Story workspace")).toBeInTheDocument();
 });

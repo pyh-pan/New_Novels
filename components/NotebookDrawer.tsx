@@ -31,6 +31,7 @@ interface NotebookDrawerProps {
   onCreateNote: () => void;
   onDeleteNote: (id: string) => void;
   accusationHref?: string;
+  showCloseButton?: boolean;
 }
 
 const tagLabels: Record<NoteFilter, string> = {
@@ -51,7 +52,8 @@ export default function NotebookDrawer({
   onUpdateNote,
   onCreateNote,
   onDeleteNote,
-  accusationHref = "/accuse"
+  accusationHref = "/accuse",
+  showCloseButton = true
 }: NotebookDrawerProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const visibleNotes =
@@ -61,16 +63,7 @@ export default function NotebookDrawer({
   const pendingDeleteNote = notes.find((note) => note.id === pendingDeleteId);
 
   if (!isOpen) {
-    return (
-      <button
-        type="button"
-        className="notebook-toggle"
-        aria-label="打开侦探笔记"
-        onClick={onToggle}
-      >
-        <span aria-hidden="true">▤</span>
-      </button>
-    );
+    return null;
   }
 
   return (
@@ -89,14 +82,16 @@ export default function NotebookDrawer({
           >
             <span aria-hidden="true">＋</span>
           </button>
-          <button
-            type="button"
-            className="notebook-close"
-            aria-label="收起侦探笔记"
-            onClick={onToggle}
-          >
-            ›
-          </button>
+          {showCloseButton ? (
+            <button
+              type="button"
+              className="notebook-close"
+              aria-label="收起侦探笔记"
+              onClick={onToggle}
+            >
+              ›
+            </button>
+          ) : null}
         </div>
       </div>
 

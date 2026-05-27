@@ -32,7 +32,10 @@ export type LocalPlayState = {
   ui: {
     activeNotebookFilter: NoteFilter;
     activeConversationId?: string;
+    investigationOpen?: boolean;
+    investigationWidth?: number;
     notebookOpen?: boolean;
+    notebookWidth?: number;
     mobileTab?: MobileTab;
   };
   savedAt: string;
@@ -139,7 +142,10 @@ export function createInitialPlayState({
     ui: {
       activeNotebookFilter: "all",
       activeConversationId: "general",
+      investigationOpen: false,
+      investigationWidth: 380,
       notebookOpen: false,
+      notebookWidth: 340,
       mobileTab: "story"
     },
     savedAt: new Date().toISOString()
@@ -321,10 +327,22 @@ export function normalizePlayState(
         typeof ui.activeConversationId === "string"
           ? ui.activeConversationId
           : initial.ui.activeConversationId,
+      investigationOpen:
+        typeof ui.investigationOpen === "boolean"
+          ? ui.investigationOpen
+          : initial.ui.investigationOpen,
+      investigationWidth:
+        typeof ui.investigationWidth === "number"
+          ? Math.min(560, Math.max(300, ui.investigationWidth))
+          : initial.ui.investigationWidth,
       notebookOpen:
         typeof ui.notebookOpen === "boolean"
           ? ui.notebookOpen
           : initial.ui.notebookOpen,
+      notebookWidth:
+        typeof ui.notebookWidth === "number"
+          ? Math.min(520, Math.max(300, ui.notebookWidth))
+          : initial.ui.notebookWidth,
       mobileTab:
         ui.mobileTab === "story" ||
         ui.mobileTab === "investigation" ||

@@ -7,6 +7,13 @@ import NotebookDrawer, {
 } from "../components/NotebookDrawer";
 import Page from "../app/page";
 
+function openInvestigationDesk() {
+  const toggle = screen.queryByRole("button", { name: "打开调查台" });
+  if (toggle) {
+    fireEvent.click(toggle);
+  }
+}
+
 test("renders the scaffolded home page", () => {
   render(<Page />);
 
@@ -135,6 +142,7 @@ test("general investigation questions stay in the general module", async () => {
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
@@ -167,6 +175,7 @@ test("mention menu inserts an agent and routes the message to that conversation"
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "@" } });
@@ -236,6 +245,7 @@ test("investigation patches player state, agent session, and unlocked act narrat
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={({ currentChapterId }) => <section>{currentChapterId}</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "我想看看锤子和伤口的关系" } });
@@ -290,6 +300,7 @@ test("npc session mood appears as player-facing state without exposing rules", a
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "@威尔弗里德牧师 他在哪里" } });
@@ -316,6 +327,7 @@ test("unknown mentions fall back to the general assistant", async () => {
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "@村长 他看到了什么" } });
@@ -348,6 +360,7 @@ test("investigation submit is locked during request and non-ok API errors use fa
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "询问威尔弗里德在哪里" } });
@@ -376,6 +389,7 @@ test("investigation state persists across reloads and reset requires confirmatio
   vi.stubGlobal("fetch", fetchMock);
 
   const { unmount } = render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "看看锤柄" } });
@@ -387,6 +401,7 @@ test("investigation state persists across reloads and reset requires confirmatio
 
   unmount();
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
   expect(screen.getByText("锤柄上没有明显血迹。")).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
@@ -403,12 +418,14 @@ test("reset utility does not render over the open notebook drawer", () => {
   window.localStorage.clear();
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
 
+  expect(screen.queryByRole("button", { name: "重新开始" })).not.toBeInTheDocument();
+  openInvestigationDesk();
   expect(screen.getByRole("button", { name: "重新开始" })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole("button", { name: "打开侦探笔记" }));
 
   expect(screen.getByRole("button", { name: "新建笔记" })).toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: "重新开始" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "重新开始" })).toBeInTheDocument();
 });
 
 test("conversation input supports keyboard submit without inline note extraction controls", async () => {
@@ -420,6 +437,7 @@ test("conversation input supports keyboard submit without inline note extraction
   vi.stubGlobal("fetch", fetchMock);
 
   render(<InvestigationDesk storySlot={() => <section>Story</section>} />);
+  openInvestigationDesk();
 
   const input = screen.getByLabelText("调查问题");
   fireEvent.change(input, { target: { value: "现场有没有拖拽痕迹" } });
