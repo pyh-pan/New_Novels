@@ -1,10 +1,79 @@
+const APP_ROUTE_SUFFIXES = [
+  /^\/cases\/[^/]+\/accuse\/?$/,
+  /^\/cases\/[^/]+\/?$/,
+  /^\/studio\/cases\/[^/]+\/?$/,
+  /^\/studio\/?$/,
+  /^\/accuse\/?$/,
+  /^\/health\/?$/
+];
+
+function trimTrailingSlash(path: string) {
+  if (path === "/") {
+    return "";
+  }
+
+  return path.replace(/\/+$/, "");
+}
+
+function normalizeBasePath(path: string) {
+  return trimTrailingSlash(path) || "";
+}
+
+function getBaseElementPath() {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  const baseHref = document.querySelector("base[href]")?.getAttribute("href");
+  if (!baseHref) {
+    return "";
+  }
+
+  try {
+    return normalizeBasePath(new URL(baseHref, window.location.origin).pathname);
+  } catch {
+    return "";
+  }
+}
+
+function getMetaEntryPath() {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  const metaEntryPath = document
+    .querySelector('meta[name="new-novels-entry-path"]')
+    ?.getAttribute("content");
+
+  return metaEntryPath ? normalizeBasePath(metaEntryPath) : "";
+}
+
+function inferBasePathFromCurrentRoute(pathname: string) {
+  const normalizedPathname = pathname.startsWith("/") ? pathname : `/${pathname}`;
+
+  for (const routeSuffix of APP_ROUTE_SUFFIXES) {
+    const segments = normalizedPathname.split("/");
+    for (let index = 0; index < segments.length; index += 1) {
+      const candidateSuffix = `/${segments.slice(index).join("/")}`;
+      if (routeSuffix.test(candidateSuffix)) {
+        return normalizeBasePath(`/${segments.slice(1, index).join("/")}`);
+      }
+    }
+  }
+
+  return normalizeBasePath(normalizedPathname);
+}
+
 export function getRuntimeBasePath() {
   if (typeof window === "undefined") {
     return "";
   }
 
-  const match = window.location.pathname.match(/^\/s\/[^/]+(?=\/|$)/);
-  return match?.[0] ?? "";
+  return (
+    getMetaEntryPath() ||
+    getBaseElementPath() ||
+    inferBasePathFromCurrentRoute(window.location.pathname)
+  );
 }
 
 export function withRuntimeBasePath(path: string) {
