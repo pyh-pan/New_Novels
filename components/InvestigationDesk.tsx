@@ -32,6 +32,7 @@ import {
   type ConversationTarget,
   type LocalPlayState
 } from "../lib/game/play-state";
+import { withRuntimeBasePath } from "../lib/app/runtime-paths";
 
 type InvestigationResponse = {
   content?: string;
@@ -58,7 +59,7 @@ interface InvestigationDeskProps {
 }
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
-  const response = await fetch(url, {
+  const response = await fetch(withRuntimeBasePath(url), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)

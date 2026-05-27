@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useRef, useState } from "react";
+import { fetchAppPath } from "../lib/app/runtime-paths";
 
 type CasePreviewIssue = {
   severity: "fatal" | "warning" | "suggestion";
@@ -56,7 +57,7 @@ export default function CaseImportPanel() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/cases/preview", {
+      const response = await fetchAppPath("/api/cases/preview", {
         method: "POST",
         body: formData
       });

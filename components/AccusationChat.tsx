@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import AppLink from "./AppLink";
+import { fetchAppPath } from "../lib/app/runtime-paths";
 
 type AccusationMessage = {
   id: string;
@@ -65,7 +66,7 @@ export default function AccusationChat({
     async function loadFirstQuestion() {
       try {
         const url = caseId ? `/api/accuse?caseId=${encodeURIComponent(caseId)}` : "/api/accuse";
-        const response = await fetch(url);
+        const response = await fetchAppPath(url);
         if (!response.ok) {
           throw new Error("Failed to load accusation question.");
         }
@@ -109,7 +110,7 @@ export default function AccusationChat({
     setAnswer("");
 
     try {
-      const response = await fetch("/api/accuse", {
+      const response = await fetchAppPath("/api/accuse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ caseId, questionIndex, answer: trimmedAnswer })
@@ -179,9 +180,9 @@ export default function AccusationChat({
           <div className="accusation-result accusation-result-wrong" role="alertdialog">
             <h2>回答错误</h2>
             <p>这项指控还缺少可靠证据。回到案卷，重新核对证词与现场细节。</p>
-            <Link className="accusation-action" href={continueHref}>
+            <AppLink className="accusation-action" href={continueHref}>
               继续调查
-            </Link>
+            </AppLink>
           </div>
         ) : null}
 
@@ -212,9 +213,9 @@ export default function AccusationChat({
                 </ul>
               </div>
             ) : null}
-            <Link className="accusation-action" href={endHref}>
+            <AppLink className="accusation-action" href={endHref}>
               结束游戏
-            </Link>
+            </AppLink>
           </div>
         ) : null}
 

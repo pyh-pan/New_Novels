@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { ChangeEvent, useMemo, useRef, useState } from "react";
 import ConfirmDialog from "./ConfirmDialog";
+import AppLink from "./AppLink";
+import { fetchAppPath, navigateToAppPath } from "../lib/app/runtime-paths";
 
 type StudioJob = {
   id: string;
@@ -72,7 +73,7 @@ type StudioHomeProps = {
 
 export default function StudioHome({
   navigateTo = (href: string) => {
-    window.location.href = href;
+    navigateToAppPath(href);
   }
 }: StudioHomeProps = {}) {
   const [modal, setModal] = useState<Modal>(null);
@@ -100,13 +101,13 @@ export default function StudioHome({
     formData.append("file", file);
 
     try {
-      const created = await fetch("/api/studio/source-jobs", {
+      const created = await fetchAppPath("/api/studio/source-jobs", {
         method: "POST",
         body: formData
       }).then((response) => readJson<StudioJob>(response));
       setSourceJob(created);
 
-      const completed = await fetch(`/api/studio/jobs/${created.id}`).then((response) =>
+      const completed = await fetchAppPath(`/api/studio/jobs/${created.id}`).then((response) =>
         readJson<StudioJob>(response)
       );
       setSourceJob(completed);
@@ -136,7 +137,7 @@ export default function StudioHome({
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/cases/preview", {
+      const response = await fetchAppPath("/api/cases/preview", {
         method: "POST",
         body: formData
       });
@@ -174,9 +175,9 @@ export default function StudioHome({
   return (
     <main className="studio-shell">
       <header className="studio-topbar">
-        <Link className="icon-action" href="/" aria-label="返回故事书架" title="返回故事书架">
+        <AppLink className="icon-action" href="/" aria-label="返回故事书架" title="返回故事书架">
           ←
-        </Link>
+        </AppLink>
         <div>
           <h1>创作者工作台</h1>
         </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import type { StudioDraftView, StudioNodeType, StudioTreeNode } from "../lib/studio/draft";
+import { fetchAppPath, navigateToAppPath } from "../lib/app/runtime-paths";
+import AppLink from "./AppLink";
 import ConfirmDialog from "./ConfirmDialog";
 
 type StudioWorkbenchProps = {
@@ -77,7 +78,7 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
     setStudioActionError("");
 
     try {
-      const response = await fetch(`/api/studio/cases/${draft.caseId}/${action}`, {
+      const response = await fetchAppPath(`/api/studio/cases/${draft.caseId}/${action}`, {
         method: "POST"
       });
       const payload = (await response.json().catch(() => undefined)) as
@@ -90,7 +91,7 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
 
       setLifecycleStatus(payload.status);
       if (action === "publish") {
-        window.location.href = payload.playHref ?? `/cases/${draft.caseId}`;
+        navigateToAppPath(payload.playHref ?? `/cases/${draft.caseId}`);
       }
     } catch (error) {
       setStudioActionError(error instanceof Error ? error.message : "操作失败。");
@@ -100,9 +101,9 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
   return (
     <main className="studio-workbench">
       <header className="studio-workbench-topbar">
-        <Link className="icon-action" href="/studio" aria-label="返回创作者工作台" title="返回创作者工作台">
+        <AppLink className="icon-action" href="/studio" aria-label="返回创作者工作台" title="返回创作者工作台">
           ←
-        </Link>
+        </AppLink>
         <div>
           <h1>{draft.title}</h1>
         </div>
@@ -130,9 +131,9 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
               </button>
             </>
           ) : null}
-          <Link className="icon-action" href={`/cases/${draft.caseId}`} aria-label="试玩案件" title="试玩案件">
+          <AppLink className="icon-action" href={`/cases/${draft.caseId}`} aria-label="试玩案件" title="试玩案件">
             ▶
-          </Link>
+          </AppLink>
         </div>
       </header>
       {studioActionError ? <p className="studio-action-error">{studioActionError}</p> : null}

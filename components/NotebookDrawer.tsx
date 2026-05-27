@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import AppLink from "./AppLink";
 import ConfirmDialog from "./ConfirmDialog";
 
 export type NoteTag = "comment" | "clue" | "testimony" | "doubt" | "contradiction";
@@ -174,9 +174,9 @@ export default function NotebookDrawer({
         )}
       </div>
 
-      <Link className="accusation-link" href={accusationHref}>
+      <AppLink className="accusation-link" href={accusationHref}>
         提出最终指认
-      </Link>
+      </AppLink>
 
       {pendingDeleteNote ? (
         <ConfirmDialog
