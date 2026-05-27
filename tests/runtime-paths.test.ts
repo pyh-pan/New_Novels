@@ -1,4 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom/vitest";
+import { createElement } from "react";
+import AppLink from "../components/AppLink";
 import { getRuntimeBasePath, withRuntimeBasePath } from "../lib/app/runtime-paths";
 
 const originalUrl = window.location.href;
@@ -70,5 +74,18 @@ describe("runtime path helpers", () => {
     expect(withRuntimeBasePath("https://example.com/cases/hunters-lodge")).toBe(
       "https://example.com/cases/hunters-lodge"
     );
+  });
+
+  it("renders app links as full document anchors with the entry path", async () => {
+    window.history.pushState({}, "", "/workspace/app-123/");
+
+    render(createElement(AppLink, { href: "/cases/hunters-lodge" }, "打开案件"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "打开案件" })).toHaveAttribute(
+        "href",
+        "/workspace/app-123/cases/hunters-lodge"
+      );
+    });
   });
 });
