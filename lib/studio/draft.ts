@@ -42,6 +42,7 @@ export type StudioDraftView = {
   chapters: Array<{
     id: string;
     title: string;
+    subtitle?: string;
     body: string;
     actId?: string;
     visibleFacts: string[];
@@ -215,6 +216,7 @@ export function createStudioDraftViewWithAdaptation(
       return {
         id: chapter.id,
         title: chapter.title,
+        subtitle: chapter.subtitle,
         body: chapter.body,
         actId: act?.id,
         visibleFacts: textForIds(act?.visibleClueIds ?? [], clueTitle),

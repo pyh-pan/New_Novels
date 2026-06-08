@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SelectionCommentPopover, {
   getSelectionWithin,
   type SelectionCommentPayload,
@@ -38,6 +38,24 @@ export default function ConversationModule({
   const panelId = `${id}-conversation-panel`;
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [commentTarget, setCommentTarget] = useState<SelectionCommentTarget | null>(null);
+  const [iconOnlyExpanded, setIconOnlyExpanded] = useState(false);
+  const hasExpandableContent = messages.length > 0 || isLoading;
+  const visuallyExpanded = hasExpandableContent ? isExpanded : iconOnlyExpanded;
+
+  useEffect(() => {
+    if (hasExpandableContent) {
+      setIconOnlyExpanded(false);
+    }
+  }, [hasExpandableContent]);
+
+  const handleToggle = () => {
+    if (!hasExpandableContent) {
+      setIconOnlyExpanded((current) => !current);
+      return;
+    }
+
+    onToggle();
+  };
 
   const handleMessageMouseUp = () => {
     window.setTimeout(() => {
@@ -59,13 +77,19 @@ export default function ConversationModule({
   };
 
   return (
-    <article className={`conversation-module ${isExpanded ? "is-expanded" : ""}`}>
+    <article
+      className={[
+        "conversation-module",
+        isExpanded && hasExpandableContent ? "is-expanded" : "",
+        iconOnlyExpanded ? "is-empty-toggled" : ""
+      ].join(" ")}
+    >
       <button
         type="button"
         className="module-header"
-        aria-expanded={isExpanded}
+        aria-expanded={hasExpandableContent && isExpanded}
         aria-controls={panelId}
-        onClick={onToggle}
+        onClick={handleToggle}
       >
         <span>
           <strong>{title}</strong>
@@ -73,11 +97,11 @@ export default function ConversationModule({
         </span>
         <span className="module-meta" aria-hidden="true">
           {messages.length} 条
-          <span className="module-toggle">{isExpanded ? "⌄" : "›"}</span>
+          <span className="module-toggle">{visuallyExpanded ? "⌄" : "›"}</span>
         </span>
       </button>
 
-      {isExpanded && (messages.length > 0 || isLoading) ? (
+      {isExpanded && hasExpandableContent ? (
         <div className="module-body" id={panelId}>
           <SelectionCommentPopover
             target={commentTarget}

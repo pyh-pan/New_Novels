@@ -45,11 +45,7 @@ accusation/questions.json
 cases/hunters-lodge/
 ```
 
-它由 `getDefaultCase()` 加载，并驱动默认应用体验。较早的参考包保留在：
-
-```text
-cases/hammer-of-god/
-```
+它由 `getDefaultCase()` 加载，并驱动默认应用体验。当前仓库只保留这一个内置可玩案件。
 
 ## 重要部分
 
@@ -134,7 +130,7 @@ Act gate 应证明玩家完成了调查进展，不应只依赖模糊关键词�
 
 ```bash
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
-node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hammer-of-god
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
 ```
 
 同一个检查器支持聚合 package JSON、拆分包目录和 zip 文件：

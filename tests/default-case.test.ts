@@ -2,11 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import {
-  getDefaultCase,
-  getDefaultRuntime,
-  loadBundledCase
-} from "../lib/case/default-case";
+import { getDefaultCase, getDefaultRuntime, loadBundledCase } from "../lib/case/default-case";
 
 describe("default case", () => {
   it("loads the runnable case from the filesystem package", () => {
@@ -42,7 +38,7 @@ describe("default case", () => {
     );
   });
 
-  it("can still load the original Hammer of God demo package", () => {
-    expect(loadBundledCase("hammer-of-god").id).toBe("hammer-of-god");
+  it("rejects removed bundled case ids", () => {
+    expect(() => loadBundledCase("missing-case")).toThrow("Unknown bundled case");
   });
 });

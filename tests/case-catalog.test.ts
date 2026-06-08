@@ -6,7 +6,7 @@ describe("case catalog", () => {
   it("lists bundled cases as shelf-ready cards", () => {
     const items = getCaseShelfItems();
 
-    expect(items.map((item) => item.id)).toEqual(["hunters-lodge", "hammer-of-god"]);
+    expect(items.map((item) => item.id)).toEqual(["hunters-lodge"]);
     expect(items[0]).toMatchObject({
       title: "猎人小屋疑案",
       sourceTitle: "The Mystery of Hunter's Lodge",
@@ -20,6 +20,7 @@ describe("case catalog", () => {
 
   it("guards unknown case ids", () => {
     expect(isBundledCaseId("hunters-lodge")).toBe(true);
+    expect(isBundledCaseId("missing-case")).toBe(false);
     expect(isBundledCaseId("unknown")).toBe(false);
   });
 });

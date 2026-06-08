@@ -22,6 +22,10 @@ describe("studio draft view", () => {
       agents: 6,
       acts: 3
     });
+    expect(view.chapters[1]).toMatchObject({
+      title: "猎人小屋疑案",
+      subtitle: "第二章 荒原上的枪声"
+    });
     expect(view.chapters[0].hiddenInvestigation.length).toBeGreaterThan(0);
     expect(view.agents.find((agent) => agent.id === "zoe")?.actMatrix).toHaveLength(3);
     expect(view.accusation[0].supportingEvidence.length).toBeGreaterThan(0);

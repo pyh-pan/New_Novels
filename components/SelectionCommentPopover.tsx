@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from "react";
+import Icon from "./Icon";
 
 export type SelectionCommentPayload = {
   quote: string;
@@ -105,6 +106,81 @@ export function persistSelectionCommentHighlight(
   setHighlightRanges(COMMENT_SAVED_HIGHLIGHT_NAME, savedCommentRanges);
 }
 
+function findTextRange(container: HTMLElement, quote: string) {
+  const trimmedQuote = quote.trim();
+  if (!trimmedQuote) {
+    return null;
+  }
+
+  const nodes: Array<{ node: Text; start: number; end: number }> = [];
+  let fullText = "";
+  const walker = document.createTreeWalker(container, 4);
+  let currentNode = walker.nextNode();
+
+  while (currentNode) {
+    if (currentNode instanceof Text) {
+      const text = currentNode.textContent ?? "";
+      nodes.push({
+        node: currentNode,
+        start: fullText.length,
+        end: fullText.length + text.length
+      });
+      fullText += text;
+    }
+    currentNode = walker.nextNode();
+  }
+
+  const start = fullText.indexOf(trimmedQuote);
+  if (start < 0) {
+    return null;
+  }
+
+  const end = start + trimmedQuote.length;
+  const startNode = nodes.find((entry) => start >= entry.start && start <= entry.end);
+  const endNode = nodes.find((entry) => end >= entry.start && end <= entry.end);
+  if (!startNode || !endNode) {
+    return null;
+  }
+
+  const range = document.createRange();
+  range.setStart(startNode.node, start - startNode.start);
+  range.setEnd(endNode.node, end - endNode.start);
+  return range;
+}
+
+export function restoreSelectionCommentHighlights(
+  containers: HTMLElement[],
+  annotations: SelectionCommentPayload[],
+  source: string
+) {
+  for (let index = savedCommentAnnotations.length - 1; index >= 0; index -= 1) {
+    if (savedCommentAnnotations[index].source === source) {
+      savedCommentAnnotations.splice(index, 1);
+      savedCommentRanges.splice(index, 1);
+    }
+  }
+
+  annotations.forEach((annotation) => {
+    const range = containers
+      .map((container) => findTextRange(container, annotation.quote))
+      .find((candidate): candidate is Range => Boolean(candidate));
+
+    if (!range) {
+      return;
+    }
+
+    const savedRange = range.cloneRange();
+    savedCommentRanges.push(savedRange);
+    savedCommentAnnotations.push({
+      id: `annotation-${annotation.source}-${savedCommentAnnotations.length}`,
+      range: savedRange,
+      ...annotation
+    });
+  });
+
+  setHighlightRanges(COMMENT_SAVED_HIGHLIGHT_NAME, savedCommentRanges);
+}
+
 function pointInRange(range: Range, x: number, y: number) {
   if (typeof range.getClientRects !== "function") {
     return false;
@@ -181,14 +257,10 @@ export default function SelectionCommentPopover({
   onClose
 }: SelectionCommentPopoverProps) {
   const [draft, setDraft] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     setDraft("");
     setSelectionCommentHighlight(target?.range ?? null);
-    if (target) {
-      window.setTimeout(() => textareaRef.current?.focus(), 0);
-    }
 
     return () => setSelectionCommentHighlight(null);
   }, [target]);
@@ -226,7 +298,6 @@ export default function SelectionCommentPopover({
     >
       <div className="selection-comment-row">
         <textarea
-          ref={textareaRef}
           value={draft}
           aria-label="批注内容"
           placeholder="记录你的想法"
@@ -234,10 +305,10 @@ export default function SelectionCommentPopover({
           onChange={(event) => setDraft(event.target.value)}
         />
         <button type="submit" aria-label="发送批注" disabled={!draft.trim()}>
-          ↵
+          <Icon name="send" />
         </button>
         <button type="button" aria-label="关闭批注框" onClick={onClose}>
-          ×
+          <Icon name="x" />
         </button>
       </div>
     </form>
@@ -330,7 +401,7 @@ export function SelectionAnnotationPreview() {
       <div className="selection-annotation-header">
         <span>{preview.annotation.source}</span>
         <button type="button" aria-label="关闭批注内容" onClick={closePreview}>
-          ×
+          <Icon name="x" />
         </button>
       </div>
       <p>{preview.annotation.comment}</p>

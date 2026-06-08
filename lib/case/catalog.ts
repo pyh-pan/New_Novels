@@ -25,17 +25,15 @@ export type CaseShelfItem = {
   };
 };
 
-export const bundledCaseIds = ["hunters-lodge", "hammer-of-god"] as const;
+export const bundledCaseIds = ["hunters-lodge"] as const;
 export type BundledCaseId = (typeof bundledCaseIds)[number];
 
 const caseTags: Record<BundledCaseId, string[]> = {
-  "hunters-lodge": ["身份伪装", "证词矛盾", "不在场证明"],
-  "hammer-of-god": ["本格谜题", "物理手法", "心理谎言"]
+  "hunters-lodge": ["身份伪装", "证词矛盾", "不在场证明"]
 };
 
 const caseDifficulty: Record<BundledCaseId, CaseShelfItem["difficulty"]> = {
-  "hunters-lodge": "标准",
-  "hammer-of-god": "入门"
+  "hunters-lodge": "标准"
 };
 
 const casePalettes: Record<
@@ -45,10 +43,6 @@ const casePalettes: Record<
   "hunters-lodge": {
     background: "#efe8d8",
     foreground: "#171512"
-  },
-  "hammer-of-god": {
-    background: "#e8e3d7",
-    foreground: "#181715"
   }
 };
 

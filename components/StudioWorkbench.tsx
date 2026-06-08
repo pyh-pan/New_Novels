@@ -1,6 +1,15 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  CSSProperties,
+  FormEvent,
+  PointerEvent as ReactPointerEvent,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import type { StudioDraftView, StudioNodeType, StudioTreeNode } from "../lib/studio/draft";
 import { fetchAppPath, navigateToAppPath } from "../lib/app/runtime-paths";
 import AppLink from "./AppLink";
@@ -16,8 +25,101 @@ type ReviewComment = {
   body: string;
 };
 
+type ReviewReference = {
+  summary: string;
+  excerpt: string;
+};
+
 function flattenNodes(nodes: StudioTreeNode[]): StudioTreeNode[] {
   return nodes.flatMap((node) => [node, ...(node.children ? flattenNodes(node.children) : [])]);
+}
+
+function compactText(value: string, maxLength = 220) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  return normalized.length > maxLength
+    ? `${normalized.slice(0, maxLength).trim()}...`
+    : normalized;
+}
+
+function chapterDisplayTitle(chapter: StudioDraftView["chapters"][number]) {
+  return chapter.subtitle ?? chapter.title;
+}
+
+function getReviewReference(draft: StudioDraftView, node: StudioTreeNode): ReviewReference {
+  if (node.type === "chapter") {
+    const chapter = draft.chapters.find((item) => item.id === node.id) ?? draft.chapters[0];
+    return {
+      summary: chapter ? chapterDisplayTitle(chapter) : node.label,
+      excerpt: compactText(chapter?.body ?? draft.title)
+    };
+  }
+
+  if (node.type === "agent") {
+    const agent = draft.agents.find((item) => item.id === node.id) ?? draft.agents[0];
+    return {
+      summary: agent ? agent.name : node.label,
+      excerpt: compactText([agent?.role, agent?.personality, ...(agent?.boundaries ?? [])].filter(Boolean).join(" "))
+    };
+  }
+
+  if (node.type === "clues") {
+    return {
+      summary: "线索",
+      excerpt: compactText(draft.clues.map((clue) => `${clue.title}：${clue.text}`).join(" "))
+    };
+  }
+
+  if (node.type === "contradictions") {
+    return {
+      summary: "矛盾",
+      excerpt: compactText(draft.contradictions.map((item) => `${item.title}：${item.facts.join("、")}`).join(" "))
+    };
+  }
+
+  if (node.type === "acts") {
+    return {
+      summary: "多幕推进",
+      excerpt: compactText(draft.acts.map((act) => `${act.title}：${act.visibleClues.join("、")}`).join(" "))
+    };
+  }
+
+  if (node.type === "accusation") {
+    return {
+      summary: "最终指认",
+      excerpt: compactText(draft.accusation.map((item) => `${item.prompt} ${item.explanation}`).join(" "))
+    };
+  }
+
+  if (node.id === "source-profile" && draft.sourceProfile) {
+    return {
+      summary: "原文画像",
+      excerpt: compactText([
+        draft.sourceProfile.title,
+        draft.sourceProfile.author,
+        draft.sourceProfile.narrativeForm,
+        ...draft.sourceProfile.structureNotes
+      ].join(" "))
+    };
+  }
+
+  if (node.id === "segmentation" && draft.segmentation) {
+    return {
+      summary: "改写分段",
+      excerpt: compactText(draft.segmentation.map((item) => `${item.label}：${item.reason}`).join(" "))
+    };
+  }
+
+  if (node.type === "validation") {
+    return {
+      summary: "校验报告",
+      excerpt: compactText(draft.validation.map((item) => `${item.title}：${item.detail}`).join(" "))
+    };
+  }
+
+  return {
+    summary: "案件控制台",
+    excerpt: `章节 ${draft.stats.chapters}，角色 ${draft.stats.agents}，线索 ${draft.stats.clues}，矛盾 ${draft.stats.contradictions}。`
+  };
 }
 
 function SectionList({ items }: { items: string[] }) {
@@ -27,10 +129,51 @@ function SectionList({ items }: { items: string[] }) {
 
   return (
     <ul className="studio-detail-list">
-      {items.map((item) => (
-        <li key={item}>{item}</li>
+      {items.map((item, index) => (
+        <li key={`${index}-${item}`}>{item}</li>
       ))}
     </ul>
+  );
+}
+
+function clampPanelWidth(width: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, Math.round(width)));
+}
+
+function resizeTextarea(textarea: HTMLTextAreaElement) {
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+}
+
+function AutoResizeStudioTextarea({
+  value,
+  onChange
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (textareaRef.current) {
+      resizeTextarea(textareaRef.current);
+    }
+  }, [value]);
+
+  const updateValue = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    resizeTextarea(event.target);
+    onChange(event.target.value);
+  };
+
+  return (
+    <textarea
+      id="studio-comment"
+      ref={textareaRef}
+      value={value}
+      onChange={updateValue}
+      placeholder="修改建议"
+      rows={1}
+    />
   );
 }
 
@@ -39,18 +182,58 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
   const [activeNodeId, setActiveNodeId] = useState("dashboard");
   const [commentDraft, setCommentDraft] = useState("");
   const [comments, setComments] = useState<ReviewComment[]>([]);
-  const [patchSummary, setPatchSummary] = useState("");
   const [lifecycleStatus, setLifecycleStatus] = useState(draft.lifecycleStatus ?? "published");
   const [publishConfirmOpen, setPublishConfirmOpen] = useState(false);
   const [studioActionError, setStudioActionError] = useState("");
+  const [treeWidth, setTreeWidth] = useState(260);
+  const [agentWidth, setAgentWidth] = useState(330);
   const activeNode = flatNodes.find((node) => node.id === activeNodeId) ?? draft.tree[0];
   const activeComments = comments.filter((comment) => comment.targetId === activeNode.id);
+  const activeReference = getReviewReference(draft, activeNode);
   const selectableNodes = flatNodes.map((node) => ({
     ...node,
     label: node.badge ? `${node.label} · ${node.badge}` : node.label
   }));
+  const workbenchStyle = {
+    "--studio-tree-width": `${treeWidth}px`,
+    "--studio-agent-width": `${agentWidth}px`
+  } as CSSProperties;
 
-  function addComment(event: FormEvent<HTMLFormElement>) {
+  const beginStudioResize = (side: "tree" | "agent") => {
+    return (event: ReactPointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const startX = event.clientX;
+      const startWidth = side === "tree" ? treeWidth : agentWidth;
+
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+
+      const move = (moveEvent: globalThis.PointerEvent) => {
+        const delta = side === "tree"
+          ? moveEvent.clientX - startX
+          : startX - moveEvent.clientX;
+        const nextWidth = startWidth + delta;
+
+        if (side === "tree") {
+          setTreeWidth(clampPanelWidth(nextWidth, 220, 420));
+        } else {
+          setAgentWidth(clampPanelWidth(nextWidth, 280, 520));
+        }
+      };
+
+      const stop = () => {
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", stop);
+      };
+
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", stop, { once: true });
+    };
+  };
+
+  function submitRevision(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = commentDraft.trim();
     if (!body) {
@@ -66,12 +249,6 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
       }
     ]);
     setCommentDraft("");
-  }
-
-  function submitPatch() {
-    setPatchSummary(
-      `已生成 ${activeComments.length} 条修改建议。`
-    );
   }
 
   async function runStudioAction(action: "save" | "publish") {
@@ -99,7 +276,7 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
   }
 
   return (
-    <main className="studio-workbench">
+    <main className="studio-workbench" style={workbenchStyle}>
       <header className="studio-workbench-topbar">
         <AppLink className="icon-action" href="/studio" aria-label="返回创作者工作台" title="返回创作者工作台">
           ←
@@ -193,60 +370,46 @@ export default function StudioWorkbench({ draft }: StudioWorkbenchProps) {
           </div>
         ))}
       </aside>
+      <div
+        className="studio-resizer studio-resizer-tree"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="调整案件结构宽度"
+        onPointerDown={beginStudioResize("tree")}
+      />
 
       <section className="studio-inspector" aria-label="案件审阅区">
         <Inspector draft={draft} nodeId={activeNode.id} nodeType={activeNode.type} />
       </section>
+      <div
+        className="studio-resizer studio-resizer-agent"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="调整改写助手宽度"
+        onPointerDown={beginStudioResize("agent")}
+      />
 
       <aside className="studio-agent-panel" aria-label="改写 agent 工作区">
         <div>
           <h2>改写助手</h2>
         </div>
-        <div className="studio-context-card">
-          <span>{activeNode.label}</span>
-          <small>{activeComments.length} 条批注待提交</small>
-        </div>
-        <form className="studio-comment-form" onSubmit={addComment}>
+        <form className="studio-comment-form" onSubmit={submitRevision}>
+          <details className="studio-reference">
+            <summary>{activeReference.summary}</summary>
+            <blockquote>{activeReference.excerpt}</blockquote>
+          </details>
           <label className="sr-only" htmlFor="studio-comment">
-            批注
+            修改建议
           </label>
-          <textarea
-            id="studio-comment"
-            value={commentDraft}
-            onChange={(event) => setCommentDraft(event.target.value)}
-            placeholder="批注"
-            rows={5}
-          />
+          <AutoResizeStudioTextarea value={commentDraft} onChange={setCommentDraft} />
           <button type="submit" disabled={!commentDraft.trim()}>
-            添加
+            {commentDraft.trim()
+              ? "提交修改建议"
+              : activeComments.length > 0
+                ? `已提交 ${activeComments.length} 条`
+                : "提交修改建议"}
           </button>
         </form>
-        <div className="studio-comments">
-          {activeComments.length === 0 ? (
-            <p>暂无批注</p>
-          ) : (
-            activeComments.map((comment) => (
-              <article key={comment.id}>
-                <p>{comment.body}</p>
-              </article>
-            ))
-          )}
-        </div>
-        <button
-          type="button"
-          className="studio-submit-patch"
-          disabled={activeComments.length === 0}
-          onClick={submitPatch}
-        >
-          提交
-        </button>
-        {patchSummary ? (
-          <div className="studio-patch-summary">
-            <strong>变更建议</strong>
-            <p>{patchSummary}</p>
-            <button type="button">差异</button>
-          </div>
-        ) : null}
       </aside>
     </main>
   );
@@ -275,8 +438,10 @@ function Inspector({
     const chapter = draft.chapters.find((item) => item.id === nodeId) ?? draft.chapters[0];
     return (
       <article className="studio-inspector-page">
-        <h2>{chapter.title}</h2>
-        <div className="studio-prose">{chapter.body.split("\n").map((line) => <p key={line}>{line}</p>)}</div>
+        <h2>{chapterDisplayTitle(chapter)}</h2>
+        <div className="studio-prose">
+          {chapter.body.split("\n").map((line, index) => <p key={`${chapter.id}-${index}`}>{line}</p>)}
+        </div>
         <div className="studio-info-grid">
           <InfoBlock title="所属幕" items={[chapter.actId ?? "未绑定"]} />
           <InfoBlock title="玩家可见事实" items={chapter.visibleFacts} />
@@ -304,8 +469,8 @@ function Inspector({
         </div>
         <h3>章节约束矩阵</h3>
         <div className="studio-matrix">
-          {agent.actMatrix.map((row) => (
-            <article key={row.actTitle}>
+          {agent.actMatrix.map((row, index) => (
+            <article key={`${agent.id}-${index}`}>
               <strong>{row.actTitle}</strong>
               <span>{row.canAppear ? "可出现" : "不可出现"}</span>
               <small>可见线索：{row.visibleClues.join("、") || "无"}</small>
@@ -463,8 +628,8 @@ function CollectionPage({
     <article className="studio-inspector-page">
       <h2>{title}</h2>
       <div className="studio-collection">
-        {items.map((item) => (
-          <section key={`${item.title}-${item.meta}`}>
+        {items.map((item, index) => (
+          <section key={`${index}-${item.title}-${item.meta}`}>
             <small>{item.meta}</small>
             <h3>{item.title}</h3>
             <SectionList items={item.details} />

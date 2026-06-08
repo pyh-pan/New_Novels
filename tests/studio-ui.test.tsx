@@ -114,18 +114,23 @@ describe("StudioWorkbench", () => {
 
     expect(screen.getByRole("heading", { name: "故事可玩性与真相路径" })).toBeInTheDocument();
 
+    fireEvent.click(screen.getByRole("button", { name: "2. 第二章 荒原上的枪声" }));
+    expect(screen.getByRole("heading", { name: "第二章 荒原上的枪声" })).toBeInTheDocument();
+    expect(screen.getByText("第二章 荒原上的枪声", { selector: "summary" })).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: "佐伊·哈弗林" }));
     expect(screen.getByRole("heading", { name: "佐伊·哈弗林" })).toBeInTheDocument();
     expect(screen.getByText("章节约束矩阵")).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("批注"), {
+    expect(screen.queryByText(/批注待提交/)).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("修改建议"), {
       target: { value: "第二幕里佐伊的隐瞒边界需要更明确。" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "添加" }));
-    fireEvent.click(screen.getByRole("button", { name: "提交" }));
+    fireEvent.click(screen.getByRole("button", { name: "提交修改建议" }));
 
     await waitFor(() => {
-      expect(screen.getByText(/已生成 1 条修改建议/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "已提交 1 条" })).toBeInTheDocument();
     });
   });
 });

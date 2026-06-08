@@ -12,7 +12,7 @@ cases/<case-id>/
 → 页面渲染 / API routes / Agent Runtime
 ```
 
-当前默认可运行案件从 `cases/hunters-lodge/` 加载，加载逻辑位于 `lib/case/default-case.ts`。较早的 `cases/hammer-of-god/` 仍作为参考案件与测试 fixture 保留。
+当前唯一内置可运行案件从 `cases/hunters-lodge/` 加载，加载逻辑位于 `lib/case/default-case.ts`。
 
 ## 主要界面
 
@@ -205,6 +205,7 @@ Studio 审阅工作台按原文画像、改写分段、故事章节、角色、�
 - `start.sh` 期待 `.next/standalone/server.js`，将生成的 `HOSTNAME` / `PORT` 引用改写为 `APP_HOSTNAME` / `APP_PORT`，并以 `exec node .next/standalone/server.js` 结束。
 - `health.sh` 检查 `http://127.0.0.1:3000/health`。
 - `npm run guard:package` 默认在项目父目录生成干净副本 `../New_Novels-guard/` 和压缩包 `../New_Novels-guard.zip`，避免打包产物污染源码目录。
+- `scripts/build-guard-package.sh` 会排除 `prototypes/` 等本地设计原型目录；平台包只包含生产应用、案件包、脚本、文档和运行所需构建产物。
 
 ## 验证
 
@@ -215,7 +216,6 @@ npm test
 npm run lint
 npm run build
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
-node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hammer-of-god
 npm audit --omit=dev --audit-level=high --registry=https://registry.npmjs.org
 ```
 

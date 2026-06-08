@@ -29,7 +29,7 @@
 
 ## 任务 1：故事书架与动态案件路由
 
-- [ ] 新增 catalog 测试，验证至少返回 `hunters-lodge` 和 `hammer-of-god`，且每个卡片包含标题、来源、章节数、agent 数和封面回退数据。
+- [ ] 新增 catalog 测试，验证至少返回当前内置案件，且每个卡片包含标题、来源、章节数、agent 数和封面回退数据。
 - [ ] 实现 `lib/case/catalog.ts`。
 - [ ] 将 `app/page.tsx` 改为渲染 `CaseLibrary`。
 - [ ] 新增 `/cases/[caseId]` 页面并复用 `CaseExperience`。

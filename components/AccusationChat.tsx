@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import AppLink from "./AppLink";
+import Icon from "./Icon";
 import { fetchAppPath } from "../lib/app/runtime-paths";
 
 type AccusationMessage = {
@@ -233,8 +234,13 @@ export default function AccusationChat({
                 placeholder="回答"
                 rows={3}
               />
-              <button type="submit" disabled={isLoading || answer.trim().length === 0}>
-                提交
+              <button
+                type="submit"
+                aria-label="提交"
+                title="提交"
+                disabled={isLoading || answer.trim().length === 0}
+              >
+                <Icon name="send" />
               </button>
             </div>
           </form>

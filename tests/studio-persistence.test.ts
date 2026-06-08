@@ -20,7 +20,7 @@ let dataDir = "";
 function generatedCaseInput() {
   return {
     caseFile: {
-      ...loadBundledCase("hammer-of-god"),
+      ...loadBundledCase("hunters-lodge"),
       id: "persisted-runtime-case",
       title: "持久化运行期案件"
     },

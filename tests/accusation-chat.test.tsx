@@ -70,7 +70,7 @@ describe("AccusationChat", () => {
     render(<AccusationChat />);
 
     fireEvent.change(await screen.findByLabelText("回答"), {
-      target: { value: "威尔弗里德牧师" }
+      target: { value: "佐伊和罗杰" }
     });
     fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
@@ -78,7 +78,7 @@ describe("AccusationChat", () => {
     expect(fetchMock).toHaveBeenLastCalledWith("/api/accuse", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionIndex: 0, answer: "威尔弗里德牧师" })
+      body: JSON.stringify({ questionIndex: 0, answer: "佐伊和罗杰" })
     });
   });
 
@@ -102,7 +102,7 @@ describe("AccusationChat", () => {
     render(<AccusationChat />);
 
     const input = await screen.findByLabelText("回答");
-    fireEvent.change(input, { target: { value: "威尔弗里德牧师" } });
+    fireEvent.change(input, { target: { value: "佐伊和罗杰" } });
 
     const form = input.closest("form");
     if (!form) {
@@ -175,10 +175,10 @@ describe("AccusationChat", () => {
         json: async () => ({
           status: "solved",
           truth: {
-            culpritName: "威尔弗里德牧师",
-            method: "从钟楼高处让小锤坠落。",
-            motive: "宗教狂热与道德审判感。",
-            decisiveEvidence: ["小锤很轻", "钟楼高度解释力度"]
+            culpritName: "佐伊和罗杰",
+            method: "佐伊伪装成米德尔顿太太，罗杰布置伦敦左轮假线索。",
+            motive: "为了继承佩斯的遗产。",
+            decisiveEvidence: ["米德尔顿身份无法成立", "伊灵左轮像被故意投放"]
           }
         })
       });
@@ -192,9 +192,9 @@ describe("AccusationChat", () => {
     fireEvent.click(screen.getByRole("button", { name: "提交" }));
 
     expect(await screen.findByText("真相大白")).toBeInTheDocument();
-    expect(screen.getByText("威尔弗里德牧师")).toBeInTheDocument();
-    expect(screen.getByText("从钟楼高处让小锤坠落。")).toBeInTheDocument();
-    expect(screen.getByText("小锤很轻")).toBeInTheDocument();
+    expect(screen.getByText("佐伊和罗杰")).toBeInTheDocument();
+    expect(screen.getByText("佐伊伪装成米德尔顿太太，罗杰布置伦敦左轮假线索。")).toBeInTheDocument();
+    expect(screen.getByText("米德尔顿身份无法成立")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "结束游戏" })).toHaveAttribute("href", "/");
   });
 });

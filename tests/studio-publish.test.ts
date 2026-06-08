@@ -33,7 +33,7 @@ afterEach(() => {
 describe("studio generated case lifecycle", () => {
   it("keeps uploaded cases out of the shelf until they are published", () => {
     const caseFile = {
-      ...loadBundledCase("hammer-of-god"),
+      ...loadBundledCase("hunters-lodge"),
       id: "runtime-uploaded-case",
       title: "运行期上传案件"
     };
@@ -97,7 +97,7 @@ describe("studio generated case lifecycle", () => {
 
   it("exposes save and publish API actions for generated drafts", async () => {
     const caseFile = {
-      ...loadBundledCase("hammer-of-god"),
+      ...loadBundledCase("hunters-lodge"),
       id: "api-uploaded-case",
       title: "API 上传案件"
     };

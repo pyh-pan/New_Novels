@@ -22,8 +22,8 @@ afterEach(() => {
   rmSync(dataDir, { recursive: true, force: true });
 });
 
-async function hammerZip(): Promise<File> {
-  const root = join(process.cwd(), "cases", "hammer-of-god");
+async function huntersLodgeZip(): Promise<File> {
+  const root = join(process.cwd(), "cases", "hunters-lodge");
   const files = [
     "manifest.json",
     "case.json",
@@ -33,10 +33,11 @@ async function hammerZip(): Promise<File> {
     "story/chapter-3.md",
     "agents/global-context.json",
     "agents/general.json",
-    "agents/wilfred.json",
-    "agents/simeon.json",
-    "agents/elizabeth.json",
-    "agents/joe.json",
+    "agents/japp.json",
+    "agents/middleton.json",
+    "agents/poirot.json",
+    "agents/roger.json",
+    "agents/zoe.json",
     "facts/facts.json",
     "acts/acts.json",
     "acts/gates.json",
@@ -53,13 +54,13 @@ async function hammerZip(): Promise<File> {
 
   await Promise.all(
     files.map(async (filePath) => {
-      zip.file(`hammer-of-god/${filePath}`, await readFile(join(root, filePath), "utf8"));
+      zip.file(`hunters-lodge/${filePath}`, await readFile(join(root, filePath), "utf8"));
     })
   );
 
   const buffer = await zip.generateAsync({ type: "uint8array" });
   return {
-    name: "hammer-of-god.zip",
+    name: "hunters-lodge.zip",
     arrayBuffer: async () => buffer.buffer.slice(
       buffer.byteOffset,
       buffer.byteOffset + buffer.byteLength
@@ -77,7 +78,7 @@ function formRequest(file?: File): Request {
 
 describe("/api/cases/preview", () => {
   it("validates and summarizes a case package zip", async () => {
-    const response = await POST(formRequest(await hammerZip()));
+    const response = await POST(formRequest(await huntersLodgeZip()));
 
     const body = await response.json();
 
@@ -86,24 +87,24 @@ describe("/api/cases/preview", () => {
       ok: true,
       manifest: {
         schemaVersion: "case-package/v1",
-        caseId: "hammer-of-god"
+        caseId: "hunters-lodge"
       },
-      draftCaseId: "import-hammer-of-god",
+      draftCaseId: "import-hunters-lodge",
       status: "draft",
       caseSummary: {
-        id: "import-hammer-of-god",
-        title: "钟楼下的锤击案",
+        id: "import-hunters-lodge",
+        title: "猎人小屋疑案",
         chapters: 3,
-        agents: 5,
+        agents: 6,
         acts: 3
       },
       issues: []
     });
-    expect(getGeneratedStudioCase("import-hammer-of-god")).toMatchObject({
+    expect(getGeneratedStudioCase("import-hunters-lodge")).toMatchObject({
       status: "draft",
       caseFile: {
-        id: "import-hammer-of-god",
-        title: "钟楼下的锤击案"
+        id: "import-hunters-lodge",
+        title: "猎人小屋疑案"
       }
     });
   });

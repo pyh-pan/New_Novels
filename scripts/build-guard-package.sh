@@ -18,6 +18,7 @@ tar \
   --exclude "node_modules" \
   --exclude "dist" \
   --exclude "coverage" \
+  --exclude "prototypes" \
   --exclude ".superpowers" \
   --exclude ".worktrees" \
   --exclude ".DS_Store" \
@@ -59,6 +60,7 @@ zip -qr "$ZIP_PATH" . \
   -x "node_modules/*" \
   -x ".git/*" \
   -x "coverage/*" \
+  -x "prototypes/*" \
   -x ".superpowers/*" \
   -x ".worktrees/*" \
   -x ".next/cache/*" \

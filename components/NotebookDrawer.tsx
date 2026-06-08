@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import AppLink from "./AppLink";
 import ConfirmDialog from "./ConfirmDialog";
+import Icon from "./Icon";
 
 export type NoteTag = "comment" | "clue" | "testimony" | "doubt" | "contradiction";
 export type NoteFilter = "all" | NoteTag;
@@ -43,6 +44,41 @@ const tagLabels: Record<NoteFilter, string> = {
   contradiction: "矛盾"
 };
 
+function resizeNoteTextarea(textarea: HTMLTextAreaElement) {
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+}
+
+interface AutoResizeNoteTextareaProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function AutoResizeNoteTextarea({ value, onChange }: AutoResizeNoteTextareaProps) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (textareaRef.current) {
+      resizeNoteTextarea(textareaRef.current);
+    }
+  }, [value]);
+
+  const updateValue = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    resizeNoteTextarea(event.target);
+    onChange(event.target.value);
+  };
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      aria-label="笔记正文"
+      rows={1}
+      onChange={updateValue}
+    />
+  );
+}
+
 export default function NotebookDrawer({
   isOpen,
   notes,
@@ -80,7 +116,7 @@ export default function NotebookDrawer({
             title="新建笔记"
             onClick={onCreateNote}
           >
-            <span aria-hidden="true">＋</span>
+            <Icon name="plus" />
           </button>
           {showCloseButton ? (
             <button
@@ -89,7 +125,7 @@ export default function NotebookDrawer({
               aria-label="收起侦探笔记"
               onClick={onToggle}
             >
-              ›
+              <Icon name="chevronRight" />
             </button>
           ) : null}
         </div>
@@ -116,16 +152,6 @@ export default function NotebookDrawer({
           visibleNotes.map((note) => (
             <article className={`note-card note-${note.tag}`} key={note.id}>
               <div className="note-card-header">
-                <label className="note-field note-title-field">
-                  <span className="sr-only">笔记标题</span>
-                  <input
-                    value={note.title}
-                    aria-label="笔记标题"
-                    onChange={(event) =>
-                      onUpdateNote(note.id, { title: event.target.value })
-                    }
-                  />
-                </label>
                 <label className="note-field note-tag-field">
                   <span className="sr-only">笔记标签</span>
                   <select
@@ -142,33 +168,30 @@ export default function NotebookDrawer({
                     ))}
                   </select>
                 </label>
-              </div>
-              {note.quote ? (
-                <details className="note-quote">
-                  <summary>查看引用</summary>
-                  <blockquote>{note.quote}</blockquote>
-                </details>
-              ) : null}
-              <label className="note-field note-text-field">
-                <span className="sr-only">笔记正文</span>
-                <textarea
-                  value={note.text}
-                  aria-label="笔记正文"
-                  rows={4}
-                  onChange={(event) => onUpdateNote(note.id, { text: event.target.value })}
-                />
-              </label>
-              <div className="note-card-footer">
-                <small>{note.source}</small>
                 <button
                   type="button"
                   className="note-delete"
-                  aria-label={`删除笔记：${note.title}`}
+                  aria-label={`删除笔记：${tagLabels[note.tag]}，${note.source}`}
                   onClick={() => setPendingDeleteId(note.id)}
                 >
-                  删除
+                  <Icon name="trash" />
                 </button>
               </div>
+              {note.quote ? (
+                <details className="note-quote">
+                  <summary>{note.source}</summary>
+                  <blockquote>{note.quote}</blockquote>
+                </details>
+              ) : (
+                <div className="note-quote note-quote-static">{note.source}</div>
+              )}
+              <label className="note-field note-text-field">
+                <span className="sr-only">笔记正文</span>
+                <AutoResizeNoteTextarea
+                  value={note.text}
+                  onChange={(text) => onUpdateNote(note.id, { text })}
+                />
+              </label>
             </article>
           ))
         )}

@@ -27,10 +27,9 @@ New Novels 要做的是一个 **文字优先的沉浸式推理体验**。
 
 ### 1. 可运行的案件原型
 
-已完成两个内置案件包：
+当前只保留一个内置案件包：
 
 - `cases/hunters-lodge/`：当前默认可玩案件，基于用户提供的 Agatha Christie《The Mystery of Hunter's Lodge》原文改写为中文互动案件“猎人小屋疑案”。
-- `cases/hammer-of-god/`：第一版验证案件“钟楼下的锤击案”，继续作为参考案件和测试 fixture 保留。
 
 当前原型包含：
 
@@ -109,7 +108,6 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 - `casePackageManifestSchema`
 - `casePackageSchema`
 - `hammerOfGodPackage`
-- `cases/hammer-of-god/` 示例案件目录。
 - `cases/hunters-lodge/` 当前默认案件目录。
 - `manifest.json`、`case.json`、`story/*.md`、`agents/*.json`、`acts/gates.json`、`truth/truth.json` 等拆分文件。
 - `CaseLoader`：从本地目录读取 split package，并组装为 `CaseFile`。
@@ -233,7 +231,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - 拆出三幕结构：猎人小屋现场、证词与外部核查、身份伪装对质。
 - 配置 6 个 agent：通用调查助手、罗杰、佐伊、米德尔顿太太、贾普探长、波洛。
 - 增加事实账本、线索、场景、矛盾、关系、信息传播和最终指认问题。
-- 将前端和 API 的 agent 路由从钟楼案固定 id 泛化为案件包动态 agent。
+- 将前端和 API 的 agent 路由从旧固定 id 泛化为案件包动态 agent。
 - 将默认案件切换为 `cases/hunters-lodge/`。
 
 使用前提：
@@ -256,7 +254,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 - `casePackageSchema`、文件系统结构、示例目录和本地目录 loader 已完成第一版。
 - `new-novels-case-adapter` skill 已更新为输出 split package，并提供目录校验脚本。
-- 默认运行案件已切换为从 `cases/hunters-lodge/` 加载，`cases/hammer-of-god/` 保留为参考包。
+- 默认运行案件从 `cases/hunters-lodge/` 加载。
 - zip 上传已从预览链路升级为 Studio 草稿链路；原文生成草稿和 zip 导入草稿均可保存、发布，并在发布后成为可玩案件。
 
 已完成：
@@ -280,7 +278,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
   - `victims/victims.json`
   - `accusation/questions.json`
   - `assets/`
-- 将“钟楼下的锤击案”迁移到 `cases/hammer-of-god/`。
+- 将可玩案件迁移到 `cases/hunters-lodge/` 文件系统案件包。
 - 新增 `CaseLoader`：
   - 从本地目录加载案件。
   - 从 zip 解包后的目录加载案件的底层能力。
@@ -315,8 +313,8 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - 任意符合规范的本地案件目录可以被解析和验证。已完成。
 - 符合规范的 zip 可以被 API 与前端导入为 Studio 草稿，并在发布后进入正式 runtime。已完成第一版。
 - `new-novels-case-adapter` skill 生成的目录可以直接被 `CaseLoader` 加载。已完成第一版。
-- 前端和 API 的默认运行案件不再直接依赖 `lib/case/hammer-of-god.ts` 手写大对象。已完成。
-- 修改 `cases/hunters-lodge/` 或 `cases/hammer-of-god/` 中的案件内容不需要改应用代码。已完成第一版。
+- 前端和 API 的默认运行案件不再直接依赖手写大对象。已完成。
+- 修改 `cases/hunters-lodge/` 中的案件内容不需要改应用代码。已完成第一版。
 
 ## Phase 2：Skill 与 Agent Runtime v2 联合设计
 
@@ -417,7 +415,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
   - `requiredNpcInteractions`
   - `requiredSceneInteractions`
   - `unlockNarrative`
-- 为“钟楼下的锤击案”建立三幕最小结构：
+- 为当前内置案件建立三幕最小结构：
   - `act-opening`
   - `act-testimony`
   - `act-confrontation`
@@ -515,7 +513,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - `POST /api/cases/preview` 返回导入校验报告、案件摘要和 Studio 草稿 id。
 - 校验失败时明确指出错误路径和修复建议。
 - 保留当前内置案件作为默认示例。
-- 首页故事书架展示多个内置案件。
+- 首页故事书架展示当前唯一内置案件，并支持发布案件继续加入书架。
 - Studio 审阅工作台展示章节、agent、线索、矛盾、act gate、最终答案和校验报告。
 - 评论模式已完成第一版，支持围绕当前节点添加批注并生成修改建议边界。
 - 接入真实改写链路：上传 `.txt` / `.md` / `.pdf` 后生成新的案件包草稿，而不是复用内置样章。
@@ -630,7 +628,6 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 已完成第一版：
 
-- `cases/hammer-of-god/`
 - `cases/hunters-lodge/`
 - `CaseLoader`
 - 本地目录加载测试。
@@ -671,10 +668,10 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 - 新增统一 `getDefaultCase()` 或 `loadDefaultCase()`。
 - API、story reader、routing、accusation 统一从默认案件服务读取。
-- 保留 `lib/case/hammer-of-god.ts` 作为测试 fixture 和迁移期兼容层。
+- 删除旧手写案件 fixture，测试统一使用当前内置案件或与案件无关的最小假数据。
 - 增加默认案件目录加载测试。
 - 前端 play state 记录 `caseId`，切换默认案件时自动清空旧案本地状态，避免旧 NPC 会话污染新案件。
-- 路由、对话模块和语义路由 prompt 已支持根据案件包 agent 动态生成，不再固定依赖 `wilfred/simeon/elizabeth/joe`。
+- 路由、对话模块和语义路由 prompt 已支持根据案件包 agent 动态生成，不再固定依赖某一组 NPC id。
 
 下一步：
 

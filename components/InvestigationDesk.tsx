@@ -14,6 +14,7 @@ import {
 } from "react";
 import ConfirmDialog from "./ConfirmDialog";
 import ConversationModule, { type ConversationMessage } from "./ConversationModule";
+import Icon from "./Icon";
 import NotebookDrawer, {
   type NotebookNote,
   type NoteTag
@@ -55,6 +56,7 @@ interface InvestigationDeskProps {
     currentChapterId: string;
     onChapterChange: (chapterId: string) => void;
     onCommentSelection: (payload: SelectionCommentPayload) => void;
+    annotations: SelectionCommentPayload[];
   }) => ReactNode;
 }
 
@@ -219,6 +221,18 @@ export default function InvestigationDesk({
       query ? option.name.toLocaleLowerCase().includes(query) : true
     );
   }, [mentionOptions, mentionRange]);
+
+  const commentAnnotations = useMemo(
+    () =>
+      notes
+        .filter((note) => note.quote?.trim())
+        .map((note) => ({
+          quote: note.quote ?? "",
+          comment: note.text,
+          source: note.source
+        })),
+    [notes]
+  );
 
   const resolvedDraftTarget = useMemo(() => {
     const message = draft.trim();
@@ -547,6 +561,18 @@ export default function InvestigationDesk({
       }
     }
 
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.metaKey &&
+      !event.ctrlKey
+    ) {
+      event.preventDefault();
+      formRef.current?.requestSubmit();
+      return;
+    }
+
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
       formRef.current?.requestSubmit();
@@ -632,7 +658,8 @@ export default function InvestigationDesk({
           currentChapterId: playState.currentChapterId,
           onChapterChange: (currentChapterId) =>
             setPlayState((current) => ({ ...current, currentChapterId })),
-          onCommentSelection: saveSelectionComment
+          onCommentSelection: saveSelectionComment,
+          annotations: commentAnnotations
         })}
       </div>
 
@@ -646,9 +673,11 @@ export default function InvestigationDesk({
           <button
             type="button"
             className="utility-button desk-reset"
+            aria-label="重新开始"
+            title="重新开始"
             onClick={() => setResetOpen(true)}
           >
-            重新开始
+            <Icon name="rotate" />
           </button>
         </div>
 
@@ -703,8 +732,13 @@ export default function InvestigationDesk({
               placeholder="提问，或 @角色"
               rows={3}
             />
-            <button type="submit" disabled={!draft.trim() || Boolean(loadingConversationId)}>
-              发送
+            <button
+              type="submit"
+              aria-label="发送"
+              title="发送"
+              disabled={!draft.trim() || Boolean(loadingConversationId)}
+            >
+              <Icon name="send" />
             </button>
           </div>
         </form>

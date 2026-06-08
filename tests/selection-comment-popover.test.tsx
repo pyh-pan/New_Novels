@@ -70,6 +70,35 @@ test("selection comment popover keeps the selected quote out of the input UI", (
   expect(registry.has("comment-annotations")).toBe(true);
 });
 
+test("selection comment popover does not steal focus from the active text selection", async () => {
+  const range = document.createRange();
+  const textNode = document.createTextNode("这段文字应保留原生复制能力。");
+  const sourceContainer = document.createElement("div");
+  sourceContainer.appendChild(textNode);
+  document.body.appendChild(sourceContainer);
+  range.setStart(textNode, 0);
+  range.setEnd(textNode, textNode.textContent?.length ?? 0);
+
+  render(
+    <SelectionCommentPopover
+      target={{
+        quote: "这段文字应保留原生复制能力。",
+        source: "第一章",
+        x: 240,
+        y: 240,
+        range
+      }}
+      onSubmit={() => undefined}
+      onClose={() => undefined}
+    />
+  );
+
+  await new Promise((resolve) => window.setTimeout(resolve, 0));
+
+  expect(screen.getByRole("form", { name: "选中文本批注" })).toBeInTheDocument();
+  expect(document.activeElement).not.toBe(screen.getByLabelText("批注内容"));
+});
+
 test("hovering a saved annotation shows the submitted comment", async () => {
   const sourceContainer = document.createElement("div");
   const textNode = document.createTextNode("一段已经添加评论的原文。");

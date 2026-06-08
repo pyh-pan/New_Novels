@@ -1,42 +1,42 @@
 import { describe, expect, it } from "vitest";
 import { caseSchema } from "../lib/case/schema";
-import { hammerOfGodCase } from "../lib/case/hammer-of-god";
+import { loadBundledCase } from "../lib/case/default-case";
+
+const huntersLodgeCase = loadBundledCase("hunters-lodge");
 
 describe("case schema", () => {
-  it("validates the Hammer of God case and preserves canonical ids", () => {
-    const parsed = caseSchema.parse(hammerOfGodCase);
+  it("validates the Hunter's Lodge case and preserves canonical ids", () => {
+    const parsed = caseSchema.parse(huntersLodgeCase);
 
-    expect(parsed.id).toBe("hammer-of-god");
-    expect(parsed.victims.map((victim) => victim.id)).toContain("norman");
+    expect(parsed.id).toBe("hunters-lodge");
+    expect(parsed.victims.map((victim) => victim.id)).toContain("harrington-pace");
     expect(parsed.globalContext.fairPlayRules.length).toBeGreaterThan(0);
     expect(parsed.agents.map((agent) => agent.id)).toEqual([
       "general",
-      "wilfred",
-      "simeon",
-      "elizabeth",
-      "joe"
+      "japp",
+      "middleton",
+      "poirot",
+      "roger",
+      "zoe"
     ]);
     expect(parsed.agents.find((agent) => agent.id === "general")?.type).toBe("general");
-    expect(parsed.clues.map((clue) => clue.id)).toEqual([
-      "small-hammer",
-      "wilfred-denial",
-      "tower-height"
-    ]);
+    expect(parsed.clues.map((clue) => clue.id)).toContain("clue-middleton-testimony");
+    expect(parsed.clues.map((clue) => clue.id)).toContain("clue-ealing-revolver");
     expect(parsed.accusation.questions.map((question) => question.id)).toEqual([
-      "culprit",
-      "method",
-      "contradiction",
-      "motive"
+      "accuse-culprits",
+      "accuse-middleton",
+      "accuse-revolver",
+      "accuse-motive"
     ]);
   });
 
   it("rejects duplicate agent ids", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         agents: [
-          hammerOfGodCase.agents[0],
-          { ...hammerOfGodCase.agents[1], id: hammerOfGodCase.agents[0].id }
+          huntersLodgeCase.agents[0],
+          { ...huntersLodgeCase.agents[1], id: huntersLodgeCase.agents[0].id }
         ]
       })
     ).toThrow();
@@ -45,27 +45,27 @@ describe("case schema", () => {
   it("requires a general agent", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
-        agents: hammerOfGodCase.agents.filter((agent) => agent.id !== "general")
+        ...huntersLodgeCase,
+        agents: huntersLodgeCase.agents.filter((agent) => agent.id !== "general")
       })
     ).toThrow();
   });
 
   it("rejects reveal rules that reference unknown clues", () => {
-    const wilfred = hammerOfGodCase.agents.find((agent) => agent.id === "wilfred");
-    if (!wilfred) {
-      throw new Error("Expected wilfred agent");
+    const middleton = huntersLodgeCase.agents.find((agent) => agent.id === "middleton");
+    if (!middleton) {
+      throw new Error("Expected middleton agent");
     }
 
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
-        agents: hammerOfGodCase.agents.map((agent) =>
-          agent.id === "wilfred"
+        ...huntersLodgeCase,
+        agents: huntersLodgeCase.agents.map((agent) =>
+          agent.id === "middleton"
             ? {
-                ...wilfred,
+                ...middleton,
                 revealRules: [
-                  ...wilfred.revealRules,
+                  ...middleton.revealRules,
                   {
                     fact: "未知线索触发的事实",
                     requiresClues: ["missing-clue"],
@@ -80,20 +80,20 @@ describe("case schema", () => {
   });
 
   it("rejects pressure rules that reference unknown contradictions", () => {
-    const wilfred = hammerOfGodCase.agents.find((agent) => agent.id === "wilfred");
-    if (!wilfred) {
-      throw new Error("Expected wilfred agent");
+    const middleton = huntersLodgeCase.agents.find((agent) => agent.id === "middleton");
+    if (!middleton) {
+      throw new Error("Expected middleton agent");
     }
 
     const result = caseSchema.safeParse({
-      ...hammerOfGodCase,
-      agents: hammerOfGodCase.agents.map((agent) =>
-        agent.id === "wilfred"
+      ...huntersLodgeCase,
+      agents: huntersLodgeCase.agents.map((agent) =>
+        agent.id === "middleton"
           ? {
-              ...wilfred,
+              ...middleton,
               pressureProfile: {
-                ...wilfred.pressureProfile,
-                increaseRules: wilfred.pressureProfile.increaseRules.map((rule, index) =>
+                ...middleton.pressureProfile,
+                increaseRules: middleton.pressureProfile.increaseRules.map((rule, index) =>
                   index === 0
                     ? { ...rule, contradictionIds: ["missing-contradiction"] }
                     : rule
@@ -121,10 +121,10 @@ describe("case schema", () => {
   it("rejects duplicate clue ids", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         clues: [
-          hammerOfGodCase.clues[0],
-          { ...hammerOfGodCase.clues[1], id: hammerOfGodCase.clues[0].id }
+          huntersLodgeCase.clues[0],
+          { ...huntersLodgeCase.clues[1], id: huntersLodgeCase.clues[0].id }
         ]
       })
     ).toThrow();
@@ -133,13 +133,13 @@ describe("case schema", () => {
   it("rejects duplicate accusation question ids", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         accusation: {
           questions: [
-            hammerOfGodCase.accusation.questions[0],
+            huntersLodgeCase.accusation.questions[0],
             {
-              ...hammerOfGodCase.accusation.questions[1],
-              id: hammerOfGodCase.accusation.questions[0].id
+              ...huntersLodgeCase.accusation.questions[1],
+              id: huntersLodgeCase.accusation.questions[0].id
             }
           ]
         }
@@ -149,10 +149,10 @@ describe("case schema", () => {
 
   it("rejects duplicate victim ids", () => {
     const result = caseSchema.safeParse({
-      ...hammerOfGodCase,
+      ...huntersLodgeCase,
       victims: [
-        hammerOfGodCase.victims[0],
-        { ...hammerOfGodCase.victims[0], name: "另一个受害者" }
+        huntersLodgeCase.victims[0],
+        { ...huntersLodgeCase.victims[0], name: "另一个受害者" }
       ]
     });
 
@@ -174,19 +174,19 @@ describe("case schema", () => {
   it("rejects blank required strings and blank accepted answers", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         title: "   "
       })
     ).toThrow();
 
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         accusation: {
           questions: [
             {
-              ...hammerOfGodCase.accusation.questions[0],
-              acceptedAnswers: ["威尔弗里德", "   "]
+              ...huntersLodgeCase.accusation.questions[0],
+              acceptedAnswers: ["佐伊和罗杰", "   "]
             }
           ]
         }
@@ -197,9 +197,9 @@ describe("case schema", () => {
   it("rejects truth.culprit when not found in agents", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         truth: {
-          ...hammerOfGodCase.truth,
+          ...huntersLodgeCase.truth,
           culprit: "unknown"
         }
       })
@@ -209,20 +209,20 @@ describe("case schema", () => {
   it("rejects truth.victim when not found in victims", () => {
     expect(() =>
       caseSchema.parse({
-        ...hammerOfGodCase,
+        ...huntersLodgeCase,
         truth: {
-          ...hammerOfGodCase.truth,
+          ...huntersLodgeCase.truth,
           victim: "unknown"
         }
       })
     ).toThrow();
   });
 
-  it("keeps the first clue observational rather than revealing the high-fall method", () => {
-    const firstClue = hammerOfGodCase.clues[0];
+  it("keeps the first clue observational rather than revealing the final culprit", () => {
+    const firstClue = huntersLodgeCase.clues[0];
 
-    expect(firstClue.text).not.toContain("高处坠落");
-    expect(firstClue.text).toContain("小锤很轻");
-    expect(firstClue.text).toContain("严重伤势不相称");
+    expect(firstClue.text).not.toContain("佐伊");
+    expect(firstClue.text).toContain("佩斯");
+    expect(firstClue.text).toContain("枪房");
   });
 });

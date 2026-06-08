@@ -63,34 +63,42 @@ export const initialConversations: Conversation[] = [
     messages: []
   },
   {
-    id: "wilfred",
-    targetId: "wilfred",
-    title: "威尔弗里德牧师",
-    subtitle: "死者的弟弟，村中牧师",
+    id: "japp",
+    targetId: "japp",
+    title: "贾普探长",
+    subtitle: "负责现场调查的苏格兰场探长",
     isExpanded: false,
     messages: []
   },
   {
-    id: "simeon",
-    targetId: "simeon",
-    title: "铁匠西米恩",
-    subtitle: "村中铁匠，表面嫌疑人",
+    id: "middleton",
+    targetId: "middleton",
+    title: "米德尔顿太太",
+    subtitle: "猎人小屋新来的女管家证词模块",
     isExpanded: false,
     messages: []
   },
   {
-    id: "elizabeth",
-    targetId: "elizabeth",
-    title: "伊丽莎白",
-    subtitle: "铁匠妻子",
+    id: "poirot",
+    targetId: "poirot",
+    title: "赫尔克里·波洛",
+    subtitle: "留在伦敦远程指挥调查的侦探",
     isExpanded: false,
     messages: []
   },
   {
-    id: "joe",
-    targetId: "joe",
-    title: "疯乔",
-    subtitle: "村中边缘人",
+    id: "roger",
+    targetId: "roger",
+    title: "罗杰·哈弗林",
+    subtitle: "死者的亲属，声称案发时已回到伦敦",
+    isExpanded: false,
+    messages: []
+  },
+  {
+    id: "zoe",
+    targetId: "zoe",
+    title: "佐伊·哈弗林",
+    subtitle: "罗杰的妻子，案发时留在猎人小屋",
     isExpanded: false,
     messages: []
   }

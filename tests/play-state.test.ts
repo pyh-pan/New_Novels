@@ -67,14 +67,14 @@ describe("play state persistence", () => {
       caseId: "hunters-lodge",
       currentChapterId: "chapter-2",
       agentSessions: {
-        wilfred: {
-          caseId: "hammer-of-god",
-          agentId: "wilfred",
-          conversationId: "wilfred",
-          pressureLevel: 3,
-          revealedFactIds: ["fact-wilfred-denies-tower"],
-          lastTopics: ["钟楼"],
-          triggeredPressureRules: ["wilfred-tower-contradiction"],
+        middleton: {
+          caseId: "hunters-lodge",
+          agentId: "middleton",
+          conversationId: "middleton",
+          pressureLevel: 6,
+          revealedFactIds: ["fact-middleton-visitor-story"],
+          lastTopics: ["介绍所"],
+          triggeredPressureRules: ["middleton-origin-pressure"],
           currentActAgentState: "guarded",
           mood: "guarded"
         }
@@ -99,8 +99,8 @@ describe("play state persistence", () => {
     });
 
     expect(normalized.currentChapterId).toBe("chapter-2");
-    expect(normalized.agentSessions.wilfred?.pressureLevel).toBe(3);
-    expect(normalized.agentSessions.wilfred?.mood).toBe("guarded");
+    expect(normalized.agentSessions.middleton?.pressureLevel).toBe(6);
+    expect(normalized.agentSessions.middleton?.mood).toBe("guarded");
     expect(normalized.notes[0]).toMatchObject({
       id: "note-1",
       title: "旧笔记",
@@ -135,7 +135,7 @@ describe("play state persistence", () => {
   test("resets saved state when switching cases", () => {
     const normalized = normalizePlayState({
       version: 1,
-      caseId: "hammer-of-god",
+      caseId: "old-case",
       currentChapterId: "chapter-2",
       notes: [{ id: "old", title: "旧案", text: "正文", tag: "clue" }]
     });

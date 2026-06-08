@@ -63,7 +63,7 @@ test("deletes notes only after confirmation", () => {
     {
       id: "note-1",
       title: "线索",
-      text: "小锤很轻",
+      text: "左轮少了一支",
       tag: "clue",
       source: "调查助手",
       createdAt: "2026-04-29T00:00:00.000Z",
@@ -71,7 +71,10 @@ test("deletes notes only after confirmation", () => {
     }
   ]);
 
-  fireEvent.click(screen.getByRole("button", { name: "删除笔记：线索" }));
+  const deleteButton = screen.getByRole("button", { name: "删除笔记：线索，调查助手" });
+  expect(deleteButton).not.toHaveTextContent("删除");
+
+  fireEvent.click(deleteButton);
   expect(screen.getByRole("dialog", { name: "删除这条笔记？" })).toBeInTheDocument();
   expect(view.handlers.onDeleteNote).not.toHaveBeenCalled();
 
@@ -94,6 +97,34 @@ test("renders quoted source text as a collapsible reference", () => {
   ]);
 
   expect(screen.getByDisplayValue("这里可能是时间线的关键。")).toBeInTheDocument();
-  expect(screen.getByText("查看引用")).toBeInTheDocument();
+  expect(screen.getByText("第一章")).toBeInTheDocument();
   expect(screen.getByText("黑斯廷斯在病榻上收到请托。")).toBeInTheDocument();
+});
+
+test("note body textarea grows to match edited content", () => {
+  const view = renderNotebook([
+    {
+      id: "note-auto-height",
+      title: "线索",
+      text: "一行",
+      tag: "clue",
+      source: "手动记录",
+      createdAt: "2026-04-29T00:00:00.000Z",
+      updatedAt: "2026-04-29T00:00:00.000Z"
+    }
+  ]);
+  const textarea = screen.getByLabelText("笔记正文") as HTMLTextAreaElement;
+  Object.defineProperty(textarea, "scrollHeight", {
+    configurable: true,
+    value: 72
+  });
+
+  expect(textarea).toHaveAttribute("rows", "1");
+
+  fireEvent.change(textarea, { target: { value: "第一行\n第二行\n第三行" } });
+
+  expect(textarea.style.height).toBe("72px");
+  expect(view.handlers.onUpdateNote).toHaveBeenCalledWith("note-auto-height", {
+    text: "第一行\n第二行\n第三行"
+  });
 });

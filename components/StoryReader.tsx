@@ -3,6 +3,7 @@
 import { type CSSProperties, type MouseEvent, useEffect, useRef, useState } from "react";
 import SelectionCommentPopover, {
   getSelectionWithin,
+  restoreSelectionCommentHighlights,
   type SelectionCommentPayload,
   type SelectionCommentTarget
 } from "./SelectionCommentPopover";
@@ -21,6 +22,7 @@ type StoryReaderProps = {
   currentChapterId: string;
   onChapterChange: (chapterId: string) => void;
   onCommentSelection?: (payload: SelectionCommentPayload) => void;
+  annotations?: SelectionCommentPayload[];
 };
 
 export default function StoryReader({
@@ -29,7 +31,8 @@ export default function StoryReader({
   chapters,
   currentChapterId,
   onChapterChange,
-  onCommentSelection
+  onCommentSelection,
+  annotations = []
 }: StoryReaderProps) {
   const chapter =
     getChapterById(chapters, currentChapterId) ?? getChapterById(chapters, "chapter-1");
@@ -49,6 +52,26 @@ export default function StoryReader({
   useEffect(() => {
     setLayoutMeta(prepareChapterLayout(chapter?.body ?? [], 680, 34));
   }, [chapter]);
+
+  useEffect(() => {
+    scrollReaderToTop();
+  }, [currentChapterId]);
+
+  const currentSource = chapter
+    ? `${storyTitle ?? sourceTitle} · ${chapter.subtitle ?? chapter.title}`
+    : "";
+
+  useEffect(() => {
+    if (!chapter || !storyTextRef.current || !currentSource) {
+      return;
+    }
+
+    restoreSelectionCommentHighlights(
+      [storyTextRef.current],
+      annotations.filter((annotation) => annotation.source === currentSource),
+      currentSource
+    );
+  }, [annotations, chapter, currentSource]);
 
   useEffect(() => {
     return () => {
@@ -78,6 +101,25 @@ export default function StoryReader({
     hideTimer.current = setTimeout(() => setNavVisible(false), 2800);
   };
 
+  function scrollReaderToTop() {
+    const resetScroll = () => {
+      if (readerRef.current) {
+        readerRef.current.scrollTop = 0;
+      }
+    };
+
+    resetScroll();
+    window.requestAnimationFrame(resetScroll);
+    window.setTimeout(resetScroll, 50);
+  }
+
+  function changeChapter(chapterId: string, event: MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+    event.currentTarget.blur();
+    setNavVisible(false);
+    onChapterChange(chapterId);
+  }
+
   const handleReaderMouseUp = (event: MouseEvent<HTMLElement>) => {
     const target = event.target;
     if (target instanceof HTMLElement && target.closest("button, input, textarea, select, a")) {
@@ -93,7 +135,7 @@ export default function StoryReader({
         setNavVisible(false);
         setCommentTarget({
           ...selection,
-          source: `${storyTitle ?? sourceTitle} · ${chapter.subtitle ?? chapter.title}`
+          source: currentSource
         });
         return;
       }
@@ -129,10 +171,7 @@ export default function StoryReader({
           <button
             type="button"
             disabled={!previous}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (previous) onChapterChange(previous.id);
-            }}
+            onClick={(event) => previous && changeChapter(previous.id, event)}
           >
             前一章
           </button>
@@ -140,10 +179,7 @@ export default function StoryReader({
           <button
             type="button"
             disabled={!next}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (next) onChapterChange(next.id);
-            }}
+            onClick={(event) => next && changeChapter(next.id, event)}
           >
             后一章
           </button>
@@ -165,20 +201,14 @@ export default function StoryReader({
         <button
           type="button"
           disabled={!previous}
-          onClick={(event) => {
-            event.stopPropagation();
-            if (previous) onChapterChange(previous.id);
-          }}
+          onClick={(event) => previous && changeChapter(previous.id, event)}
         >
           前一章
         </button>
         <button
           type="button"
           disabled={!next}
-          onClick={(event) => {
-            event.stopPropagation();
-            if (next) onChapterChange(next.id);
-          }}
+          onClick={(event) => next && changeChapter(next.id, event)}
         >
           后一章
         </button>
