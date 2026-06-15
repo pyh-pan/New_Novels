@@ -76,6 +76,13 @@ function getReviewReference(draft: StudioDraftView, node: StudioTreeNode): Revie
     };
   }
 
+  if (node.type === "events") {
+    return {
+      summary: "故事事件",
+      excerpt: compactText(draft.storyEvents.map((event) => `${event.title}：${event.designRationale}`).join(" "))
+    };
+  }
+
   if (node.type === "acts") {
     return {
       summary: "多幕推进",
@@ -118,7 +125,7 @@ function getReviewReference(draft: StudioDraftView, node: StudioTreeNode): Revie
 
   return {
     summary: "案件控制台",
-    excerpt: `章节 ${draft.stats.chapters}，角色 ${draft.stats.agents}，线索 ${draft.stats.clues}，矛盾 ${draft.stats.contradictions}。`
+    excerpt: `章节 ${draft.stats.chapters}，角色 ${draft.stats.agents}，线索 ${draft.stats.clues}，矛盾 ${draft.stats.contradictions}，事件 ${draft.stats.storyEvents}。`
   };
 }
 
@@ -502,6 +509,21 @@ function Inspector({
     );
   }
 
+  if (nodeType === "events") {
+    return (
+      <CollectionPage title="故事事件" items={draft.storyEvents.map((event) => ({
+        title: event.title,
+        meta: `${event.kind} / ${event.timing}`,
+        details: [
+          event.description,
+          ...event.trigger,
+          ...event.effects,
+          `设计理由：${event.designRationale}`
+        ]
+      }))} />
+    );
+  }
+
   if (nodeType === "acts") {
     return (
       <CollectionPage title="多幕推进" items={draft.acts.map((act) => ({
@@ -583,6 +605,7 @@ function Inspector({
         <Stat label="角色" value={draft.stats.agents} />
         <Stat label="线索" value={draft.stats.clues} />
         <Stat label="矛盾" value={draft.stats.contradictions} />
+        <Stat label="事件" value={draft.stats.storyEvents} />
         <Stat label="幕" value={draft.stats.acts} />
         <Stat label="最终问题" value={draft.stats.accusationQuestions} />
       </dl>

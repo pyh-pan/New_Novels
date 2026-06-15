@@ -175,6 +175,10 @@ async function loadCaseFileFromSplitDirectory(directory: string): Promise<CaseFi
     directory,
     "acts/gates.json"
   );
+  const storyEvents = await readJsonFile<CaseFileInput["storyEvents"]>(
+    directory,
+    "events/story-events.json"
+  );
   const facts = await readJsonFile<CaseFileInput["facts"]>(directory, "facts/facts.json");
   const scenes = await readJsonFile<CaseFileInput["scenes"]>(directory, "scenes/scenes.json");
   const clues = await readJsonFile<CaseFileInput["clues"]>(directory, "clues/clues.json");
@@ -206,6 +210,7 @@ async function loadCaseFileFromSplitDirectory(directory: string): Promise<CaseFi
     chapters,
     acts,
     actGates,
+    storyEvents,
     scenes,
     facts,
     relationships,
@@ -242,6 +247,7 @@ function loadCaseFileFromReader(reader: CasePackageFileReader): CaseFileInput {
     chapters,
     acts: reader.readJson("acts/acts.json"),
     actGates: reader.readJson("acts/gates.json"),
+    storyEvents: reader.readJson("events/story-events.json"),
     scenes: reader.readJson("scenes/scenes.json"),
     facts: reader.readJson("facts/facts.json"),
     relationships: reader.readJson("relationships/relationships.json"),

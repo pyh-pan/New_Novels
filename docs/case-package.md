@@ -25,6 +25,7 @@ agents/<agent-id>.json
 facts/facts.json
 acts/acts.json
 acts/gates.json
+events/story-events.json
 scenes/scenes.json
 clues/clues.json
 relationships/relationships.json
@@ -168,7 +169,21 @@ validateCasePackageDirectory("cases/hunters-lodge")
 - 压力模型；
 - 揭示规则；
 - 剧情幕和 act gate；
+- 故事事件 `storyEvents`，区分即时结果、角色状态变化、故事节拍和幕推进；
 - 最终指认问题。
+
+## 故事事件（storyEvents）
+
+`storyEvents` 记录推理小说动作在互动案件中的因果设计。它不模拟现实耗时；只有玩家行为造成角色、证据、场景或调查阶段变化时，才需要推进故事节拍。
+
+事件类型：
+
+- `instant-result`：查账单、查登记、查时刻表、查介绍所、核实电报或俱乐部签到。玩家想到要查即可获得结果，`timing` 为 `none`。
+- `agent-state-change`：玩家暴露怀疑、展示矛盾或告诉 NPC 某条事实，导致 NPC 防御、慌张、改口或改变后续回答。
+- `story-beat`：NPC 消失、证据移动、波洛电报改变调查方向、场景开放等世界状态变化。
+- `act-transition`：阶段性调查完成后进入新幕，应与 `actGates` 的进入条件对齐。
+
+不要因为原文写“过了两天”就创建等待。时间设计只服务于因果顺序、角色反应、机会窗口和调查阶段变化。
 
 ## Zip 导入
 

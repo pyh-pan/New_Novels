@@ -71,4 +71,33 @@ describe("new novels case adapter skill contract", () => {
     expect(workflow).toContain("发行级");
     expect(workflow).toContain("读者-玩家双重验收");
   });
+
+  it("requires story event classification for time and consequence design", () => {
+    const skill = readFileSync(join(skillRoot, "SKILL.md"), "utf8");
+    const packageReference = readFileSync(
+      join(skillRoot, "references", "case-package-v1.md"),
+      "utf8"
+    );
+    const workflow = readFileSync(
+      join(skillRoot, "references", "novel-to-case-workflow.md"),
+      "utf8"
+    );
+    const checker = readFileSync(
+      join(skillRoot, "scripts", "check_case_package_refs.mjs"),
+      "utf8"
+    );
+
+    for (const text of [skill, packageReference, workflow]) {
+      expect(text).toContain("storyEvents");
+      expect(text).toContain("instant-result");
+      expect(text).toContain("agent-state-change");
+      expect(text).toContain("story-beat");
+      expect(text).toContain("act-transition");
+    }
+    expect(skill).toContain("查账单");
+    expect(skill).toContain("不推进故事时间");
+    expect(workflow).toContain("因果顺序");
+    expect(checker).toContain("storyEvents");
+    expect(checker).toContain("events/story-events.json");
+  });
 });

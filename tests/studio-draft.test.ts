@@ -13,6 +13,7 @@ describe("studio draft view", () => {
       "agents",
       "clues",
       "contradictions",
+      "events",
       "acts",
       "accusation",
       "validation"
@@ -20,8 +21,13 @@ describe("studio draft view", () => {
     expect(view.stats).toMatchObject({
       chapters: 3,
       agents: 6,
-      acts: 3
+      acts: 3,
+      storyEvents: expect.any(Number)
     });
+    expect(view.stats.storyEvents).toBeGreaterThan(0);
+    expect(view.storyEvents.map((event) => event.kind)).toEqual(
+      expect.arrayContaining(["instant-result", "story-beat"])
+    );
     expect(view.chapters[1]).toMatchObject({
       title: "猎人小屋疑案",
       subtitle: "第二章 荒原上的枪声"

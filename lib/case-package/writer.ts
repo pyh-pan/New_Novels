@@ -48,6 +48,7 @@ function writeSplitCaseFile(caseFile: CaseFile, directory: string) {
   writeJson(join(/* turbopackIgnore: true */ directory, "facts", "facts.json"), caseFile.facts);
   writeJson(join(/* turbopackIgnore: true */ directory, "acts", "acts.json"), caseFile.acts);
   writeJson(join(/* turbopackIgnore: true */ directory, "acts", "gates.json"), caseFile.actGates);
+  writeJson(join(/* turbopackIgnore: true */ directory, "events", "story-events.json"), caseFile.storyEvents);
   writeJson(join(/* turbopackIgnore: true */ directory, "scenes", "scenes.json"), caseFile.scenes);
   writeJson(join(/* turbopackIgnore: true */ directory, "clues", "clues.json"), caseFile.clues);
   writeJson(join(/* turbopackIgnore: true */ directory, "relationships", "relationships.json"), caseFile.relationships);
@@ -65,6 +66,7 @@ export function writeCasePackageToDirectorySync(pkg: CasePackage, directory: str
     "agents",
     "facts",
     "acts",
+    "events",
     "scenes",
     "clues",
     "relationships",

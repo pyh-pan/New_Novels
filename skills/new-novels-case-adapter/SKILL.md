@@ -39,6 +39,7 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - `facts/facts.json`
 - `acts/acts.json`
 - `acts/gates.json`
+- `events/story-events.json`
 - `scenes/scenes.json`
 - `clues/clues.json`
 - `relationships/relationships.json`
@@ -69,6 +70,8 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - 每个 id 稳定、小写、连字符化且有意义，例如 `fact-bell-tower-shadow`、`clue-light-hammer`、`act-opening`。
 - 优先少量强线索，而不是大量模糊线索。每条线索都应帮助玩家提出更好的问题、发现矛盾或回答最终指认。
 - 多幕设计是游戏结构，不是章节分页。每一幕需要 required discoveries、scene goals，以及能证明下一幕为何解锁的 `ActGate`。
+- 为小说中的行动后果生成 `storyEvents`。不要按现实耗时设计游戏时间；查账单、查登记、查时刻表、核实俱乐部签到等纯记录核查应是 `instant-result`，`timing: "none"`，不推进故事时间。只有玩家行为导致 NPC 行为、证据状态、角色可用性或调查阶段变化时，才使用事件推进。
+- `storyEvents` 必须分为四类：`instant-result`（玩家提出正确调查方向后立即获得记录或事实）、`agent-state-change`（玩家暴露怀疑或拿出证据后 NPC 变得防御/慌张/改口）、`story-beat`（NPC 消失、证据被移动、外部电报改变调查方向等世界状态变化）、`act-transition`（调查阶段打开或关闭）。
 - 为每个 NPC 生成 runtime 行为。`pressureProfile`、`emotionalArc`、`confrontationTriggers`、`confessionBoundary` 和 `styleAnchors` 必须来自源文本中的角色功能与性格，而不是固定模板。
 - 案件包组装后必须运行 `editorial pass`。修订章节文本的文学连续性、叙述声音、节奏、场景质感和读者信任。
 - 交付前必须运行 `reader-player validation`：先判断故事不依赖调查 UI 时是否值得阅读，再判断隐藏调查内容是否能通过游玩发现。
@@ -103,10 +106,11 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
    - 为每一幕定义玩家目标、required discoveries、可用 NPC、scene goals，以及解锁下一幕的 `ActGate`。
 
 5. **建立调查抽取映射**
-   - 每个 `investigation-hide` 片段至少要变成一个可玩入口：`scene.interactableObjects`、`clues`、`facts`、`agent.revealRules`、`contradictions` 或 `actGates`。
+   - 每个 `investigation-hide` 片段至少要变成一个可玩入口：`scene.interactableObjects`、`clues`、`facts`、`agent.revealRules`、`contradictions`、`storyEvents` 或 `actGates`。
    - 每个 `deduction-hide` 片段要变成后期矛盾、压力揭示、最终指认问题或通关后解释。
    - 每个隐藏线索都必须回答：谁能揭示、在哪里观察、什么话题解锁、支持玩家什么行动。
    - 如果隐藏信息没有可玩发现路径，继续前必须添加场景 / NPC 路径，或在故事文本中暴露非剧透版本。
+   - 对每个原文行动判断是否需要时间或事件：只获得资料就是 `instant-result`；让某个 NPC 知道玩家掌握了什么就是 `agent-state-change`；造成世界状态变化就是 `story-beat`；打开新调查阶段就是 `act-transition`。
 
 6. **重写阅读章节**
    - 在权利允许范围内保留尽可能多的 `story-keep` 文本；翻译或轻改，而不是摘要化。
@@ -146,12 +150,20 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
     - Act gate 应要求真实调查进展，而不是任意关键词猜测。
     - 解锁叙事应告诉玩家发生了什么变化，但不剧透完整解答。
 
-12. **构建最终指认**
+12. **构建 storyEvents**
+    - 为源文本中所有侦探行动建立因果分类，而不是照搬“过了两天”“稍后”等小说压缩时间。
+    - `instant-result`：查账单、查档案、查介绍所、查车站记录、核实电报、核实俱乐部签到。这类事件的价值是玩家想到要查；结果可以即时返回，`timing` 必须是 `none`。
+    - `agent-state-change`：玩家向 NPC 暴露怀疑、展示矛盾或告诉某人某条事实，导致对方后续语气、撒谎策略或 reveal rules 变化。
+    - `story-beat`：玩家或导师的某个行为触发角色离场、证据移动、警方行动、波洛电报或新场景出现。这类事件才推进故事节拍。
+    - `act-transition`：玩家完成阶段性 required discoveries 后进入新幕。它应与 `ActGate` 对齐，但用 `storyEvents` 解释为什么这是调查结构变化。
+    - 每个事件都必须写明 `designRationale`，说明为什么需要或不需要推进故事时间。
+
+13. **构建最终指认**
     - 包含覆盖真凶、手法、决定性矛盾 / 证据和动机的问题。
     - accepted answers 应包含常见变体、别名和简洁转述。
     - explanation 应在成功或失败处理后揭示标准真相。
 
-13. **校验和修复**
+14. **校验和修复**
     - 当包已接入代码时，运行仓库测试。
     - 对独立 package JSON 或 package directory，运行本 skill 的 `scripts/check_case_package_refs.mjs` 做引用完整性快速检查。
     - 交付前修复重复 id、缺失引用、缺失 general agent、真相覆盖不足、剧透泄露、缺失压力模型和缺失 ActGates。
@@ -168,6 +180,7 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - 指认问题覆盖所有核心真相组成。
 - 每个 NPC 具备 runtime-ready 的 pressureProfile、emotionalArc、confrontationTriggers、confessionBoundary 和 styleAnchors。
 - 每个非最终幕都有包含 required discoveries 和非剧透 unlock narrative 的 ActGate。
+- `storyEvents` 覆盖纯信息获取、NPC 状态变化、故事节拍和幕推进；纯记录核查不得被设计成等待或时间门槛。
 - 普通 NPC 无法通过正常对话揭示完整解答。
 - 故事文本不包含 UI 指令。
 - 故事读起来像 `publication-grade` 产品样章，而不是 demo、梗概、大纲或设计说明。
@@ -193,5 +206,7 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - accepted answers 过于严格，导致正确的人类回答失败。
 - 把氛围当证据。只有结构化 facts 和 clues 能驱动最终判断。
 - 按文本长度而不是调查状态拆分 acts。
+- 把查账单、查档案、查介绍所这类纯信息获取做成等待任务，误把现实耗时当成故事推进。
+- 缺少 `agent-state-change` 或 `story-beat`，导致玩家暴露怀疑后 NPC 和世界仍像静态问答库。
 - 给每个 NPC 相同的压力阈值和情绪行为。
 - 创建依赖任意话题而非 required discoveries 的 ActGates。

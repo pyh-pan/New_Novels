@@ -5,6 +5,18 @@ export const nonEmptyString = z.string().trim().min(1);
 export const noteTagSchema = z.enum(["clue", "testimony", "doubt", "contradiction"]);
 export const revealModeSchema = z.enum(["direct", "reluctant", "evasive", "partial"]);
 export const factVisibilitySchema = z.enum(["public", "private", "truth", "unlocked"]);
+export const storyEventKindSchema = z.enum([
+  "instant-result",
+  "agent-state-change",
+  "story-beat",
+  "act-transition"
+]);
+export const storyEventTimingSchema = z.enum([
+  "none",
+  "immediate",
+  "story-beat",
+  "act-transition"
+]);
 export const lieStrategySchema = z.enum([
   "deny",
   "deflect",
@@ -214,6 +226,37 @@ export const actGateSchema = z.object({
   unlockNarrative: nonEmptyString
 });
 
+export const storyEventTriggerSchema = z.object({
+  requiresAct: nonEmptyString.optional(),
+  agentId: nonEmptyString.optional(),
+  topics: z.array(nonEmptyString).default([]),
+  requiredClueIds: z.array(nonEmptyString).default([]),
+  requiredFactIds: z.array(nonEmptyString).default([]),
+  requiredContradictionIds: z.array(nonEmptyString).default([]),
+  requiredNpcInteractions: z.array(nonEmptyString).default([]),
+  requiredSceneInteractions: z.array(nonEmptyString).default([])
+});
+
+export const storyEventEffectSchema = z.object({
+  revealedFactIds: z.array(nonEmptyString).default([]),
+  revealedClueIds: z.array(nonEmptyString).default([]),
+  revealedContradictionIds: z.array(nonEmptyString).default([]),
+  targetAgentIds: z.array(nonEmptyString).default([]),
+  nextActId: nonEmptyString.optional(),
+  narrative: nonEmptyString
+});
+
+export const storyEventSchema = z.object({
+  id: nonEmptyString,
+  kind: storyEventKindSchema,
+  title: nonEmptyString,
+  description: nonEmptyString,
+  timing: storyEventTimingSchema,
+  trigger: storyEventTriggerSchema,
+  effects: storyEventEffectSchema,
+  designRationale: nonEmptyString
+});
+
 export const sceneSchema = z.object({
   id: nonEmptyString,
   actId: nonEmptyString,
@@ -259,6 +302,7 @@ const baseCaseSchema = z.object({
   chapters: z.array(storyChapterSchema).min(1),
   acts: z.array(actSchema).min(1),
   actGates: z.array(actGateSchema).default([]),
+  storyEvents: z.array(storyEventSchema).default([]),
   scenes: z.array(sceneSchema).min(1),
   facts: z.array(factSchema).min(1),
   relationships: z.array(agentRelationshipSchema).default([]),
@@ -300,6 +344,7 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
   const actIds = caseFile.acts.map((act) => act.id);
   const sceneIds = caseFile.scenes.map((scene) => scene.id);
   const actGateIds = caseFile.actGates.map((gate) => gate.id);
+  const storyEventIds = caseFile.storyEvents.map((event) => event.id);
   const chapterIds = caseFile.chapters.map((chapter) => chapter.id);
   const questionIds = caseFile.accusation.questions.map((question) => question.id);
   const victimIds = caseFile.victims.map((victim) => victim.id);
@@ -326,6 +371,10 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
 
   if (hasDuplicates(actGateIds)) {
     addDuplicateIssue(context, ["actGates"], "Act gate");
+  }
+
+  if (hasDuplicates(storyEventIds)) {
+    addDuplicateIssue(context, ["storyEvents"], "Story event");
   }
 
   if (hasDuplicates(chapterIds)) {
@@ -470,6 +519,82 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
     });
   });
 
+  caseFile.storyEvents.forEach((event, eventIndex) => {
+    const expectedTimingByKind = {
+      "instant-result": "none",
+      "agent-state-change": "immediate",
+      "story-beat": "story-beat",
+      "act-transition": "act-transition"
+    } as const;
+    const expectedTiming = expectedTimingByKind[event.kind];
+
+    if (event.timing !== expectedTiming) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["storyEvents", eventIndex, "timing"],
+        message: "Story event timing must match its kind"
+      });
+    }
+
+    if (event.trigger.requiresAct) {
+      checkActRef(["storyEvents", eventIndex, "trigger", "requiresAct"], event.trigger.requiresAct);
+    }
+    if (event.trigger.agentId) {
+      checkAgentRef(["storyEvents", eventIndex, "trigger", "agentId"], event.trigger.agentId);
+    }
+    event.trigger.requiredClueIds.forEach((clueId, clueIndex) => {
+      checkClueRef(["storyEvents", eventIndex, "trigger", "requiredClueIds", clueIndex], clueId);
+    });
+    event.trigger.requiredFactIds.forEach((factId, factIndex) => {
+      if (!factIds.includes(factId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["storyEvents", eventIndex, "trigger", "requiredFactIds", factIndex],
+          message: "Story event fact references must match fact ids"
+        });
+      }
+    });
+    event.trigger.requiredContradictionIds.forEach((contradictionId, contradictionIndex) => {
+      if (!caseFile.contradictions.some((item) => item.id === contradictionId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["storyEvents", eventIndex, "trigger", "requiredContradictionIds", contradictionIndex],
+          message: "Story event contradiction references must match contradiction ids"
+        });
+      }
+    });
+    event.trigger.requiredNpcInteractions.forEach((agentId, agentIndex) => {
+      checkAgentRef(["storyEvents", eventIndex, "trigger", "requiredNpcInteractions", agentIndex], agentId);
+    });
+    event.effects.revealedFactIds.forEach((factId, factIndex) => {
+      if (!factIds.includes(factId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["storyEvents", eventIndex, "effects", "revealedFactIds", factIndex],
+          message: "Story event fact references must match fact ids"
+        });
+      }
+    });
+    event.effects.revealedClueIds.forEach((clueId, clueIndex) => {
+      checkClueRef(["storyEvents", eventIndex, "effects", "revealedClueIds", clueIndex], clueId);
+    });
+    event.effects.revealedContradictionIds.forEach((contradictionId, contradictionIndex) => {
+      if (!caseFile.contradictions.some((item) => item.id === contradictionId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["storyEvents", eventIndex, "effects", "revealedContradictionIds", contradictionIndex],
+          message: "Story event contradiction references must match contradiction ids"
+        });
+      }
+    });
+    event.effects.targetAgentIds.forEach((agentId, agentIndex) => {
+      checkAgentRef(["storyEvents", eventIndex, "effects", "targetAgentIds", agentIndex], agentId);
+    });
+    if (event.effects.nextActId) {
+      checkActRef(["storyEvents", eventIndex, "effects", "nextActId"], event.effects.nextActId);
+    }
+  });
+
   caseFile.scenes.forEach((scene, sceneIndex) => {
     checkActRef(["scenes", sceneIndex, "actId"], scene.actId);
     scene.observableFactIds.forEach((factId, factIndex) => {
@@ -565,6 +690,8 @@ export const caseSchema = baseCaseSchema.superRefine((caseFile, context) => {
 export type NoteTag = z.infer<typeof noteTagSchema>;
 export type RevealMode = z.infer<typeof revealModeSchema>;
 export type FactVisibility = z.infer<typeof factVisibilitySchema>;
+export type StoryEventKind = z.infer<typeof storyEventKindSchema>;
+export type StoryEventTiming = z.infer<typeof storyEventTimingSchema>;
 export type LieStrategy = z.infer<typeof lieStrategySchema>;
 export type GlobalContext = z.infer<typeof globalContextSchema>;
 export type CaseFile = z.infer<typeof caseSchema>;
@@ -573,6 +700,7 @@ export type CaseFact = z.infer<typeof factSchema>;
 export type StoryChapter = z.infer<typeof storyChapterSchema>;
 export type CaseAct = z.infer<typeof actSchema>;
 export type ActGate = z.infer<typeof actGateSchema>;
+export type StoryEvent = z.infer<typeof storyEventSchema>;
 export type CaseScene = z.infer<typeof sceneSchema>;
 export type AgentRelationship = z.infer<typeof agentRelationshipSchema>;
 export type InformationPropagationRule = z.infer<typeof informationPropagationRuleSchema>;

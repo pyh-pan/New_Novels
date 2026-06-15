@@ -157,7 +157,33 @@ function modelJsonInstruction() {
     "title": string,
     "detail": string
   }],
-  "caseFile": case-package/v1 的完整 case.json 内联结构
+  "caseFile": case-package/v1 的完整 case.json 内联结构，必须包含 storyEvents。storyEvents 每项包含：
+  {
+    "id": string,
+    "kind": "instant-result" | "agent-state-change" | "story-beat" | "act-transition",
+    "title": string,
+    "description": string,
+    "timing": "none" | "immediate" | "story-beat" | "act-transition",
+    "trigger": {
+      "requiresAct"?: string,
+      "agentId"?: string,
+      "topics": string[],
+      "requiredClueIds": string[],
+      "requiredFactIds": string[],
+      "requiredContradictionIds": string[],
+      "requiredNpcInteractions": string[],
+      "requiredSceneInteractions": string[]
+    },
+    "effects": {
+      "revealedFactIds": string[],
+      "revealedClueIds": string[],
+      "revealedContradictionIds": string[],
+      "targetAgentIds": string[],
+      "nextActId"?: string,
+      "narrative": string
+    },
+    "designRationale": string
+  }
 }`;
 }
 
@@ -183,14 +209,16 @@ export function buildSourceAdaptationMessages(source: SourceDocument): AIMessage
 2. Source Segmentation Pass：把原文片段标为 story-keep、investigation-hide、deduction-hide、solution-lock、bridge-rewrite。
 3. Fair-Play Spine：提取受害者、真凶、动机、方法、时间线、决定性证据、必要误导。
 4. Adaptive Design：根据原文而不是模板决定章节、幕、agent、场景、线索、矛盾、推进门槛和最终指认。
-5. Publication Rewrite：正文必须是成熟中文样章，不能是剧情摘要；隐藏探案段落后必须补足连贯性。
-6. Agent Design：每个 NPC 的性格、压力水平、隐瞒边界、撒谎习惯、揭示规则都必须来自原文角色特征。
-7. Strict Validation：所有 id 引用必须一致；general agent 必须存在；truth.culprit 必须是 agent id；truth.victim 必须是 victim id；不能编造没有原文支撑的核心事实。
+5. Story Event Design：为原文中的行动后果建立 storyEvents。查账单、查登记、查时刻表等纯记录核查使用 instant-result，timing 必须是 none，不推进故事时间；玩家暴露怀疑导致 NPC 防御使用 agent-state-change；NPC 消失、证据被移动、波洛电报改变调查方向等世界状态变化使用 story-beat；调查阶段打开使用 act-transition。
+6. Publication Rewrite：正文必须是成熟中文样章，不能是剧情摘要；隐藏探案段落后必须补足连贯性。
+7. Agent Design：每个 NPC 的性格、压力水平、隐瞒边界、撒谎习惯、揭示规则都必须来自原文角色特征。
+8. Strict Validation：所有 id 引用必须一致；general agent 必须存在；truth.culprit 必须是 agent id；truth.victim 必须是 victim id；不能编造没有原文支撑的核心事实。
 
 质量底线：
 - 如果原文缺少明确真相，必须在 qualityReport 中标 fatal，不能硬编。
 - 如果 PDF/OCR 或截断导致信息不足，必须在 qualityReport 中标 warning/fatal。
 - 输出的 caseFile 必须能被现有 case schema 直接解析。
+- caseFile.storyEvents 必须覆盖调查动作的因果顺序，且不能把现实耗时误当成游戏时间机制。
 - 所有面向读者的正文、agent 内容、线索内容必须使用中文。
 
 ${modelJsonInstruction()}`

@@ -1,0 +1,224 @@
+[
+  {
+    "id": "event-verify-roger-alibi",
+    "kind": "instant-result",
+    "title": "核实罗杰的不在场证明",
+    "description": "玩家追问火车、伦敦俱乐部或铁路记录时，贾普可以直接给出罗杰行踪已被核实的结果。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "agentId": "japp",
+      "topics": ["罗杰", "火车", "伦敦", "俱乐部", "不在场证明"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-roger-train-alibi"],
+      "revealedClueIds": ["clue-roger-alibi"],
+      "targetAgentIds": ["japp", "roger"],
+      "narrative": "贾普核实过罗杰的火车和伦敦俱乐部行踪；这条记录可以直接作为已知信息，而不是等待事件。"
+    },
+    "designRationale": "铁路账单或俱乐部签到的价值在于玩家想到核实不在场证明，现实耗时不构成有意义的故事推进。"
+  },
+  {
+    "id": "event-check-middleton-agency",
+    "kind": "instant-result",
+    "title": "核查米德尔顿的介绍所来源",
+    "description": "玩家质疑女管家来源或介绍所登记时，贾普可直接提供介绍所否认派人的核查结果。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "japp",
+      "topics": ["米德尔顿", "介绍所", "女管家", "来源"],
+      "requiredClueIds": ["clue-middleton-vanished"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-agency-denies-middleton"],
+      "revealedClueIds": ["clue-agency-denial"],
+      "targetAgentIds": ["japp", "poirot"],
+      "narrative": "介绍所没有派出过名叫米德尔顿太太的女管家。"
+    },
+    "designRationale": "介绍所核查是纯信息获取；不需要让玩家等待，只需要玩家提出正确调查方向。"
+  },
+  {
+    "id": "event-check-middleton-transport",
+    "kind": "instant-result",
+    "title": "核查女管家的到达路线",
+    "description": "玩家追问米德尔顿如何抵达偏僻猎人小屋时，贾普直接给出车站、马车和车行均无记录的结果。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "japp",
+      "topics": ["交通", "车站", "马车", "车行", "到达"],
+      "requiredClueIds": ["clue-agency-denial"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-middleton-no-transport"],
+      "revealedClueIds": ["clue-transport-gap"],
+      "targetAgentIds": ["japp", "poirot"],
+      "narrative": "当地交通记录解释不了米德尔顿太太如何来到猎人小屋。"
+    },
+    "designRationale": "交通记录是可立即反馈的外部核查；它不推进故事时间，只加深女管家身份矛盾。"
+  },
+  {
+    "id": "event-canvass-station-stranger",
+    "kind": "instant-result",
+    "title": "核实车站黑胡子陌生人",
+    "description": "玩家沿着黑胡子访客路线追问车站和出入记录时，警方可以直接说明没人记得这样的陌生人。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "japp",
+      "topics": ["车站", "黑胡子", "陌生人", "访客"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-no-stranger-at-station"],
+      "revealedClueIds": ["clue-station-no-stranger"],
+      "targetAgentIds": ["japp"],
+      "narrative": "车站没有留下黑胡子陌生人抵达或离开的清楚痕迹。"
+    },
+    "designRationale": "这是对假凶手路线的即时核查；等待不会带来新的角色行为或证据变化。"
+  },
+  {
+    "id": "event-trace-ealing-revolver",
+    "kind": "instant-result",
+    "title": "追查伊灵左轮",
+    "description": "玩家追问失踪左轮去向时，贾普可以给出伊灵牛皮纸包的发现结果。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "japp",
+      "topics": ["伊灵", "左轮", "牛皮纸", "伦敦"],
+      "requiredClueIds": ["clue-missing-revolver"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-ealing-revolver-found"],
+      "revealedClueIds": ["clue-ealing-revolver"],
+      "revealedContradictionIds": ["contradiction-ealing-revolver"],
+      "targetAgentIds": ["japp", "roger", "poirot"],
+      "narrative": "失踪左轮在伦敦伊灵出现，反而让伦敦路线像人为布置。"
+    },
+    "designRationale": "左轮去向是玩家需要想到的核查点；结果本身可即时揭示，矛盾来自它与罗杰不在场证明的组合。"
+  },
+  {
+    "id": "event-poirot-clothing-telegram",
+    "kind": "story-beat",
+    "title": "波洛电报转向衣着问题",
+    "description": "玩家掌握现场和访客证词后，波洛的电报把调查重点从黑胡子访客转向佐伊与米德尔顿的衣着、声音和是否同框。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "poirot",
+      "topics": ["衣着", "门厅", "女管家", "佐伊"],
+      "requiredClueIds": ["clue-middleton-testimony", "clue-zoe-no-visitor"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-dim-hall-housekeeper"],
+      "revealedClueIds": ["clue-dim-hall-housekeeper"],
+      "targetAgentIds": ["poirot", "japp"],
+      "narrative": "波洛不要求再追黑胡子访客，而是要求回忆两个女人的衣着和门厅光线。"
+    },
+    "designRationale": "这不是等待电报，而是导师行为改变调查方向，属于故事节拍。"
+  },
+  {
+    "id": "event-middleton-vanishes",
+    "kind": "story-beat",
+    "title": "米德尔顿太太消失",
+    "description": "波洛要求看住女管家后，警方发现米德尔顿已经消失，只留下无法证明身份的箱子。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "japp",
+      "topics": ["看住", "消失", "女管家", "米德尔顿"],
+      "requiredClueIds": ["clue-dim-hall-housekeeper"]
+    },
+    "effects": {
+      "revealedFactIds": ["fact-middleton-vanished"],
+      "revealedClueIds": ["clue-middleton-vanished"],
+      "targetAgentIds": ["japp", "poirot", "middleton"],
+      "narrative": "米德尔顿太太已经无法作为普通 NPC 继续稳定询问；她的消失本身成为身份疑点。"
+    },
+    "designRationale": "这类事件改变角色可用性和证据状态，才需要推进故事节拍。"
+  },
+  {
+    "id": "event-zoe-guarded-when-confronted",
+    "kind": "agent-state-change",
+    "title": "佐伊听见身份矛盾后变得防御",
+    "description": "玩家把演员经历、女管家来源空白或从未同框的矛盾指向佐伊时，她后续回答更谨慎。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "agentId": "zoe",
+      "topics": ["演员", "化装", "同时", "米德尔顿", "女管家"],
+      "requiredClueIds": ["clue-zoe-actress", "clue-never-seen-together"],
+      "requiredContradictionIds": ["contradiction-middleton-existence"]
+    },
+    "effects": {
+      "revealedContradictionIds": ["contradiction-zoe-alibi"],
+      "targetAgentIds": ["zoe"],
+      "narrative": "佐伊意识到玩家已经把女管家身份和自己的演员经历联系起来，后续会更防御。"
+    },
+    "designRationale": "玩家暴露怀疑会改变 NPC 状态，但不需要推进故事时间。"
+  },
+  {
+    "id": "event-opening-to-testimony-transition",
+    "kind": "act-transition",
+    "title": "从现场进入证词核查",
+    "description": "玩家掌握枪房、访客证词、失踪左轮和枪伤方向后，调查重心转向外部核查和证词来源。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "requiredClueIds": [
+        "clue-middleton-testimony",
+        "clue-locked-door-window",
+        "clue-missing-revolver",
+        "clue-close-shot"
+      ],
+      "requiredFactIds": [
+        "fact-middleton-visitor-story",
+        "fact-locked-door-open-window",
+        "fact-missing-revolver",
+        "fact-close-shot-behind"
+      ],
+      "requiredNpcInteractions": ["zoe", "middleton", "japp"],
+      "requiredSceneInteractions": ["scene-gun-room:尸体", "scene-gun-room:左轮手枪"]
+    },
+    "effects": {
+      "targetAgentIds": ["general", "japp", "poirot"],
+      "nextActId": "act-testimony",
+      "narrative": "现场阶段结束，玩家现在有足够依据去核查证词来源和外部记录。"
+    },
+    "designRationale": "这是调查结构变化，应与 gate-opening-to-testimony 对齐，而不是按章节或自然时间推进。"
+  },
+  {
+    "id": "event-testimony-to-confrontation-transition",
+    "kind": "act-transition",
+    "title": "从证词核查进入身份对质",
+    "description": "介绍所、交通记录、消失的女管家、演员经历和从未同框形成身份矛盾后，调查进入对质阶段。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "requiredClueIds": [
+        "clue-agency-denial",
+        "clue-transport-gap",
+        "clue-middleton-vanished",
+        "clue-zoe-actress",
+        "clue-never-seen-together"
+      ],
+      "requiredFactIds": [
+        "fact-agency-denies-middleton",
+        "fact-middleton-no-transport",
+        "fact-zoe-actress",
+        "fact-no-one-saw-both-women"
+      ],
+      "requiredContradictionIds": ["contradiction-middleton-existence"],
+      "requiredNpcInteractions": ["japp", "poirot", "zoe"],
+      "requiredSceneInteractions": ["scene-selbourne-agency:登记簿"]
+    },
+    "effects": {
+      "revealedContradictionIds": ["contradiction-middleton-existence"],
+      "targetAgentIds": ["general", "zoe", "poirot", "japp"],
+      "nextActId": "act-confrontation",
+      "narrative": "米德尔顿太太已经无法作为独立证人站住脚，现在可以把身份伪装问题推到佐伊面前。"
+    },
+    "designRationale": "这是阶段性 required discoveries 的结果；事件解释调查阶段变化，进入条件仍由 ActGate 控制。"
+  }
+]

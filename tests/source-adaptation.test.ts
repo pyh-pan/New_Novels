@@ -96,6 +96,26 @@ function modelOutput(): CaseAdaptationModelOutput {
         }
       ],
       actGates: [],
+      storyEvents: [
+        {
+          id: "event-check-key-record",
+          kind: "instant-result",
+          title: "核对钥匙保管记录",
+          description: "玩家要求核对备用钥匙登记时，直接获得记录结果。",
+          timing: "none",
+          trigger: {
+            agentId: "general",
+            topics: ["钥匙", "登记"]
+          },
+          effects: {
+            revealedFactIds: ["fact-locked-room"],
+            revealedClueIds: ["clue-locked-room"],
+            targetAgentIds: ["general"],
+            narrative: "钥匙保管记录可以立即核对，不推进故事时间。"
+          },
+          designRationale: "单纯记录核查的价值在于玩家提出方向，不在等待。"
+        }
+      ],
       scenes: [
         {
           id: "scene-study",
@@ -325,6 +345,10 @@ describe("source adaptation", () => {
     expect(joined).toContain("segmentation");
     expect(joined).toContain("story-keep");
     expect(joined).toContain("investigation-hide");
+    expect(joined).toContain("storyEvents");
+    expect(joined).toContain("instant-result");
+    expect(joined).toContain("agent-state-change");
+    expect(joined).toContain("story-beat");
     expect(joined).toContain("不能套用固定幕数");
     expect(joined).toContain("case-package/v1");
   });
@@ -346,6 +370,9 @@ describe("source adaptation", () => {
     expect(generated.package.caseFile.agents.map((agent) => agent.id)).toEqual([
       "general",
       "butler"
+    ]);
+    expect(generated.package.caseFile.storyEvents.map((event) => event.kind)).toEqual([
+      "instant-result"
     ]);
     expect(generated.segmentation.map((segment) => segment.label)).toEqual([
       "story-keep",

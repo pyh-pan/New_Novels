@@ -22,6 +22,14 @@ describe("case schema", () => {
     expect(parsed.agents.find((agent) => agent.id === "general")?.type).toBe("general");
     expect(parsed.clues.map((clue) => clue.id)).toContain("clue-middleton-testimony");
     expect(parsed.clues.map((clue) => clue.id)).toContain("clue-ealing-revolver");
+    expect(parsed.storyEvents.map((event) => event.kind)).toEqual(
+      expect.arrayContaining([
+        "instant-result",
+        "agent-state-change",
+        "story-beat",
+        "act-transition"
+      ])
+    );
     expect(parsed.accusation.questions.map((question) => question.id)).toEqual([
       "accuse-culprits",
       "accuse-middleton",
@@ -128,6 +136,53 @@ describe("case schema", () => {
         ]
       })
     ).toThrow();
+  });
+
+  it("rejects story events that reference unknown facts", () => {
+    const result = caseSchema.safeParse({
+      ...huntersLodgeCase,
+      storyEvents: [
+        ...huntersLodgeCase.storyEvents,
+        {
+          ...huntersLodgeCase.storyEvents[0],
+          id: "event-bad-fact",
+          effects: {
+            ...huntersLodgeCase.storyEvents[0].effects,
+            revealedFactIds: ["missing-fact"]
+          }
+        }
+      ]
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return;
+    }
+
+    expect(result.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: "Story event fact references must match fact ids"
+        })
+      ])
+    );
+  });
+
+  it("keeps record checks as instant results without story time progression", () => {
+    const eventsById = new Map(huntersLodgeCase.storyEvents.map((event) => [event.id, event]));
+
+    expect(eventsById.get("event-verify-roger-alibi")).toMatchObject({
+      kind: "instant-result",
+      timing: "none"
+    });
+    expect(eventsById.get("event-check-middleton-agency")).toMatchObject({
+      kind: "instant-result",
+      timing: "none"
+    });
+    expect(eventsById.get("event-middleton-vanishes")).toMatchObject({
+      kind: "story-beat",
+      timing: "story-beat"
+    });
   });
 
   it("rejects duplicate accusation question ids", () => {

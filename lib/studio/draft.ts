@@ -11,6 +11,7 @@ export type StudioNodeType =
   | "agent"
   | "clues"
   | "contradictions"
+  | "events"
   | "acts"
   | "accusation"
   | "validation";
@@ -36,6 +37,7 @@ export type StudioDraftView = {
     agents: number;
     clues: number;
     contradictions: number;
+    storyEvents: number;
     acts: number;
     accusationQuestions: number;
   };
@@ -82,6 +84,16 @@ export type StudioDraftView = {
     facts: string[];
     clues: string[];
     agents: string[];
+  }>;
+  storyEvents: Array<{
+    id: string;
+    kind: CaseFile["storyEvents"][number]["kind"];
+    title: string;
+    description: string;
+    timing: CaseFile["storyEvents"][number]["timing"];
+    trigger: string[];
+    effects: string[];
+    designRationale: string;
   }>;
   acts: Array<{
     id: string;
@@ -190,6 +202,7 @@ export function createStudioDraftViewWithAdaptation(
       },
       { id: "clues", type: "clues", label: "线索" },
       { id: "contradictions", type: "contradictions", label: "矛盾" },
+      { id: "events", type: "events", label: "故事事件" },
       { id: "acts", type: "acts", label: "多幕推进" },
       { id: "accusation", type: "accusation", label: "最终指认" },
       { id: "validation", type: "validation", label: "校验报告" }
@@ -199,6 +212,7 @@ export function createStudioDraftViewWithAdaptation(
       agents: caseFile.agents.length,
       clues: caseFile.clues.length,
       contradictions: caseFile.contradictions.length,
+      storyEvents: caseFile.storyEvents.length,
       acts: caseFile.acts.length,
       accusationQuestions: caseFile.accusation.questions.length
     },
@@ -268,6 +282,28 @@ export function createStudioDraftViewWithAdaptation(
       facts: textForIds(contradiction.factIds, factText),
       clues: textForIds(contradiction.clueIds, clueTitle),
       agents: textForIds(contradiction.agentIds, agentName)
+    })),
+    storyEvents: caseFile.storyEvents.map((event) => ({
+      id: event.id,
+      kind: event.kind,
+      title: event.title,
+      description: event.description,
+      timing: event.timing,
+      trigger: [
+        event.trigger.requiresAct ? `剧情幕：${event.trigger.requiresAct}` : undefined,
+        event.trigger.agentId ? `触发对象：${agentName.get(event.trigger.agentId) ?? event.trigger.agentId}` : undefined,
+        ...event.trigger.topics.map((topic) => `话题：${topic}`),
+        ...textForIds(event.trigger.requiredClueIds, clueTitle).map((item) => `需要线索：${item}`),
+        ...textForIds(event.trigger.requiredFactIds, factText).map((item) => `需要事实：${item}`)
+      ].filter((item): item is string => Boolean(item)),
+      effects: [
+        ...textForIds(event.effects.revealedClueIds, clueTitle).map((item) => `揭示线索：${item}`),
+        ...textForIds(event.effects.revealedFactIds, factText).map((item) => `揭示事实：${item}`),
+        ...event.effects.targetAgentIds.map((agentId) => `影响角色：${agentName.get(agentId) ?? agentId}`),
+        event.effects.nextActId ? `进入剧情幕：${event.effects.nextActId}` : undefined,
+        `叙事：${event.effects.narrative}`
+      ].filter((item): item is string => Boolean(item)),
+      designRationale: event.designRationale
     })),
     acts: caseFile.acts.map((act) => ({
       id: act.id,

@@ -109,7 +109,7 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 - `casePackageSchema`
 - `hammerOfGodPackage`
 - `cases/hunters-lodge/` 当前默认案件目录。
-- `manifest.json`、`case.json`、`story/*.md`、`agents/*.json`、`acts/gates.json`、`truth/truth.json` 等拆分文件。
+- `manifest.json`、`case.json`、`story/*.md`、`agents/*.json`、`acts/gates.json`、`events/story-events.json`、`truth/truth.json` 等拆分文件。
 - `CaseLoader`：从本地目录读取 split package，并组装为 `CaseFile`。
 - `validateCasePackageDirectory`：输出统一校验报告，包含错误级别、文件路径、字段路径、原因和修复建议。
 
@@ -123,12 +123,12 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 
 - 小说内容 ingest。
 - 推理主干提取。
-- 章节、事实账本、线索、NPC、揭示规则、多幕结构、最终指认的生成流程。
+- 章节、事实账本、线索、NPC、揭示规则、故事事件、多幕结构、最终指认的生成流程。
 - `case-package/v1` 参考文档。
 - `novel-to-case-workflow` 工作流文档。
 - `check_case_package_refs.mjs` 引用完整性校验脚本，支持 package JSON、package directory 和 zip。
 - NPC `pressureProfile`、`emotionalArc`、`confrontationTriggers`、`confessionBoundary`、`styleAnchors` 输出要求。
-- `ActGate`、required discoveries、scene goals 和 package assembly 流程。
+- `storyEvents`、`ActGate`、required discoveries、scene goals 和 package assembly 流程。
 
 当前还需要完善：
 
@@ -269,6 +269,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
   - `facts/facts.json`
   - `acts/acts.json`
   - `acts/gates.json`
+  - `events/story-events.json`
   - `scenes/scenes.json`
   - `clues/clues.json`
   - `relationships/relationships.json`
@@ -292,7 +293,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
   - 支持 package JSON。
   - 支持 package directory。
   - 支持 package zip。
-  - 检查 ActGate、pressureProfile、revealRules、relationships、contradictions 等引用。
+  - 检查 storyEvents、ActGate、pressureProfile、revealRules、relationships、contradictions 等引用。
 - 新增 `POST /api/cases/preview`：
   - 支持 multipart zip 上传。
   - 支持单顶层目录 zip 自动归一。
@@ -492,7 +493,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 已完成第一版：
 
 - `check_case_package_refs.mjs` 支持 package JSON、目录和 zip。
-- 校验脚本检查 NPC 压力规则、情绪弧线、风格锚点、非最终幕 ActGate 和最终指认题数量。
+- 校验脚本检查故事事件、NPC 压力规则、情绪弧线、风格锚点、非最终幕 ActGate 和最终指认题数量。
 
 成功标准：
 
@@ -500,7 +501,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - skill 生成的内容不需要人工改代码即可运行。
 - 人工主要负责审校推理公平性和文学表达。
 - Skill 输出的 NPC 行为配置可以被 Agent Runtime v2 直接执行。
-- Skill 输出的多幕结构可以被 ActGate 校验。
+- Skill 输出的故事事件和多幕结构可以被 schema、校验脚本和 ActGate 校验。
 
 ## Phase 5：案件导入与预览
 

@@ -56,7 +56,7 @@ cases/<case-id>/
 - `POST /api/studio/source-jobs`
   - 输入：`.txt`、`.md` 或 `.pdf` 原文文件。
   - 先提取纯文本；PDF 使用 `pdf-parse` 读取可选择文本，扫描件需要另行 OCR。
-  - 调用平台 AI，按 `new-novels-case-adapter` 的工作流生成 `sourceProfile`、`segmentation`、`qualityReport` 和 schema-valid `caseFile`。
+- 调用平台 AI，按 `new-novels-case-adapter` 的工作流生成 `sourceProfile`、`segmentation`、`qualityReport` 和包含 `storyEvents` 的 schema-valid `caseFile`。
   - 生成结果会注册为内存中的 Studio 动态草稿，并返回进度步骤与 `draftCaseId`。
 
 - `POST /api/studio/cases/[caseId]/save`
@@ -187,7 +187,7 @@ ai.api_key=<Runway API key>
 - 上传 `.txt` / `.md` / `.pdf` 原文，创建可审阅草稿任务；
 - 上传 `case-package/v1` zip，执行结构校验并生成 Studio 草稿。
 
-原文上传链路不是固定模板：系统先分析原文画像，再把文本分为 `story-keep`、`investigation-hide`、`deduction-hide`、`solution-lock` 和 `bridge-rewrite`，最后根据原文特征自适应生成章节、幕、agent、线索、矛盾、压力机制和最终指认问题。
+原文上传链路不是固定模板：系统先分析原文画像，再把文本分为 `story-keep`、`investigation-hide`、`deduction-hide`、`solution-lock` 和 `bridge-rewrite`，最后根据原文特征自适应生成章节、幕、agent、线索、矛盾、故事事件、压力机制和最终指认问题。故事事件用于区分即时资料核查、NPC 状态变化、故事节拍和幕推进；它不是现实时间等待队列。
 
 Studio 审阅工作台按原文画像、改写分段、故事章节、角色、线索、矛盾、多幕推进、最终指认和校验报告组织内容。创作者可以在右侧改写助手区域添加批注并生成修改建议。状态机包含 `draft`、`saved` 和 `published`：草稿保存在 `.data/studio-drafts`，发布案件保存在 `.data/published-cases`，只有发布后的动态案件会出现在书架并进入正式游玩 runtime。原文上传和 zip 导入会在“生成 Studio draft”这一步交汇，之后共用同一套审阅、保存、发布、书架和游玩链路。后续在平台发布时可将文件系统 store 替换为数据库 store。
 

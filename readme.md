@@ -13,7 +13,7 @@ New Novels 是一个文字优先的网页原型，用于把推理小说转化为
 - 基于 Next.js 的网页应用，包含故事书架、故事阅读区、调查台、笔记抽屉、最终指认页面和创作者 Studio。
 - 首页以封面书架展示内置案件；玩家点击案件后进入 `/cases/<case-id>` 的阅读与调查界面。
 - 默认可玩案件通过 `CaseLoader` 从 `cases/hunters-lodge/` 加载。
-- `case-package/v1` 文件系统布局，覆盖故事文本、agent、事实、剧情幕、幕间门槛、线索、矛盾、真相、受害者和指认问题。
+- `case-package/v1` 文件系统布局，覆盖故事文本、agent、事实、剧情幕、幕间门槛、故事事件、线索、矛盾、真相、受害者和指认问题。
 - Agent Runtime，支持语义 / 关键词路由、玩家已知状态、揭示规则、压力模型、剧情幕门槛和输出护栏。
 - 基于 CoWork / Guard Runway Bedrock 网关契约（`ai.properties`）的 AI 调查 API，包含结构化 prompt 与响应处理。
 - 基于真相数据的确定性最终指认校验，成功后展示真相摘要。

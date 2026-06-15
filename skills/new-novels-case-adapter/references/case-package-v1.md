@@ -23,6 +23,7 @@ agents/<agent-id>.json
 facts/facts.json
 acts/acts.json
 acts/gates.json
+events/story-events.json
 scenes/scenes.json
 clues/clues.json
 relationships/relationships.json
@@ -58,6 +59,7 @@ accusation/questions.json
 - `chapters`
 - `acts`
 - `actGates`
+- `storyEvents`
 - `scenes`
 - `facts`
 - `relationships`
@@ -129,6 +131,30 @@ accusation/questions.json
 - `unlockNarrative`
 
 使用 actGates 创造剧本杀式 progression。gate 应证明玩家已经完成某个推理阶段，然后才打开下一幕。不要仅凭模糊话题解锁 acts。
+
+## 故事事件（storyEvents）
+
+`storyEvents` 记录原文行动在互动案件中的因果设计。它不是后台任务队列，也不是现实时间模拟；它说明玩家行为、NPC 行为、世界状态和调查阶段之间的关系。
+
+每个 story event 包含：
+
+- `id`
+- `kind`：`instant-result`、`agent-state-change`、`story-beat` 或 `act-transition`
+- `title`
+- `description`
+- `timing`：`none`、`immediate`、`story-beat` 或 `act-transition`
+- `trigger`：可包含 `requiresAct`、`agentId`、`topics`、`requiredClueIds`、`requiredFactIds`、`requiredContradictionIds`、`requiredNpcInteractions`、`requiredSceneInteractions`
+- `effects`：可包含 `revealedFactIds`、`revealedClueIds`、`revealedContradictionIds`、`targetAgentIds`、`nextActId` 和 `narrative`
+- `designRationale`
+
+四类事件的使用边界：
+
+- `instant-result`：查账单、查登记、查时刻表、核实电报、核实俱乐部签到等纯信息获取。价值在于玩家提出正确调查方向，`timing` 必须是 `none`，不推进故事时间。
+- `agent-state-change`：玩家向 NPC 暴露怀疑、展示矛盾或告知某条事实，导致对方防御、慌张、改口或改变撒谎策略。`timing` 应为 `immediate`。
+- `story-beat`：玩家、导师或警方行动触发 NPC 离场、证据状态变化、波洛电报、场景开放等世界变化。`timing` 应为 `story-beat`。
+- `act-transition`：阶段性调查完成后打开新幕。它应与 act gate 对齐，`timing` 应为 `act-transition`。
+
+不要因为原文写“过了两天”就引入等待。只有这段时间造成新的角色行为、机会窗口、证据变化或调查阶段变化时，才需要 story-beat。
 
 ## 场景（Scenes）
 

@@ -27,6 +27,9 @@ describe("case package directory loader", () => {
     expect(loaded.caseFile.contradictions.map((item) => item.id)).toContain(
       "contradiction-middleton-existence"
     );
+    expect(loaded.caseFile.storyEvents.map((event) => event.id)).toContain(
+      "event-middleton-vanishes"
+    );
     expect(loaded.caseFile.accusation.questions).toHaveLength(4);
   });
 
@@ -42,6 +45,47 @@ describe("case package directory loader", () => {
       const loaded = await loadCasePackageFromDirectory(tempDirectory);
 
       expect(loaded.caseFile.chapters[0].body).toBe("拆分章节正文来自 markdown 文件。");
+    } finally {
+      await rm(tempDirectory, { recursive: true, force: true });
+    }
+  });
+
+  it("uses split story events instead of trusting the aggregate snapshot", async () => {
+    const tempDirectory = await mkdtemp(join(tmpdir(), "new-novels-case-"));
+    try {
+      await cp(huntersLodgeDirectory, tempDirectory, { recursive: true });
+      await writeFile(
+        join(tempDirectory, "events", "story-events.json"),
+        JSON.stringify(
+          [
+            {
+              id: "event-test-split",
+              kind: "instant-result",
+              title: "拆分事件",
+              description: "用于验证加载器读取拆分事件文件。",
+              timing: "none",
+              trigger: {
+                topics: ["测试"]
+              },
+              effects: {
+                revealedFactIds: ["fact-roger-train-alibi"],
+                revealedClueIds: ["clue-roger-alibi"],
+                targetAgentIds: ["japp"],
+                narrative: "拆分事件正文。"
+              },
+              designRationale: "即时记录核查不推进故事时间。"
+            }
+          ],
+          null,
+          2
+        )
+      );
+
+      const loaded = await loadCasePackageFromDirectory(tempDirectory);
+
+      expect(loaded.caseFile.storyEvents.map((event) => event.id)).toEqual([
+        "event-test-split"
+      ]);
     } finally {
       await rm(tempDirectory, { recursive: true, force: true });
     }

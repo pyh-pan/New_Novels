@@ -104,6 +104,7 @@ describe("studio filesystem persistence", () => {
     expect(published?.status).toBe("published");
     expect(existsSync(join(packageDir, "manifest.json"))).toBe(true);
     expect(existsSync(join(packageDir, "story", "chapter-1.md"))).toBe(true);
+    expect(existsSync(join(packageDir, "events", "story-events.json"))).toBe(true);
     expect(loadCasePackageFromDirectorySync(packageDir).caseFile.id).toBe(caseId);
 
     clearGeneratedStudioCases();

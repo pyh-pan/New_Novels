@@ -41,6 +41,7 @@ async function huntersLodgeZip(): Promise<File> {
     "facts/facts.json",
     "acts/acts.json",
     "acts/gates.json",
+    "events/story-events.json",
     "scenes/scenes.json",
     "clues/clues.json",
     "relationships/relationships.json",

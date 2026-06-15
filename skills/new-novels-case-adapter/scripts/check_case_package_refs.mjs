@@ -24,6 +24,7 @@ const requiredDirectoryFiles = [
   "facts/facts.json",
   "acts/acts.json",
   "acts/gates.json",
+  "events/story-events.json",
   "scenes/scenes.json",
   "clues/clues.json",
   "relationships/relationships.json",
@@ -50,6 +51,7 @@ async function unzipToTemp(targetPath) {
           "agents",
           "facts",
           "acts",
+          "events",
           "scenes",
           "clues",
           "relationships",
@@ -112,6 +114,7 @@ async function readPackage(targetPath) {
       })),
       acts: readJson(path.join(resolved, "acts/acts.json")),
       actGates: readJson(path.join(resolved, "acts/gates.json")),
+      storyEvents: readJson(path.join(resolved, "events/story-events.json")),
       scenes: readJson(path.join(resolved, "scenes/scenes.json")),
       facts: readJson(path.join(resolved, "facts/facts.json")),
       relationships: readJson(path.join(resolved, "relationships/relationships.json")),
@@ -167,6 +170,7 @@ const clueIds = ids(caseFile.clues);
 const factIds = ids(caseFile.facts);
 const actIds = ids(caseFile.acts);
 const actGateIds = ids(caseFile.actGates);
+const storyEventIds = ids(caseFile.storyEvents);
 const chapterIds = ids(caseFile.chapters);
 const victimIds = ids(caseFile.victims);
 const contradictionIds = ids(caseFile.contradictions);
@@ -176,6 +180,7 @@ checkUnique(caseFile.clues, "clues");
 checkUnique(caseFile.facts, "facts");
 checkUnique(caseFile.acts, "acts");
 checkUnique(caseFile.actGates, "actGates");
+checkUnique(caseFile.storyEvents, "storyEvents");
 checkUnique(caseFile.scenes, "scenes");
 checkUnique(caseFile.chapters, "chapters");
 checkUnique(caseFile.victims, "victims");
@@ -237,6 +242,35 @@ const checkRef = (set, id, pathLabel, kind) => {
   (gate.requiredFactIds ?? []).forEach((id) => checkRef(factIds, id, `actGates[${index}].requiredFactIds`, "fact"));
   (gate.requiredContradictionIds ?? []).forEach((id) => checkRef(contradictionIds, id, `actGates[${index}].requiredContradictionIds`, "contradiction"));
   (gate.requiredNpcInteractions ?? []).forEach((id) => checkRef(agentIds, id, `actGates[${index}].requiredNpcInteractions`, "agent"));
+});
+
+(caseFile.storyEvents ?? []).forEach((event, index) => {
+  const base = `storyEvents[${index}]`;
+  checkRef(storyEventIds, event.id, `${base}.id`, "storyEvent");
+  const expectedTimingByKind = {
+    "instant-result": "none",
+    "agent-state-change": "immediate",
+    "story-beat": "story-beat",
+    "act-transition": "act-transition"
+  };
+
+  if (!expectedTimingByKind[event.kind]) {
+    add(`${base}.kind`, "must be instant-result, agent-state-change, story-beat, or act-transition");
+  } else if (event.timing !== expectedTimingByKind[event.kind]) {
+    add(`${base}.timing`, "must match story event kind");
+  }
+
+  checkRef(actIds, event.trigger?.requiresAct, `${base}.trigger.requiresAct`, "act");
+  checkRef(agentIds, event.trigger?.agentId, `${base}.trigger.agentId`, "agent");
+  (event.trigger?.requiredClueIds ?? []).forEach((id) => checkRef(clueIds, id, `${base}.trigger.requiredClueIds`, "clue"));
+  (event.trigger?.requiredFactIds ?? []).forEach((id) => checkRef(factIds, id, `${base}.trigger.requiredFactIds`, "fact"));
+  (event.trigger?.requiredContradictionIds ?? []).forEach((id) => checkRef(contradictionIds, id, `${base}.trigger.requiredContradictionIds`, "contradiction"));
+  (event.trigger?.requiredNpcInteractions ?? []).forEach((id) => checkRef(agentIds, id, `${base}.trigger.requiredNpcInteractions`, "agent"));
+  (event.effects?.revealedFactIds ?? []).forEach((id) => checkRef(factIds, id, `${base}.effects.revealedFactIds`, "fact"));
+  (event.effects?.revealedClueIds ?? []).forEach((id) => checkRef(clueIds, id, `${base}.effects.revealedClueIds`, "clue"));
+  (event.effects?.revealedContradictionIds ?? []).forEach((id) => checkRef(contradictionIds, id, `${base}.effects.revealedContradictionIds`, "contradiction"));
+  (event.effects?.targetAgentIds ?? []).forEach((id) => checkRef(agentIds, id, `${base}.effects.targetAgentIds`, "agent"));
+  checkRef(actIds, event.effects?.nextActId, `${base}.effects.nextActId`, "act");
 });
 
 (caseFile.scenes ?? []).forEach((scene, index) => {

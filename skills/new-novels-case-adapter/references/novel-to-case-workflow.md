@@ -44,6 +44,7 @@ source span | label | why | destination | player discovery route
 - `scene-gun-room:window`
 - `clue-missing-revolver`
 - `agent-japp.revealRules`
+- `storyEvents`
 - `contradiction-middleton-existence`
 - `truth.method`
 - `accusation.questions`
@@ -75,6 +76,7 @@ source span | label | why | destination | player discovery route
 - 玩家应该做什么来替代。
 - 哪个 scene、object、NPC 或外部询问会暴露它。
 - 哪个 fact / clue / contradiction id 存储它。
+- 它是否需要 `storyEvents` 表达行动后果。
 - 哪个 act gate 依赖它。
 
 对每个 `deduction-hide` 片段说明：
@@ -98,6 +100,40 @@ Agency denies the housekeeper -> clue-agency-denial via Japp/external inquiry.
 No one saw both women together -> contradiction-never-together via Poirot reveal.
 Housekeeper is fake -> solution-lock and accusation question.
 ```
+
+## 4.5 故事事件分类（Story Event Design）
+
+在写 acts 和 reveal rules 前，先判断原文中每个行动的因果顺序。目标不是模拟现实耗时，而是表达玩家行为是否改变 NPC、证据、场景或调查阶段。
+
+使用 `storyEvents` 记录四类事件：
+
+- `instant-result`：玩家提出正确调查方向后立即获得资料。查账单、查登记、查时刻表、查介绍所、核实俱乐部签到、核实电报来源都属于这一类。`timing` 必须是 `none`，不推进故事时间。
+- `agent-state-change`：玩家把某条事实、矛盾或怀疑暴露给 NPC，导致该 NPC 后续回答、压力、撒谎策略或 reveal rules 改变。`timing` 使用 `immediate`。
+- `story-beat`：侦探或导师的行为导致世界状态变化，例如 NPC 消失、证据被移动、警方封锁现场、波洛电报改变调查方向、新场景开放。`timing` 使用 `story-beat`。
+- `act-transition`：玩家完成阶段性 required discoveries 后进入下一幕。`timing` 使用 `act-transition`，并与对应 `ActGate` 对齐。
+
+判断规则：
+
+1. 这个动作只是获得信息吗？是则 `instant-result`。
+2. 这个动作会让某个 NPC 知道玩家掌握了什么吗？是则 `agent-state-change`。
+3. 这个动作会改变世界状态、机会窗口或角色可用性吗？是则 `story-beat`。
+4. 这个动作是否打开新的调查阶段？是则 `act-transition`。
+
+错误设计：
+
+```text
+Japp takes two days to check railway bills -> create a waiting task.
+```
+
+正确设计：
+
+```text
+Player asks Japp to verify railway bills -> instant-result, unlock verified alibi facts.
+Poirot says watch the housekeeper -> story-beat, Middleton vanishes and can no longer be questioned normally.
+Player confronts Zoe with "no one saw both women together" -> agent-state-change, Zoe becomes guarded.
+```
+
+每个 story event 必须写明 `designRationale`，说明为什么需要或不需要推进故事时间。这能防止把小说压缩时间误翻译成游戏等待。
 
 ## 5. 重写章节
 
@@ -167,7 +203,7 @@ Housekeeper is fake -> solution-lock and accusation question.
 3. `act-confrontation`：对质阶段，用已发现矛盾逼问关键 NPC。
 4. `act-accusation`：指认或真相阶段。
 
-每一幕都要有 required discoveries。玩家进入下一幕时应该感觉自己完成了一个阶段性谜题，而不是只是翻到下一章。
+每一幕都要有 required discoveries。玩家进入下一幕时应该感觉自己完成了一个阶段性谜题，而不是只是翻到下一章。对应的 `act-transition` story event 应解释为什么调查结构发生变化，但真正的进入条件仍以 `ActGate` 为准。
 
 ## 7. 先写事实，再写 Agents
 
@@ -272,6 +308,7 @@ accepted answers 应包含：
 - 改写是否保留了氛围、人物质感和非调查事件？
 - 调查和推理段落是否从故事文本中隐藏？
 - 每个隐藏线索是否有可探索入口？
+- 每个原文行动是否已按 storyEvents 分类，且纯记录核查没有误用时间推进？
 - 玩家是否知道足够多，能开始提出有效问题？
 - 故事是否避免告诉玩家侦探已经证明了什么？
 
@@ -286,6 +323,7 @@ accepted answers 应包含：
 
 - Reader acceptance：文本作为发行级样章，应连贯、有氛围、有节奏、情绪可读。
 - Player acceptance：每个隐藏调查或推理片段，都有 scene、NPC、object、contradiction、act gate 或 accusation 路线。
+- Event acceptance：`storyEvents` 清楚表达因果顺序，instant-result、agent-state-change、story-beat 和 act-transition 各自边界清楚。
 - 失败条件：如果读者体验只是 synopsis，或玩家路径只是重复正文已经说出的事实，交付前必须重写。
 
 ## 13. 自审清单
@@ -302,6 +340,8 @@ accepted answers 应包含：
 - 章节是否可作为 prose 阅读，并基于 `story-keep` 加 `bridge-rewrite`？
 - `investigation-hide`、`deduction-hide` 和 `solution-lock` 是否从普通阅读中排除？
 - 每个隐藏调查项是否有可玩发现路线？
+- `storyEvents` 是否覆盖即时结果、NPC 状态变化、故事节拍和幕推进？
+- 查账单、查档案、查介绍所等纯信息动作是否保持 `instant-result` 且不推进故事时间？
 - 最终可接受答案（accepted answers）是否足以覆盖自然人类输入？
 
 ## 14. 案件包组装（Package Assembly）
@@ -313,6 +353,7 @@ accepted answers 应包含：
 - `agents/global-context.json` 包含共享行为规则。
 - `agents/<agent-id>.json` 每个文件只包含一个已配置 agent，包括 runtime 行为字段。
 - `acts/gates.json` 包含带具体 required discoveries 的 ActGates。
+- `events/story-events.json` 包含即时信息、角色状态变化、故事节拍和幕推进设计。
 - `truth/`、`victims/`、`relationships/`、`propagation/` 和 `contradictions/` 即使数组很小或为空，也应是独立目录。
 
 对目录运行 skill checker：
