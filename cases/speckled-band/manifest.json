@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "case-package/v1",
+  "caseId": "speckled-band",
+  "title": "斑点带子疑案",
+  "language": "zh-CN",
+  "entryChapterId": "chapter-1",
+  "createdBy": "new-novels-case-adapter",
+  "source": {
+    "title": "The Adventure of the Speckled Band",
+    "author": "Arthur Conan Doyle",
+    "rightsNote": "EPUB metadata states: Public domain in the USA."
+  }
+}

@@ -6,8 +6,10 @@ import path from "node:path";
 import process from "node:process";
 import JSZip from "jszip";
 
-const usage = "Usage: node check_case_package_refs.mjs <case-package.json|case-package-directory|case-package.zip>";
-const filePath = process.argv[2];
+const usage = "Usage: node check_case_package_refs.mjs [--json] <case-package.json|case-package-directory|case-package.zip|studio-draft-directory>";
+const args = process.argv.slice(2);
+const jsonMode = args[0] === "--json";
+const filePath = jsonMode ? args[1] : args[0];
 
 if (!filePath) {
   process.stderr.write(`${usage}\n`);
@@ -16,6 +18,18 @@ if (!filePath) {
 
 const readJson = (targetPath) => JSON.parse(fs.readFileSync(targetPath, "utf8"));
 const readText = (targetPath) => fs.readFileSync(targetPath, "utf8");
+const issues = [];
+
+const add = (pathLabel, message, code = "validation") => {
+  issues.push({
+    severity: "fatal",
+    code,
+    filePath: pathLabel,
+    message,
+    suggestion: "Update the case package so every runtime reference is valid."
+  });
+};
+
 const requiredDirectoryFiles = [
   "manifest.json",
   "case.json",
@@ -89,53 +103,115 @@ async function readPackage(targetPath) {
     return readJson(resolved);
   }
 
+  const draftPackageDirectory = path.join(resolved, "package");
+  const packageDirectory = fs.existsSync(path.join(draftPackageDirectory, "manifest.json"))
+    ? draftPackageDirectory
+    : resolved;
+
+  if (packageDirectory !== resolved) {
+    [
+      "studio.json",
+      "validation-report.json",
+      "adaptation-notes.md"
+    ].forEach((file) => {
+      if (!fs.existsSync(path.join(resolved, file))) {
+        add(file, `Studio draft artifact ${file} is missing.`, "missing-artifact");
+      }
+    });
+  }
+
   for (const file of requiredDirectoryFiles) {
-    const absolutePath = path.join(resolved, file);
+    const absolutePath = path.join(packageDirectory, file);
     if (!fs.existsSync(absolutePath)) {
       throw new Error(`Missing required package file: ${file}`);
     }
   }
 
-  const caseFile = readJson(path.join(resolved, "case.json"));
-  const chapterIndex = readJson(path.join(resolved, "story/chapters.json"));
+  const caseFile = readJson(path.join(packageDirectory, "case.json"));
+  const chapterIndex = readJson(path.join(packageDirectory, "story/chapters.json"));
   const agentFiles = fs
-    .readdirSync(path.join(resolved, "agents"))
+    .readdirSync(path.join(packageDirectory, "agents"))
     .filter((fileName) => fileName.endsWith(".json") && fileName !== "global-context.json")
     .sort();
 
   return {
-    manifest: readJson(path.join(resolved, "manifest.json")),
+    manifest: readJson(path.join(packageDirectory, "manifest.json")),
     caseFile: {
       ...caseFile,
-      globalContext: readJson(path.join(resolved, "agents/global-context.json")),
+      globalContext: readJson(path.join(packageDirectory, "agents/global-context.json")),
       chapters: chapterIndex.map((chapter) => ({
         ...chapter,
-        body: readText(path.join(resolved, chapter.body))
+        body: readText(path.join(packageDirectory, chapter.body))
       })),
-      acts: readJson(path.join(resolved, "acts/acts.json")),
-      actGates: readJson(path.join(resolved, "acts/gates.json")),
-      storyEvents: readJson(path.join(resolved, "events/story-events.json")),
-      scenes: readJson(path.join(resolved, "scenes/scenes.json")),
-      facts: readJson(path.join(resolved, "facts/facts.json")),
-      relationships: readJson(path.join(resolved, "relationships/relationships.json")),
-      propagationRules: readJson(path.join(resolved, "propagation/rules.json")),
-      contradictions: readJson(path.join(resolved, "contradictions/contradictions.json")),
-      truth: readJson(path.join(resolved, "truth/truth.json")),
-      victims: readJson(path.join(resolved, "victims/victims.json")),
-      agents: agentFiles.map((fileName) => readJson(path.join(resolved, "agents", fileName))),
-      clues: readJson(path.join(resolved, "clues/clues.json")),
+      acts: readJson(path.join(packageDirectory, "acts/acts.json")),
+      actGates: readJson(path.join(packageDirectory, "acts/gates.json")),
+      storyEvents: readJson(path.join(packageDirectory, "events/story-events.json")),
+      scenes: readJson(path.join(packageDirectory, "scenes/scenes.json")),
+      facts: readJson(path.join(packageDirectory, "facts/facts.json")),
+      relationships: readJson(path.join(packageDirectory, "relationships/relationships.json")),
+      propagationRules: readJson(path.join(packageDirectory, "propagation/rules.json")),
+      contradictions: readJson(path.join(packageDirectory, "contradictions/contradictions.json")),
+      truth: readJson(path.join(packageDirectory, "truth/truth.json")),
+      victims: readJson(path.join(packageDirectory, "victims/victims.json")),
+      agents: agentFiles.map((fileName) => readJson(path.join(packageDirectory, "agents", fileName))),
+      clues: readJson(path.join(packageDirectory, "clues/clues.json")),
       accusation: {
         ...caseFile.accusation,
-        questions: readJson(path.join(resolved, "accusation/questions.json"))
+        questions: readJson(path.join(packageDirectory, "accusation/questions.json"))
       }
     }
   };
 }
 
-const pkg = await readPackage(filePath);
-const issues = [];
+function createSummary(caseFile = {}) {
+  return {
+    chapters: (caseFile.chapters ?? []).length,
+    agents: (caseFile.agents ?? []).length,
+    acts: (caseFile.acts ?? []).length,
+    actGates: (caseFile.actGates ?? []).length,
+    storyEvents: (caseFile.storyEvents ?? []).length,
+    facts: (caseFile.facts ?? []).length,
+    clues: (caseFile.clues ?? []).length,
+    contradictions: (caseFile.contradictions ?? []).length,
+    accusationQuestions: (caseFile.accusation?.questions ?? []).length
+  };
+}
 
-const add = (pathLabel, message) => issues.push(`${pathLabel}: ${message}`);
+function createReport(pkg) {
+  return {
+    ok: issues.length === 0,
+    generatedAt: new Date().toISOString(),
+    summary: createSummary(pkg?.caseFile),
+    issues
+  };
+}
+
+function outputAndExit(pkg) {
+  const report = createReport(pkg);
+
+  if (jsonMode) {
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+  } else if (issues.length > 0) {
+    process.stderr.write(`Found ${issues.length} issue(s):\n`);
+    for (const issue of issues) {
+      process.stderr.write(`- ${issue.filePath}: ${issue.message}\n`);
+    }
+  } else {
+    process.stdout.write("Case package reference check passed.\n");
+  }
+
+  process.exit(report.ok ? 0 : 1);
+}
+
+let pkg;
+try {
+  pkg = await readPackage(filePath);
+} catch (error) {
+  const message = error instanceof Error ? error.message : "Unknown package loading error.";
+  add(filePath, message, "read-error");
+  outputAndExit(undefined);
+}
+
 const ids = (items = []) => new Set(items.map((item) => item.id));
 const has = (set, id) => set.has(id);
 const checkUnique = (items = [], label) => {
@@ -336,10 +412,4 @@ const checkRef = (set, id, pathLabel, kind) => {
   });
 });
 
-if (issues.length > 0) {
-  process.stderr.write(`Found ${issues.length} issue(s):\n`);
-  for (const issue of issues) process.stderr.write(`- ${issue}\n`);
-  process.exit(1);
-}
-
-process.stdout.write("Case package reference check passed.\n");
+outputAndExit(pkg);

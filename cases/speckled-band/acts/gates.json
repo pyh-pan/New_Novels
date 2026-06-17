@@ -1,0 +1,70 @@
+[
+  {
+    "id": "gate-opening-to-manor",
+    "fromActId": "act-opening",
+    "toActId": "act-manor-search",
+    "requiredClueIds": [
+      "clue-night-whistle",
+      "clue-dying-words",
+      "clue-locked-room",
+      "clue-will-motive"
+    ],
+    "requiredFactIds": [
+      "fact-helen-heard-whistle",
+      "fact-julia-dying-words",
+      "fact-locked-room-conditions",
+      "fact-marriage-income-loss"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-sealed-room-but-sound"
+    ],
+    "requiredNpcInteractions": [
+      "helen-stoner",
+      "county-coroner"
+    ],
+    "requiredSceneInteractions": [
+      "scene-baker-street",
+      "scene-doctors-commons"
+    ],
+    "unlockNarrative": "海伦的恐惧、官方密室记录与遗嘱动机已经形成足够危险的图形；调查必须从陈述转向斯托克莫兰现场。"
+  },
+  {
+    "id": "gate-manor-to-confrontation",
+    "fromActId": "act-manor-search",
+    "toActId": "act-confrontation",
+    "requiredClueIds": [
+      "clue-false-repairs",
+      "clue-dummy-bell-rope",
+      "clue-inside-ventilator",
+      "clue-fixed-bed",
+      "clue-milk-and-safe",
+      "clue-dog-lash-loop",
+      "clue-chair-marks"
+    ],
+    "requiredFactIds": [
+      "fact-repairs-forced-room",
+      "fact-dummy-bell-rope",
+      "fact-inside-ventilator",
+      "fact-fixed-bed",
+      "fact-milk-and-safe",
+      "fact-dog-lash-loop",
+      "fact-chair-marks"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-devices-not-domestic",
+      "contradiction-no-cat-but-milk",
+      "contradiction-tool-path-and-motive"
+    ],
+    "requiredNpcInteractions": [
+      "helen-stoner",
+      "housekeeper",
+      "crown-landlord"
+    ],
+    "requiredSceneInteractions": [
+      "scene-manor-exterior",
+      "scene-julia-bedroom",
+      "scene-roylott-bedroom"
+    ],
+    "unlockNarrative": "卧室里的“家用设施”已经显示出非家用目的；海伦必须离开中间房间，调查转入夜间验证。"
+  }
+]

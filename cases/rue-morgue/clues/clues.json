@@ -1,0 +1,356 @@
+[
+  {
+    "id": "clue-locked-room",
+    "title": "反锁的后房",
+    "text": "后房门从内锁住，破门时没有活人留下。",
+    "tag": "clue",
+    "source": "莫格街四楼后房",
+    "unlockHints": [
+      "检查四楼后房门锁和钥匙。"
+    ],
+    "unlock": {
+      "type": "story",
+      "topics": [
+        "门锁",
+        "密室"
+      ],
+      "factIds": [
+        "fact-door-locked-inside"
+      ]
+    }
+  },
+  {
+    "id": "clue-gold-left",
+    "title": "未被拿走的金币",
+    "text": "大额金币和首饰留在现场，抢劫动机被削弱。",
+    "tag": "doubt",
+    "source": "后房地面与银行记录",
+    "unlockHints": [
+      "核对银行提款与现场财物。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "金币",
+        "抢劫"
+      ],
+      "factIds": [
+        "fact-gold-left-behind",
+        "fact-motive-not-robbery"
+      ]
+    }
+  },
+  {
+    "id": "clue-chimney-body",
+    "title": "烟囱中的卡米耶",
+    "text": "尸体被强塞进狭窄烟囱，力量异常。",
+    "tag": "clue",
+    "source": "后房壁炉",
+    "unlockHints": [
+      "检查烟囱和卡米耶尸体位置。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "烟囱",
+        "尸体"
+      ],
+      "factIds": [
+        "fact-camille-in-chimney",
+        "fact-force-beyond-ordinary-human"
+      ]
+    }
+  },
+  {
+    "id": "clue-yard-body",
+    "title": "后院的老妇人",
+    "text": "老妇人尸体在后院，伤势与从高处坠落和锐器割喉同时相关。",
+    "tag": "clue",
+    "source": "莫格街后院",
+    "unlockHints": [
+      "查看后院铺石地和老妇人伤势。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "后院",
+        "老妇人"
+      ],
+      "factIds": [
+        "fact-madame-in-yard"
+      ]
+    }
+  },
+  {
+    "id": "clue-razor",
+    "title": "沾血剃刀",
+    "text": "剃刀解释割喉，却不能解释烟囱、攀爬和异常力量。",
+    "tag": "clue",
+    "source": "后房椅子",
+    "unlockHints": [
+      "检查椅子上的剃刀。"
+    ],
+    "unlock": {
+      "type": "story",
+      "topics": [
+        "剃刀",
+        "凶器"
+      ],
+      "factIds": [
+        "fact-razor-bloodied"
+      ]
+    }
+  },
+  {
+    "id": "clue-no-regular-visitors",
+    "title": "没有常客的房子",
+    "text": "洗衣妇与烟草商都证实母女少见访客，没有仆人。",
+    "tag": "testimony",
+    "source": "保利娜·迪堡与皮埃尔·莫罗证词",
+    "unlockHints": [
+      "询问洗衣妇或烟草商。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "pauline-dubourg",
+      "topics": [
+        "访客",
+        "仆人"
+      ],
+      "factIds": [
+        "fact-victims-reclusive"
+      ]
+    }
+  },
+  {
+    "id": "clue-le-bon-delivery",
+    "title": "勒邦只送过钱",
+    "text": "勒邦陪送钱款，但没有证据显示他留在现场或取走金币。",
+    "tag": "doubt",
+    "source": "银行记录与勒邦证词",
+    "unlockHints": [
+      "询问勒邦和银行家米尼奥。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "adolph-le-bon",
+      "topics": [
+        "送钱",
+        "金币",
+        "逮捕"
+      ],
+      "factIds": [
+        "fact-le-bon-delivered-money",
+        "fact-le-bon-no-other-evidence"
+      ]
+    }
+  },
+  {
+    "id": "clue-gruff-french-voice",
+    "title": "低沉法语惊呼",
+    "text": "低沉声音多次喊出法语惊呼，更像惊恐旁观者。",
+    "tag": "testimony",
+    "source": "楼梯证人",
+    "unlockHints": [
+      "比对楼梯上听见的低沉声音。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "isidore-muset",
+      "topics": [
+        "低声",
+        "mon dieu",
+        "法语"
+      ],
+      "factIds": [
+        "fact-gruff-voice-french"
+      ]
+    }
+  },
+  {
+    "id": "clue-voice-disagreement",
+    "title": "没有国籍的尖声",
+    "text": "各国证人都把尖声归为自己不懂的外语，且听不出词。",
+    "tag": "contradiction",
+    "source": "多名楼梯证人证词",
+    "unlockHints": [
+      "并排审阅多个证人的尖声描述。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "尖声",
+        "外语",
+        "证词"
+      ],
+      "factIds": [
+        "fact-shrill-voice-unidentified"
+      ]
+    }
+  },
+  {
+    "id": "clue-window-spring",
+    "title": "会自锁的窗",
+    "text": "窗框隐藏弹簧让窗扇关闭后自动扣住。",
+    "tag": "clue",
+    "source": "后房窗框",
+    "unlockHints": [
+      "细查窗框而不是只看钉子。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "窗户",
+        "弹簧"
+      ],
+      "factIds": [
+        "fact-window-hidden-spring"
+      ]
+    }
+  },
+  {
+    "id": "clue-broken-nail",
+    "title": "伪装完整的断钉",
+    "text": "靠床后窗的钉头断裂，放回后足以误导警方。",
+    "tag": "contradiction",
+    "source": "靠床后窗",
+    "unlockHints": [
+      "移动视角检查床头遮住的窗钉。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "断钉",
+        "床头窗"
+      ],
+      "factIds": [
+        "fact-broken-nail-mimics-fastening"
+      ]
+    }
+  },
+  {
+    "id": "clue-lightning-rod-shutter",
+    "title": "避雷杆与格栅百叶窗",
+    "text": "后墙避雷杆、宽格栅百叶窗和床头窗构成非普通人的进出路线。",
+    "tag": "clue",
+    "source": "莫格街后巷",
+    "unlockHints": [
+      "绕到后巷观察墙面和百叶窗宽度。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "避雷杆",
+        "百叶窗"
+      ],
+      "factIds": [
+        "fact-lightning-rod-shutter-route"
+      ]
+    }
+  },
+  {
+    "id": "clue-nonhuman-hair",
+    "title": "老妇人手中的非人毛发",
+    "text": "毛发颜色和质地不像人发，指向大型猩猩。",
+    "tag": "clue",
+    "source": "老妇人手中毛发",
+    "unlockHints": [
+      "检查老妇人手中攥住的毛发，并查自然史描述。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "毛发",
+        "猩猩"
+      ],
+      "factIds": [
+        "fact-hair-not-human",
+        "fact-force-beyond-ordinary-human"
+      ]
+    }
+  },
+  {
+    "id": "clue-finger-marks",
+    "title": "不属于人手的喉痕",
+    "text": "喉部指痕与人手无法吻合，支持非人直接施暴。",
+    "tag": "contradiction",
+    "source": "卡米耶喉部伤痕图",
+    "unlockHints": [
+      "把指痕与人手尺寸比较。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "指痕",
+        "喉咙"
+      ],
+      "factIds": [
+        "fact-finger-marks-not-human"
+      ]
+    }
+  },
+  {
+    "id": "clue-sailor-ribbon",
+    "title": "避雷杆下的船员发带",
+    "text": "油腻发带与马耳他船员结法把案发现场连向一名船员。",
+    "tag": "clue",
+    "source": "后墙避雷杆脚下",
+    "unlockHints": [
+      "搜查避雷杆附近的细小遗留物。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "发带",
+        "船员"
+      ],
+      "factIds": [
+        "fact-sailor-ribbon-at-rod"
+      ]
+    }
+  },
+  {
+    "id": "clue-maltese-ad",
+    "title": "寻猩猩广告",
+    "text": "以失物招领方式诱出猩猩主人，避免提前暴露指控。",
+    "tag": "clue",
+    "source": "航运报纸广告",
+    "unlockHints": [
+      "根据发带和猩猩线索设计公开广告。"
+    ],
+    "unlock": {
+      "type": "system",
+      "topics": [
+        "广告",
+        "猩猩主人"
+      ],
+      "factIds": [
+        "fact-advertisement-draws-owner"
+      ]
+    }
+  },
+  {
+    "id": "clue-sailor-confession",
+    "title": "船员供述",
+    "text": "船员承认猩猩逃脱、持剃刀进入莫格街，并说明自己只是追赶和目击。",
+    "tag": "testimony",
+    "source": "杜宾寓所对质",
+    "unlockHints": [
+      "用发带、广告和法语惊呼向船员施压。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "maltese-sailor",
+      "topics": [
+        "猩猩",
+        "剃刀",
+        "莫格街"
+      ],
+      "factIds": [
+        "fact-sailor-owns-orangutan",
+        "fact-orangutan-escaped-with-razor",
+        "fact-sailor-witnessed-not-killer"
+      ]
+    }
+  }
+]

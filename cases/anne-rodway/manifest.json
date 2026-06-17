@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "case-package/v1",
+  "caseId": "anne-rodway",
+  "title": "断领巾的证词",
+  "language": "zh-CN",
+  "entryChapterId": "chapter-1",
+  "createdBy": "codex-new-novels-case-adapter",
+  "source": {
+    "title": "Brother Owen's Story of Anne Rodway",
+    "author": "Wilkie Collins",
+    "rightsNote": "EPUB metadata states: Public domain in the USA."
+  }
+}

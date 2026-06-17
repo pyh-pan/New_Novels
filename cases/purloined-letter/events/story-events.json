@@ -1,0 +1,258 @@
+[
+  {
+    "id": "event-verify-police-search",
+    "kind": "instant-result",
+    "title": "核验警方搜查记录",
+    "description": "玩家要求 G-- 展示警方已检查的范围，立即获得三个月搜查结果。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "agentId": "prefect-g",
+      "topics": [
+        "搜查记录",
+        "府邸",
+        "显微镜"
+      ],
+      "requiredClueIds": [
+        "clue-letter-must-be-at-hand"
+      ],
+      "requiredFactIds": [
+        "fact-letter-must-be-available"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "prefect-g"
+      ],
+      "requiredSceneInteractions": [
+        "scene-dupins-library:prefect-account"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-police-searched-hotel",
+        "fact-search-found-nothing",
+        "fact-original-letter-description"
+      ],
+      "revealedClueIds": [
+        "clue-exhaustive-search",
+        "clue-original-description"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-search-vs-availability"
+      ],
+      "targetAgentIds": [
+        "prefect-g"
+      ],
+      "narrative": "G-- 的备忘簿被摊开，玩家获得足够信息判断搜查失败不是疏漏。"
+    },
+    "designRationale": "查搜查记录只是信息获取，价值在于玩家想到要核验警方边界；不需要等待或推进现实时间。"
+  },
+  {
+    "id": "event-minister-guarded-by-card-rack",
+    "kind": "agent-state-change",
+    "title": "部长因纸夹追问而戒备",
+    "description": "玩家把纸夹破旧信件、原信外观和反折痕放在一起质问部长，部长进入防御状态。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "agentId": "minister-d",
+      "topics": [
+        "纸夹",
+        "反折",
+        "封印"
+      ],
+      "requiredClueIds": [
+        "clue-visible-card-rack-letter",
+        "clue-reversed-folds"
+      ],
+      "requiredFactIds": [
+        "fact-card-rack-visible",
+        "fact-reversed-folds"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-worthless-design",
+        "contradiction-address-folds"
+      ],
+      "requiredNpcInteractions": [
+        "minister-d"
+      ],
+      "requiredSceneInteractions": [
+        "scene-minister-salon:blue-ribbon-card-rack"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-disguised-address"
+      ],
+      "revealedClueIds": [
+        "clue-disguised-address"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-address-folds"
+      ],
+      "targetAgentIds": [
+        "minister-d"
+      ],
+      "narrative": "部长不再只是嘲弄警方，而开始把纸夹称作无聊废纸；这种回避本身暴露压力。"
+    },
+    "designRationale": "玩家暴露怀疑会改变 NPC 回答策略和压力状态，因此使用 agent-state-change。"
+  },
+  {
+    "id": "event-street-distraction-opens-substitution",
+    "kind": "story-beat",
+    "title": "街上枪声打开调包窗口",
+    "description": "玩家发现鼻烟盒复访路线后，街面骚乱作为故事节拍触发，解释杜宾如何获得短暂行动窗口。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "agentId": "dupin",
+      "topics": [
+        "鼻烟盒",
+        "第二次拜访",
+        "枪声"
+      ],
+      "requiredClueIds": [
+        "clue-snuffbox-second-visit",
+        "clue-visible-card-rack-letter"
+      ],
+      "requiredFactIds": [
+        "fact-dupin-left-snuffbox",
+        "fact-card-rack-visible"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-worthless-design"
+      ],
+      "requiredNpcInteractions": [
+        "dupin"
+      ],
+      "requiredSceneInteractions": [
+        "scene-street-beneath-window:window-commotion"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-dupin-arranged-distraction",
+        "fact-facsimile-substitution"
+      ],
+      "revealedClueIds": [
+        "clue-street-distraction",
+        "clue-facsimile-substitution"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-distraction-substitution"
+      ],
+      "targetAgentIds": [
+        "dupin",
+        "minister-d"
+      ],
+      "narrative": "街面骚乱让部长离开纸夹，调包从危险猜测变成可解释行动。"
+    },
+    "designRationale": "枪声改变现场注意力和行动窗口，属于世界状态变化，而不是单纯资料返回。"
+  },
+  {
+    "id": "event-act-opening-to-search",
+    "kind": "act-transition",
+    "title": "调查转向警方边界",
+    "description": "玩家确认盗信事实、受害风险和信件必须随时可用后，进入警方搜查盲点阶段。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [
+        "进入搜查记录"
+      ],
+      "requiredClueIds": [
+        "clue-theft-witnessed",
+        "clue-letter-power",
+        "clue-letter-must-be-at-hand"
+      ],
+      "requiredFactIds": [
+        "fact-minister-seen-taking",
+        "fact-letter-power",
+        "fact-letter-must-be-available"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "prefect-g",
+        "royal-lady"
+      ],
+      "requiredSceneInteractions": [
+        "scene-dupins-library:prefect-account",
+        "scene-royal-boudoir-report:table-swap"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-police-searched-hotel"
+      ],
+      "revealedClueIds": [
+        "clue-exhaustive-search"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "prefect-g",
+        "dupin"
+      ],
+      "nextActId": "act-search",
+      "narrative": "G-- 开放搜查记录，案件从谁偷了信转向信为何找不到。"
+    },
+    "designRationale": "该事件解释调查阶段变化，并与 gate-opening-to-search 对齐。"
+  },
+  {
+    "id": "event-act-search-to-confrontation",
+    "kind": "act-transition",
+    "title": "调查转向部长客厅",
+    "description": "玩家证明警方搜查原则错误后，进入观察部长客厅与明处物件的阶段。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-search",
+      "topics": [
+        "部长客厅",
+        "明处藏匿"
+      ],
+      "requiredClueIds": [
+        "clue-exhaustive-search",
+        "clue-search-principle-wrong",
+        "clue-minister-anticipates-search",
+        "clue-original-description"
+      ],
+      "requiredFactIds": [
+        "fact-search-found-nothing",
+        "fact-search-principle-wrong",
+        "fact-minister-understands-police",
+        "fact-original-letter-description"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-search-vs-availability",
+        "contradiction-police-principle"
+      ],
+      "requiredNpcInteractions": [
+        "prefect-g",
+        "dupin"
+      ],
+      "requiredSceneInteractions": [
+        "scene-police-search-ledger:search-map",
+        "scene-dupins-library:method-discussion"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-dupin-visited-minister",
+        "fact-card-rack-visible"
+      ],
+      "revealedClueIds": [
+        "clue-dupin-visit",
+        "clue-visible-card-rack-letter"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-worthless-design"
+      ],
+      "targetAgentIds": [
+        "dupin",
+        "minister-d"
+      ],
+      "nextActId": "act-confrontation",
+      "narrative": "杜宾承认应把视线投向部长待客处那些人人都能看见的物件。"
+    },
+    "designRationale": "该事件打开新 scene 和关键 NPC 压力路线，属于 act-transition。"
+  }
+]

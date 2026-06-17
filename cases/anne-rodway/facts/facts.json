@@ -1,0 +1,429 @@
+[
+  {
+    "id": "fact-anne-poor-needlewoman",
+    "text": "Anne Rodway 是伦敦贫穷女针线工，与 Robert Lyon 相恋但因贫困不能成婚。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "Anne",
+      "针线工",
+      "贫困"
+    ]
+  },
+  {
+    "id": "fact-mary-friend",
+    "text": "Mary Mallinson 是 Anne 的好友，住在同一寄宿屋，年轻、贫穷、常受绝望困扰。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "anne-rodway",
+      "sally"
+    ],
+    "relatedClueIds": [
+      "clue-mary-despair"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "Mary",
+      "好友",
+      "寄宿屋"
+    ]
+  },
+  {
+    "id": "fact-mary-in-debt",
+    "text": "Mary 欠下三周房租，做针线活也常因笨拙和疲惫挨骂。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-mary-despair"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "债务",
+      "针线",
+      "压力"
+    ]
+  },
+  {
+    "id": "fact-laudanum-found",
+    "text": "Anne 曾在 Mary 床边发现标有毒药的鸦片酊瓶，但 Mary 称自己只取几滴帮助入睡。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-laudanum-bottle"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "鸦片酊",
+      "毒药",
+      "睡眠"
+    ]
+  },
+  {
+    "id": "fact-mary-despair",
+    "text": "Mary 曾说自己的人生从痛苦开始，也注定在痛苦中结束。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-mary-despair"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "绝望",
+      "遗言",
+      "误导"
+    ]
+  },
+  {
+    "id": "fact-mary-found-in-street",
+    "text": "警察在几条街外的路沿边发现昏迷的 Mary，身旁没有目击者。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "doctor-harris"
+    ],
+    "relatedClueIds": [
+      "clue-temple-blow"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "路沿",
+      "警察",
+      "昏迷"
+    ]
+  },
+  {
+    "id": "fact-temple-blow",
+    "text": "Mary 左太阳穴有单一严重伤痕，医生认为可能来自跌倒撞击。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "doctor-harris"
+    ],
+    "relatedClueIds": [
+      "clue-temple-blow"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "太阳穴",
+      "伤痕",
+      "跌倒"
+    ]
+  },
+  {
+    "id": "fact-cravat-in-hand",
+    "text": "Mary 右手紧攥着一截男人旧黑领巾，黑底上有淡紫色交错纹，边缘被暴力撕断。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-cravat-fragment"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "领巾",
+      "残片",
+      "撕断"
+    ]
+  },
+  {
+    "id": "fact-fainted-at-work",
+    "text": "Mary 当晚离开前曾在工作间因疲惫昏倒。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "doctor-harris"
+    ],
+    "relatedClueIds": [
+      "clue-workroom-fainting"
+    ],
+    "actId": "act-inquest",
+    "keywords": [
+      "工作间",
+      "昏倒",
+      "疲惫"
+    ]
+  },
+  {
+    "id": "fact-sent-home-alone",
+    "text": "工作间的人在 Mary 醒来后让她独自回家，没有给她搀扶或兴奋剂。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "doctor-harris"
+    ],
+    "relatedClueIds": [
+      "clue-workroom-fainting"
+    ],
+    "actId": "act-inquest",
+    "keywords": [
+      "独自回家",
+      "疏忽",
+      "工作间"
+    ]
+  },
+  {
+    "id": "fact-inquest-held",
+    "text": "验尸讯问听取医生、警察和工作间人员证词。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "beadle-wicks"
+    ],
+    "relatedClueIds": [
+      "clue-accidental-verdict"
+    ],
+    "actId": "act-inquest",
+    "keywords": [
+      "验尸",
+      "证词"
+    ]
+  },
+  {
+    "id": "fact-inquest-accidental",
+    "text": "验尸庭裁定 Mary 死于意外死亡，认为她可能再次昏倒撞上路沿。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "beadle-wicks",
+      "doctor-harris"
+    ],
+    "relatedClueIds": [
+      "clue-accidental-verdict"
+    ],
+    "actId": "act-inquest",
+    "keywords": [
+      "意外死亡",
+      "裁定",
+      "false-solution"
+    ]
+  },
+  {
+    "id": "fact-cravat-discounted",
+    "text": "验尸庭承认领巾残片可疑，但认为缺乏积极证据，警方未继续调查。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "beadle-wicks"
+    ],
+    "relatedClueIds": [
+      "clue-accidental-verdict",
+      "clue-cravat-fragment"
+    ],
+    "actId": "act-inquest",
+    "keywords": [
+      "领巾",
+      "证据不足",
+      "警方"
+    ]
+  },
+  {
+    "id": "fact-shop-sells-rags",
+    "text": "Anne 下工途中进入一家兼卖蜡烛、收破布旧铁的小铺。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-matching-cravat"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "旧物铺",
+      "破布",
+      "蜡烛"
+    ]
+  },
+  {
+    "id": "fact-cravat-match",
+    "text": "旧物铺破布堆中的同花色领巾断口与 Mary 手中残片完全吻合。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-matching-cravat"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "吻合",
+      "断口",
+      "物证"
+    ]
+  },
+  {
+    "id": "fact-horlick-cravat-owner",
+    "text": "Mrs. Horlick 证明那条破领巾原属于她的丈夫 Josiah Horlick。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "mrs-horlick"
+    ],
+    "relatedClueIds": [
+      "clue-horlick-owner"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "Horlick",
+      "领巾主人",
+      "妻子"
+    ]
+  },
+  {
+    "id": "fact-josiah-cabman",
+    "text": "Josiah Horlick 是驼背车夫，Mary 遇害当夜曾在街头拉客。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "josiah-horlick",
+      "mrs-horlick"
+    ],
+    "relatedClueIds": [
+      "clue-horlick-owner"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "车夫",
+      "驼背",
+      "夜车"
+    ]
+  },
+  {
+    "id": "fact-cabman-witnessed-blow",
+    "text": "Josiah Horlick 承认一名醉酒乘客绊住 Mary；Mary 抓住 Horlick 的领巾撕下一端，随后醉汉挥拳击中她。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "josiah-horlick"
+    ],
+    "relatedClueIds": [
+      "clue-cabman-admission"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "醉汉",
+      "挥拳",
+      "目击"
+    ]
+  },
+  {
+    "id": "fact-red-lion-entry",
+    "text": "Josiah Horlick 将那名醉酒乘客载到 Dodd Street 与 Rudgely Street 转角的红狮酒馆。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "josiah-horlick"
+    ],
+    "relatedClueIds": [
+      "clue-red-lion-address"
+    ],
+    "actId": "act-cravat-trail",
+    "keywords": [
+      "红狮酒馆",
+      "地址",
+      "乘客"
+    ]
+  },
+  {
+    "id": "fact-noah-identity",
+    "text": "红狮酒馆的人确认当夜病倒在楼上的醉汉名叫 Noah Truscott。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "robert-lyon",
+      "doctor-red-lion"
+    ],
+    "relatedClueIds": [
+      "clue-noah-name"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "Noah Truscott",
+      "姓名",
+      "酒馆"
+    ]
+  },
+  {
+    "id": "fact-doctor-delirium",
+    "text": "红狮酒馆医生称 Noah Truscott 患上由长期酗酒引发并影响心神的病症。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "doctor-red-lion"
+    ],
+    "relatedClueIds": [
+      "clue-doctor-delirium"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "医生",
+      "酗酒",
+      "病症"
+    ]
+  },
+  {
+    "id": "fact-noah-ruined-father",
+    "text": "Mary 生前告诉 Anne，Noah Truscott 曾是毁掉她父亲的恶友。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "anne-rodway"
+    ],
+    "relatedClueIds": [
+      "clue-noah-old-name"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "父亲",
+      "旧恶",
+      "同名"
+    ]
+  },
+  {
+    "id": "fact-court-reaction",
+    "text": "Noah 在法庭听见 Mary 名字和她父亲往事时显出恐惧，最终喊出自己毁了父亲又害死女儿。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "noah-truscott"
+    ],
+    "relatedClueIds": [
+      "clue-court-reaction"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "法庭",
+      "自白",
+      "恐惧"
+    ]
+  },
+  {
+    "id": "fact-noah-struck-mary",
+    "text": "Noah Truscott 是击中 Mary 太阳穴并导致她死亡的人。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "noah-truscott"
+    ],
+    "relatedClueIds": [
+      "clue-cabman-admission",
+      "clue-noah-name"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "真凶",
+      "拳击",
+      "死亡"
+    ]
+  },
+  {
+    "id": "fact-noah-sentenced",
+    "text": "Noah Truscott 因 manslaughter 被判终身流放。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "noah-truscott"
+    ],
+    "relatedClueIds": [
+      "clue-court-reaction"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "判决",
+      "流放"
+    ]
+  }
+]

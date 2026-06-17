@@ -25,15 +25,29 @@ export type CaseShelfItem = {
   };
 };
 
-export const bundledCaseIds = ["hunters-lodge"] as const;
+export const bundledCaseIds = [
+  "hunters-lodge",
+  "speckled-band",
+  "anne-rodway",
+  "rue-morgue",
+  "purloined-letter"
+] as const;
 export type BundledCaseId = (typeof bundledCaseIds)[number];
 
 const caseTags: Record<BundledCaseId, string[]> = {
-  "hunters-lodge": ["身份伪装", "证词矛盾", "不在场证明"]
+  "hunters-lodge": ["身份伪装", "证词矛盾", "不在场证明"],
+  "speckled-band": ["乡宅惊悚", "遗产动机", "密室疑云"],
+  "anne-rodway": ["证物追踪", "证词链", "伦敦贫民区"],
+  "rue-morgue": ["密室", "证词矛盾", "非人真相"],
+  "purloined-letter": ["政治勒索", "明处藏匿", "方法推理"]
 };
 
 const caseDifficulty: Record<BundledCaseId, CaseShelfItem["difficulty"]> = {
-  "hunters-lodge": "标准"
+  "hunters-lodge": "标准",
+  "speckled-band": "标准",
+  "anne-rodway": "标准",
+  "rue-morgue": "进阶",
+  "purloined-letter": "进阶"
 };
 
 const casePalettes: Record<
@@ -43,6 +57,22 @@ const casePalettes: Record<
   "hunters-lodge": {
     background: "#efe8d8",
     foreground: "#171512"
+  },
+  "speckled-band": {
+    background: "#e8eadf",
+    foreground: "#151813"
+  },
+  "anne-rodway": {
+    background: "#eee6df",
+    foreground: "#1b1513"
+  },
+  "rue-morgue": {
+    background: "#e5e8ec",
+    foreground: "#12161b"
+  },
+  "purloined-letter": {
+    background: "#ece8d5",
+    foreground: "#17150f"
   }
 };
 

@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import StudioHome from "../components/StudioHome";
 import StudioWorkbench from "../components/StudioWorkbench";
 import { loadBundledCase } from "../lib/case/default-case";
-import { createStudioDraftView } from "../lib/studio/draft";
+import { createStudioDraftView, createStudioDraftViewWithAdaptation } from "../lib/studio/draft";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -132,5 +132,33 @@ describe("StudioWorkbench", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "已提交 1 条" })).toBeInTheDocument();
     });
+  });
+
+  it("shows adaptation notes for generated drafts", () => {
+    render(
+      <StudioWorkbench
+        draft={createStudioDraftViewWithAdaptation(loadBundledCase("hunters-lodge"), {
+          sourceProfile: {
+            title: "猎人小屋疑案",
+            author: "Agatha Christie",
+            language: "zh-CN",
+            narrativeForm: "第三人称短篇推理",
+            structureNotes: ["包含案发、调查、误导和真相。"],
+            adaptationStrategy: ["保留故事阅读，隐藏侦探推理。"],
+            rightsNote: "测试。"
+          },
+          segmentation: [],
+          qualityReport: [],
+          adaptationNotesMarkdown:
+            "# 猎人小屋疑案 改写说明\n\n## Fair-Play Spine\n\n保留误导并隐藏真相。"
+        })}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "改写说明" }));
+
+    expect(screen.getByRole("heading", { name: "改写说明" })).toBeInTheDocument();
+    expect(screen.getByText("Fair-Play Spine")).toBeInTheDocument();
+    expect(screen.getByText("保留误导并隐藏真相。")).toBeInTheDocument();
   });
 });

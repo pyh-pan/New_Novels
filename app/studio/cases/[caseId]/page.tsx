@@ -34,7 +34,8 @@ export default async function StudioCasePage({ params }: StudioCasePageProps) {
           lifecycleStatus: generated.status,
           sourceProfile: generated.sourceProfile,
           segmentation: generated.segmentation,
-          qualityReport: generated.qualityReport
+          qualityReport: generated.qualityReport,
+          adaptationNotesMarkdown: generated.adaptationNotesMarkdown
         })}
       />
     );

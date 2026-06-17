@@ -1,0 +1,90 @@
+[
+  {
+    "id": "contradiction-search-vs-availability",
+    "title": "搜遍暗处与随时可用",
+    "factIds": [
+      "fact-letter-must-be-available",
+      "fact-search-found-nothing"
+    ],
+    "clueIds": [
+      "clue-letter-must-be-at-hand",
+      "clue-exhaustive-search"
+    ],
+    "agentIds": [
+      "prefect-g",
+      "dupin"
+    ]
+  },
+  {
+    "id": "contradiction-police-principle",
+    "title": "越精密越狭窄",
+    "factIds": [
+      "fact-police-searched-hotel",
+      "fact-search-principle-wrong",
+      "fact-minister-understands-police"
+    ],
+    "clueIds": [
+      "clue-exhaustive-search",
+      "clue-search-principle-wrong",
+      "clue-minister-anticipates-search"
+    ],
+    "agentIds": [
+      "prefect-g",
+      "dupin",
+      "minister-d"
+    ]
+  },
+  {
+    "id": "contradiction-worthless-design",
+    "title": "破旧废纸过于刻意",
+    "factIds": [
+      "fact-card-rack-visible",
+      "fact-minister-understands-police"
+    ],
+    "clueIds": [
+      "clue-visible-card-rack-letter",
+      "clue-minister-anticipates-search"
+    ],
+    "agentIds": [
+      "minister-d",
+      "dupin"
+    ]
+  },
+  {
+    "id": "contradiction-address-folds",
+    "title": "外观相反但纸张相同",
+    "factIds": [
+      "fact-original-letter-description",
+      "fact-disguised-address",
+      "fact-reversed-folds"
+    ],
+    "clueIds": [
+      "clue-original-description",
+      "clue-disguised-address",
+      "clue-reversed-folds"
+    ],
+    "agentIds": [
+      "minister-d",
+      "dupin",
+      "prefect-g"
+    ]
+  },
+  {
+    "id": "contradiction-distraction-substitution",
+    "title": "短暂离窗与信件调包",
+    "factIds": [
+      "fact-dupin-left-snuffbox",
+      "fact-dupin-arranged-distraction",
+      "fact-facsimile-substitution"
+    ],
+    "clueIds": [
+      "clue-snuffbox-second-visit",
+      "clue-street-distraction",
+      "clue-facsimile-substitution"
+    ],
+    "agentIds": [
+      "dupin",
+      "minister-d"
+    ]
+  }
+]

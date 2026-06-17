@@ -1,0 +1,15 @@
+{
+  "culprit": "minister-d",
+  "victim": "royal-lady",
+  "motive": "部长 D-- 为取得对王室女士的政治控制权，利用失窃信件威胁其名誉与安宁。",
+  "method": "他在王室内室当场换走信件，随后把真信翻转、重新折叠、改封并写成寄给自己的破旧来信，挂在客厅壁炉下方的纸夹中，以明处藏匿避开警方的暗处搜查。",
+  "decisiveEvidence": [
+    "clue-theft-witnessed",
+    "clue-letter-must-be-at-hand",
+    "clue-exhaustive-search",
+    "clue-visible-card-rack-letter",
+    "clue-reversed-folds",
+    "contradiction-search-vs-availability",
+    "contradiction-address-folds"
+  ]
+}

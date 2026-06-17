@@ -1,0 +1,209 @@
+[
+  {
+    "id": "act-opening",
+    "title": "惨案与假动机",
+    "availableAgentIds": [
+      "general",
+      "dupin",
+      "adolph-le-bon",
+      "jules-mignaud",
+      "pauline-dubourg",
+      "pierre-moreau",
+      "isidore-muset",
+      "paul-dumas"
+    ],
+    "visibleClueIds": [
+      "clue-locked-room",
+      "clue-gold-left",
+      "clue-chimney-body",
+      "clue-yard-body",
+      "clue-razor",
+      "clue-le-bon-delivery",
+      "clue-no-regular-visitors"
+    ],
+    "lockedFactIds": [
+      "fact-window-hidden-spring",
+      "fact-broken-nail-mimics-fastening",
+      "fact-hair-not-human",
+      "fact-truth-orangutan-culprit"
+    ],
+    "entryConditions": [],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-locked-room",
+          "clue-gold-left",
+          "clue-chimney-body"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-le-bon-delivered-money"
+        ],
+        "requiresContradictions": [
+          "contradiction-robbery-motive"
+        ],
+        "requiresAct": "act-opening"
+      }
+    ]
+  },
+  {
+    "id": "act-testimony",
+    "title": "证词与封闭房间",
+    "availableAgentIds": [
+      "general",
+      "dupin",
+      "isidore-muset",
+      "henri-duval",
+      "odenheimer",
+      "william-bird",
+      "alfonzo-garcio",
+      "alberto-montani",
+      "paul-dumas",
+      "adolph-le-bon"
+    ],
+    "visibleClueIds": [
+      "clue-gruff-french-voice",
+      "clue-voice-disagreement",
+      "clue-window-spring",
+      "clue-broken-nail",
+      "clue-lightning-rod-shutter"
+    ],
+    "lockedFactIds": [
+      "fact-hair-not-human",
+      "fact-finger-marks-not-human",
+      "fact-sailor-ribbon-at-rod",
+      "fact-truth-method-entry-exit"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-locked-room",
+          "clue-gold-left"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-motive-not-robbery"
+        ],
+        "requiresContradictions": [
+          "contradiction-robbery-motive"
+        ],
+        "requiresAct": "act-opening"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-voice-disagreement",
+          "clue-broken-nail",
+          "clue-lightning-rod-shutter"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-lightning-rod-shutter-route"
+        ],
+        "requiresContradictions": [
+          "contradiction-window-locked-yet-route",
+          "contradiction-voice-nationality"
+        ],
+        "requiresAct": "act-testimony"
+      }
+    ]
+  },
+  {
+    "id": "act-confrontation",
+    "title": "非人线索与船员",
+    "availableAgentIds": [
+      "general",
+      "dupin",
+      "paul-dumas",
+      "maltese-sailor",
+      "ourang-outang",
+      "isidore-muset"
+    ],
+    "visibleClueIds": [
+      "clue-nonhuman-hair",
+      "clue-finger-marks",
+      "clue-sailor-ribbon",
+      "clue-maltese-ad",
+      "clue-sailor-confession"
+    ],
+    "lockedFactIds": [
+      "fact-truth-orangutan-culprit",
+      "fact-truth-no-human-motive",
+      "fact-le-bon-released"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-broken-nail",
+          "clue-lightning-rod-shutter"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-broken-nail-mimics-fastening"
+        ],
+        "requiresContradictions": [
+          "contradiction-window-locked-yet-route"
+        ],
+        "requiresAct": "act-testimony"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-nonhuman-hair",
+          "clue-finger-marks",
+          "clue-sailor-ribbon",
+          "clue-sailor-confession"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-sailor-owns-orangutan"
+        ],
+        "requiresContradictions": [
+          "contradiction-hand-not-human"
+        ],
+        "requiresAct": "act-confrontation"
+      }
+    ]
+  },
+  {
+    "id": "act-accusation",
+    "title": "最终指认",
+    "availableAgentIds": [
+      "general",
+      "dupin",
+      "maltese-sailor",
+      "ourang-outang",
+      "adolph-le-bon"
+    ],
+    "visibleClueIds": [
+      "clue-sailor-confession",
+      "clue-nonhuman-hair",
+      "clue-finger-marks",
+      "clue-broken-nail",
+      "clue-lightning-rod-shutter",
+      "clue-gold-left"
+    ],
+    "lockedFactIds": [],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-sailor-confession",
+          "clue-nonhuman-hair",
+          "clue-finger-marks"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-sailor-witnessed-not-killer"
+        ],
+        "requiresContradictions": [
+          "contradiction-hand-not-human",
+          "contradiction-human-strength"
+        ],
+        "requiresAct": "act-confrontation"
+      }
+    ],
+    "exitConditions": []
+  }
+]

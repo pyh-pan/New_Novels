@@ -1,0 +1,103 @@
+[
+  {
+    "id": "scene-dupins-library",
+    "actId": "act-opening",
+    "location": "圣日耳曼郊区杜宾的背街书房",
+    "observableFactIds": [
+      "fact-confidential-case",
+      "fact-letter-stolen",
+      "fact-minister-seen-taking"
+    ],
+    "interactableObjects": [
+      "prefect-account",
+      "dark-room",
+      "memorandum-book",
+      "pipe-smoke"
+    ],
+    "ambientText": [
+      "屋内没有点灯，谈话被保密需要压得很低。",
+      "G-- 的叙述提供开局事实，但他的自尊会遮蔽失败原因。"
+    ]
+  },
+  {
+    "id": "scene-royal-boudoir-report",
+    "actId": "act-opening",
+    "location": "王室内室的复盘记录",
+    "observableFactIds": [
+      "fact-theft-swap-in-boudoir",
+      "fact-victim-honor-risk"
+    ],
+    "interactableObjects": [
+      "table-swap",
+      "address-side-up",
+      "useless-letter-left-behind"
+    ],
+    "ambientText": [
+      "现场不能公开进入，只能通过王室女士和 G-- 的证词复盘。",
+      "关键不是秘密内容，而是她为何无法当场制止部长。"
+    ]
+  },
+  {
+    "id": "scene-police-search-ledger",
+    "actId": "act-search",
+    "location": "警察厅秘密搜查记录",
+    "observableFactIds": [
+      "fact-police-body-search",
+      "fact-police-searched-hotel",
+      "fact-search-found-nothing",
+      "fact-original-letter-description"
+    ],
+    "interactableObjects": [
+      "body-search-note",
+      "search-map",
+      "microscope-record",
+      "letter-description"
+    ],
+    "ambientText": [
+      "记录精密得近乎傲慢，每一个暗处都被编号、探针和显微镜占领。",
+      "没有发现本身成为事实：若信在传统藏处，它早该被找到。"
+    ]
+  },
+  {
+    "id": "scene-minister-salon",
+    "actId": "act-confrontation",
+    "location": "部长府邸客厅",
+    "observableFactIds": [
+      "fact-dupin-visited-minister",
+      "fact-card-rack-visible",
+      "fact-disguised-address",
+      "fact-reversed-folds"
+    ],
+    "interactableObjects": [
+      "writing-table",
+      "musical-instruments",
+      "blue-ribbon-card-rack",
+      "soiled-letter",
+      "mantel-brass-knob"
+    ],
+    "ambientText": [
+      "客厅没有机关感，只有过分日常的杂物。",
+      "纸夹在壁炉下方摇晃，像一个不值得搜查的答案。"
+    ]
+  },
+  {
+    "id": "scene-street-beneath-window",
+    "actId": "act-confrontation",
+    "location": "部长府邸窗下街面",
+    "observableFactIds": [
+      "fact-dupin-left-snuffbox",
+      "fact-dupin-arranged-distraction",
+      "fact-facsimile-substitution"
+    ],
+    "interactableObjects": [
+      "snuffbox-return",
+      "window-commotion",
+      "blank-cartridge-shot",
+      "facsimile-letter"
+    ],
+    "ambientText": [
+      "街声能短暂改变客厅权力关系：部长离开纸夹，访客获得一瞬行动空间。",
+      "这不是等待任务，而是玩家发现调包条件后的故事节拍。"
+    ]
+  }
+]

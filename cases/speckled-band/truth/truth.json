@@ -1,0 +1,16 @@
+{
+  "culprit": "grimesby-roylott",
+  "victim": "julia-stoner",
+  "motive": "阻止两个继女结婚后分走斯托纳太太遗产年金，从而保住自己已大幅缩水的收入。",
+  "method": "罗伊洛特把印度毒蛇藏在铁保险柜中，训练它在夜里从通向隔壁的通风孔爬下假铃绳，到达固定床上的受害者身边；他用口哨召回，并用打成套环的狗鞭控制蛇。",
+  "decisiveEvidence": [
+    "clue-will-motive",
+    "clue-dummy-bell-rope",
+    "clue-inside-ventilator",
+    "clue-fixed-bed",
+    "clue-milk-and-safe",
+    "clue-dog-lash-loop",
+    "clue-chair-marks",
+    "clue-night-hiss"
+  ]
+}

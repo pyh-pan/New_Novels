@@ -1,0 +1,152 @@
+[
+  {
+    "id": "scene-lodging-room",
+    "actId": "act-opening",
+    "location": "Anne 的寄宿屋小房间",
+    "observableFactIds": [
+      "fact-anne-poor-needlewoman",
+      "fact-mary-friend",
+      "fact-mary-found-in-street",
+      "fact-temple-blow"
+    ],
+    "interactableObjects": [
+      "anne-diary",
+      "mary-card",
+      "wash-basin",
+      "bedside-chair"
+    ],
+    "ambientText": [
+      "窄屋里有针线、茶杯和未干的泪痕。",
+      "门外的楼梯吱呀作响，像每个房客都在偷听不幸。"
+    ]
+  },
+  {
+    "id": "scene-mary-room",
+    "actId": "act-opening",
+    "location": "Mary 楼上的房间",
+    "observableFactIds": [
+      "fact-laudanum-found",
+      "fact-mary-despair",
+      "fact-mary-in-debt"
+    ],
+    "interactableObjects": [
+      "laudanum-bottle",
+      "unfinished-needlework",
+      "empty-teacup",
+      "thin-bedclothes"
+    ],
+    "ambientText": [
+      "床边椅子上残留小瓶印痕，屋中散着没做完的活。",
+      "一切都像贫穷来不及收拾自己的证据。"
+    ]
+  },
+  {
+    "id": "scene-workroom",
+    "actId": "act-inquest",
+    "location": "Mary 做工的工作间",
+    "observableFactIds": [
+      "fact-fainted-at-work",
+      "fact-sent-home-alone"
+    ],
+    "interactableObjects": [
+      "workroom-ledger",
+      "forewoman-statement",
+      "unfinished-piecework"
+    ],
+    "ambientText": [
+      "长桌旁的女工记得 Mary 倒下，却没有谁陪她回去。"
+    ]
+  },
+  {
+    "id": "scene-inquest-room",
+    "actId": "act-inquest",
+    "location": "验尸讯问处",
+    "observableFactIds": [
+      "fact-inquest-held",
+      "fact-inquest-accidental",
+      "fact-cravat-discounted"
+    ],
+    "interactableObjects": [
+      "coroner-notes",
+      "doctor-statement",
+      "police-statement",
+      "cravat-exhibit"
+    ],
+    "ambientText": [
+      "一句“意外死亡”盖住了许多犹豫，也盖不住 Anne 手里的旧布。"
+    ]
+  },
+  {
+    "id": "scene-chandler-shop",
+    "actId": "act-cravat-trail",
+    "location": "蜡烛兼旧物铺",
+    "observableFactIds": [
+      "fact-shop-sells-rags",
+      "fact-cravat-match"
+    ],
+    "interactableObjects": [
+      "rag-counter",
+      "candle-bundle",
+      "torn-cravat",
+      "shopwoman-gossip"
+    ],
+    "ambientText": [
+      "铺子一边卖蜡烛，一边堆着破布和旧铁；煤气灯把污旧纹样照得分明。"
+    ]
+  },
+  {
+    "id": "scene-horlick-mews",
+    "actId": "act-cravat-trail",
+    "location": "Horlick 所住马厩街",
+    "observableFactIds": [
+      "fact-horlick-cravat-owner",
+      "fact-josiah-cabman"
+    ],
+    "interactableObjects": [
+      "mews-corner",
+      "pipe-smoke",
+      "horlick-door",
+      "sixpence-offer"
+    ],
+    "ambientText": [
+      "马厩街尽头有烟草味和湿稻草味，矮小驼背的男人总站在能立刻溜走的地方。"
+    ]
+  },
+  {
+    "id": "scene-red-lion",
+    "actId": "act-accusation",
+    "location": "Dodd Street 与 Rudgely Street 转角的红狮酒馆",
+    "observableFactIds": [
+      "fact-red-lion-entry",
+      "fact-noah-identity",
+      "fact-doctor-delirium"
+    ],
+    "interactableObjects": [
+      "jug-and-bottle-door",
+      "barman-memory",
+      "sickroom-stairs",
+      "doctor-card"
+    ],
+    "ambientText": [
+      "酒馆白日也有隔夜酒气；楼上病人的名字从酒保嘴里漏出来，像一根钉子落地。"
+    ]
+  },
+  {
+    "id": "scene-police-court",
+    "actId": "act-accusation",
+    "location": "警署与法庭",
+    "observableFactIds": [
+      "fact-court-reaction",
+      "fact-noah-sentenced"
+    ],
+    "interactableObjects": [
+      "witness-box",
+      "dock-rail",
+      "magistrate-notes",
+      "court-report"
+    ],
+    "ambientText": [
+      "被告栏很高，Noah 的手垂在栏上，像还没收回的暴力。"
+    ]
+  }
+]

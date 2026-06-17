@@ -1,0 +1,56 @@
+[
+  {
+    "fromAgentId": "jules-mignaud",
+    "toAgentId": "adolph-le-bon",
+    "factId": "fact-le-bon-no-other-evidence",
+    "condition": {
+      "requiresAllClues": [
+        "clue-gold-left"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-gold-left-behind"
+      ],
+      "requiresContradictions": [
+        "contradiction-le-bon-arrest"
+      ],
+      "requiresAct": "act-testimony"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "dupin",
+    "toAgentId": "maltese-sailor",
+    "factId": "fact-advertisement-draws-owner",
+    "condition": {
+      "requiresAllClues": [
+        "clue-sailor-ribbon",
+        "clue-maltese-ad"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-sailor-ribbon-at-rod"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-confrontation"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "paul-dumas",
+    "toAgentId": "dupin",
+    "factId": "fact-finger-marks-not-human",
+    "condition": {
+      "requiresAllClues": [
+        "clue-finger-marks"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [],
+      "requiresContradictions": [
+        "contradiction-human-strength"
+      ],
+      "requiresAct": "act-confrontation"
+    },
+    "mode": "observed"
+  }
+]

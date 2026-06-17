@@ -1,0 +1,307 @@
+[
+  {
+    "id": "clue-laudanum-bottle",
+    "title": "床边的鸦片酊瓶",
+    "text": "Mary 曾把鸦片酊放在床边，这会诱导自杀或自伤的假解释，但剂量和当夜事实并不支持它成为死因。",
+    "tag": "clue",
+    "source": "scene-mary-room",
+    "unlockHints": [
+      "调查 Mary 房间床边椅子",
+      "询问 Anne 关于 Mary 的睡眠"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "anne-rodway",
+      "topics": [
+        "鸦片酊",
+        "睡眠"
+      ],
+      "factIds": [
+        "fact-laudanum-found"
+      ]
+    }
+  },
+  {
+    "id": "clue-mary-despair",
+    "title": "Mary 的绝望言语",
+    "text": "Mary 多次说自己命苦，甚至说人生注定悲惨结束；这是情绪背景，也是 false solution 的心理诱因。",
+    "tag": "testimony",
+    "source": "anne-rodway",
+    "unlockHints": [
+      "询问 Anne 与 Mary 的最后几次谈话"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "anne-rodway",
+      "topics": [
+        "Mary",
+        "绝望"
+      ],
+      "factIds": [
+        "fact-mary-despair"
+      ]
+    }
+  },
+  {
+    "id": "clue-temple-blow",
+    "title": "左太阳穴的单点重伤",
+    "text": "Mary 左太阳穴有严重伤痕，可能来自跌倒，也可能来自外力拳击。",
+    "tag": "clue",
+    "source": "scene-lodging-room",
+    "unlockHints": [
+      "查看 Mary 被送回时的伤势",
+      "询问医生医学判断"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "doctor-harris",
+      "topics": [
+        "太阳穴",
+        "伤势"
+      ],
+      "factIds": [
+        "fact-temple-blow"
+      ]
+    }
+  },
+  {
+    "id": "clue-cravat-fragment",
+    "title": "掌心里的断领巾",
+    "text": "Mary 右手攥着一截男人旧领巾，边缘像被暴力撕断，说明她倒下前抓住过某个人或物。",
+    "tag": "clue",
+    "source": "scene-lodging-room",
+    "unlockHints": [
+      "检查 Mary 的右手",
+      "询问 Anne 手中落下的东西"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "anne-rodway",
+      "topics": [
+        "领巾",
+        "右手"
+      ],
+      "factIds": [
+        "fact-cravat-in-hand"
+      ]
+    }
+  },
+  {
+    "id": "clue-workroom-fainting",
+    "title": "工作间昏倒记录",
+    "text": "Mary 当晚确曾在工作间昏倒并被独自放回家，支撑意外死亡解释。",
+    "tag": "testimony",
+    "source": "scene-workroom",
+    "unlockHints": [
+      "核实 Mary 下班前状态",
+      "询问医生走访工作间结果"
+    ],
+    "unlock": {
+      "type": "system",
+      "topics": [
+        "工作间",
+        "昏倒"
+      ],
+      "factIds": [
+        "fact-fainted-at-work",
+        "fact-sent-home-alone"
+      ]
+    }
+  },
+  {
+    "id": "clue-accidental-verdict",
+    "title": "意外死亡裁定",
+    "text": "验尸庭采纳跌倒撞伤解释，认为断领巾不足以启动警方调查。",
+    "tag": "testimony",
+    "source": "scene-inquest-room",
+    "unlockHints": [
+      "查看验尸记录",
+      "询问执事或医生"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "beadle-wicks",
+      "topics": [
+        "验尸",
+        "意外死亡"
+      ],
+      "factIds": [
+        "fact-inquest-accidental",
+        "fact-cravat-discounted"
+      ]
+    }
+  },
+  {
+    "id": "clue-matching-cravat",
+    "title": "旧物铺里的同源领巾",
+    "text": "旧物铺破布堆中领巾的花纹和断口与 Mary 手中残片完全吻合。",
+    "tag": "clue",
+    "source": "scene-chandler-shop",
+    "unlockHints": [
+      "沿断领巾追查旧物铺",
+      "比对花纹和撕裂边缘"
+    ],
+    "unlock": {
+      "type": "system",
+      "topics": [
+        "旧物铺",
+        "领巾"
+      ],
+      "factIds": [
+        "fact-cravat-match"
+      ]
+    }
+  },
+  {
+    "id": "clue-horlick-owner",
+    "title": "领巾属于 Horlick",
+    "text": "Mrs. Horlick 证明旧领巾原属于丈夫 Josiah Horlick。",
+    "tag": "testimony",
+    "source": "mrs-horlick",
+    "unlockHints": [
+      "拿匹配后的领巾询问 Mrs. Horlick",
+      "追问破布来源"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "mrs-horlick",
+      "topics": [
+        "领巾",
+        "丈夫"
+      ],
+      "factIds": [
+        "fact-horlick-cravat-owner",
+        "fact-josiah-cabman"
+      ]
+    }
+  },
+  {
+    "id": "clue-cabman-admission",
+    "title": "车夫承认街头一击",
+    "text": "Josiah Horlick 承认醉酒乘客绊住 Mary，并在她斥责后挥拳击中她。",
+    "tag": "testimony",
+    "source": "josiah-horlick",
+    "unlockHints": [
+      "用领巾归属向 Josiah 施压",
+      "提及警察或给出利益诱导"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "josiah-horlick",
+      "topics": [
+        "乘客",
+        "挥拳",
+        "Mary"
+      ],
+      "factIds": [
+        "fact-cabman-witnessed-blow"
+      ]
+    }
+  },
+  {
+    "id": "clue-red-lion-address",
+    "title": "红狮酒馆地址",
+    "text": "Josiah 把醉酒乘客送到 Dodd Street 与 Rudgely Street 转角的红狮酒馆。",
+    "tag": "clue",
+    "source": "josiah-horlick",
+    "unlockHints": [
+      "追问醉汉下车地点",
+      "在 Horlick 害怕后继续追问"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "josiah-horlick",
+      "topics": [
+        "红狮",
+        "下车"
+      ],
+      "factIds": [
+        "fact-red-lion-entry"
+      ]
+    }
+  },
+  {
+    "id": "clue-noah-name",
+    "title": "红狮楼上的 Noah Truscott",
+    "text": "红狮酒馆确认当夜醉汉名叫 Noah Truscott。",
+    "tag": "clue",
+    "source": "robert-lyon",
+    "unlockHints": [
+      "委托 Robert 或 general 核查红狮酒馆",
+      "询问酒保与医生"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "robert-lyon",
+      "topics": [
+        "红狮",
+        "姓名"
+      ],
+      "factIds": [
+        "fact-noah-identity"
+      ]
+    }
+  },
+  {
+    "id": "clue-doctor-delirium",
+    "title": "酗酒引发的病症",
+    "text": "Noah 当夜后病倒，病症来自长期酗酒并影响心神；这解释了他被留在红狮楼上。",
+    "tag": "testimony",
+    "source": "doctor-red-lion",
+    "unlockHints": [
+      "向红狮医生核查病人状态"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "doctor-red-lion",
+      "topics": [
+        "病情",
+        "酗酒"
+      ],
+      "factIds": [
+        "fact-doctor-delirium"
+      ]
+    }
+  },
+  {
+    "id": "clue-noah-old-name",
+    "title": "Mary 生前说过的旧恶人",
+    "text": "Mary 生前提到 Noah Truscott 曾毁掉她父亲；红狮姓名让旧事与新案扣合。",
+    "tag": "testimony",
+    "source": "anne-rodway",
+    "unlockHints": [
+      "获得 Noah 姓名后再询问 Anne 关于 Mary 父亲的旧事"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "anne-rodway",
+      "topics": [
+        "Noah Truscott",
+        "父亲"
+      ],
+      "factIds": [
+        "fact-noah-ruined-father"
+      ]
+    }
+  },
+  {
+    "id": "clue-court-reaction",
+    "title": "Noah 对 Mary 名字的恐惧",
+    "text": "Noah 听见 Mary 和她父亲时出现恐惧反应，结案后说明他被旧罪与新罪共同压垮。",
+    "tag": "doubt",
+    "source": "scene-police-court",
+    "unlockHints": [
+      "完成最终指认后查看法庭反应"
+    ],
+    "unlock": {
+      "type": "story",
+      "topics": [
+        "法庭",
+        "Mary"
+      ],
+      "factIds": [
+        "fact-court-reaction"
+      ]
+    }
+  }
+]

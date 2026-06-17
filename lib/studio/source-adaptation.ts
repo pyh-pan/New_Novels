@@ -2,6 +2,8 @@ import { casePackageSchema, type CasePackage } from "../case-package/schema";
 import { caseSchema, type CaseFile } from "../case/schema";
 import { createChatCompletion, type AIMessage } from "../ai/provider";
 import type { CasePackageIssue, CasePackageValidationReport } from "../case-package/loader";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 
 export type SourceDocumentKind = "text" | "markdown" | "pdf";
@@ -49,9 +51,28 @@ const adaptationQualityItemSchema = z.object({
   title: nonEmptyString,
   detail: nonEmptyString
 });
+const fairPlaySpineSchema = z.object({
+  victim: nonEmptyString,
+  culprit: nonEmptyString,
+  motive: nonEmptyString,
+  method: nonEmptyString,
+  falseSolution: nonEmptyString,
+  minimumClueChain: z.array(nonEmptyString).min(1),
+  decisiveContradictions: z.array(nonEmptyString).min(1)
+});
+const adaptationNotesSchema = z.object({
+  summary: nonEmptyString,
+  readingStrategy: z.array(nonEmptyString).min(1),
+  investigationStrategy: z.array(nonEmptyString).min(1),
+  npcStrategy: z.array(nonEmptyString).min(1),
+  actStructureStrategy: z.array(nonEmptyString).min(1),
+  unresolvedRisks: z.array(nonEmptyString).default([])
+});
 const caseAdaptationModelOutputSchema = z.object({
   sourceProfile: sourceProfileSchema,
   segmentation: z.array(sourceSegmentationItemSchema).min(3),
+  fairPlaySpine: fairPlaySpineSchema,
+  adaptationNotes: adaptationNotesSchema,
   qualityReport: z.array(adaptationQualityItemSchema).default([]),
   caseFile: caseSchema
 });
@@ -59,15 +80,61 @@ const caseAdaptationModelOutputSchema = z.object({
 export type SourceProfile = z.infer<typeof sourceProfileSchema>;
 export type SourceSegmentationItem = z.infer<typeof sourceSegmentationItemSchema>;
 export type AdaptationQualityItem = z.infer<typeof adaptationQualityItemSchema>;
+export type FairPlaySpine = z.infer<typeof fairPlaySpineSchema>;
+export type AdaptationNotes = z.infer<typeof adaptationNotesSchema>;
 export type CaseAdaptationModelOutput = z.input<typeof caseAdaptationModelOutputSchema>;
 type ParsedCaseAdaptationModelOutput = z.infer<typeof caseAdaptationModelOutputSchema>;
+
+export type AdaptationRequest = {
+  source: SourceDocument;
+  options: {
+    targetLanguage: "zh-CN";
+    adaptationGranularity: "publication-grade";
+    investigationScope: "full-playable-investigation";
+  };
+  rights: {
+    statement: string;
+    requiresUserConfirmation: boolean;
+  };
+  skill: {
+    name: "new-novels-case-adapter";
+    version: string;
+    loadedFiles: string[];
+  };
+};
+
+export type AdaptationValidationReport = {
+  ok: boolean;
+  generatedAt: string;
+  skillName: string;
+  skillVersion: string;
+  caseId: string;
+  title: string;
+  summary: {
+    chapters: number;
+    agents: number;
+    acts: number;
+    actGates: number;
+    storyEvents: number;
+    facts: number;
+    clues: number;
+    contradictions: number;
+    accusationQuestions: number;
+  };
+  issues: CasePackageIssue[];
+};
 
 export type GeneratedCasePackage = {
   package: CasePackage;
   sourceProfile: SourceProfile;
   segmentation: SourceSegmentationItem[];
+  fairPlaySpine: FairPlaySpine;
+  adaptationNotes: AdaptationNotes;
   qualityReport: AdaptationQualityItem[];
   validation: CasePackageValidationReport;
+  validationReport: AdaptationValidationReport;
+  adaptationNotesMarkdown: string;
+  request: AdaptationRequest;
 };
 
 type GenerateText = (messages: AIMessage[]) => Promise<string>;
@@ -77,6 +144,14 @@ type CreateCasePackageOptions = {
 };
 
 const maxPromptSourceChars = 60_000;
+const adapterSkillName = "new-novels-case-adapter";
+const adapterSkillVersion = "new-novels-case-adapter/v1";
+const adapterSkillFiles = [
+  "skills/new-novels-case-adapter/SKILL.md",
+  "skills/new-novels-case-adapter/references/case-package-v1.md",
+  "skills/new-novels-case-adapter/references/novel-to-case-workflow.md",
+  "skills/new-novels-case-adapter/references/studio-runner-contract.md"
+];
 
 function detectKind(fileName: string, mimeType?: string): SourceDocumentKind {
   if (/\.pdf$/iu.test(fileName) || mimeType === "application/pdf") {
@@ -132,6 +207,43 @@ export async function extractSourceDocument(file: File): Promise<SourceDocument>
   };
 }
 
+export function loadAdapterSkillContract() {
+  const root = process.cwd();
+  const documents = adapterSkillFiles.map((filePath) => ({
+    filePath,
+    content: readFileSync(join(root, filePath), "utf8")
+  }));
+
+  return {
+    name: adapterSkillName,
+    version: adapterSkillVersion,
+    loadedFiles: adapterSkillFiles,
+    documents
+  };
+}
+
+export function buildAdaptationRequest(source: SourceDocument): AdaptationRequest {
+  const skill = loadAdapterSkillContract();
+
+  return {
+    source,
+    options: {
+      targetLanguage: "zh-CN",
+      adaptationGranularity: "publication-grade",
+      investigationScope: "full-playable-investigation"
+    },
+    rights: {
+      statement: "上传者负责确认原文改写与发行权利；生成报告必须保留版权确认提示。",
+      requiresUserConfirmation: true
+    },
+    skill: {
+      name: adapterSkillName,
+      version: skill.version,
+      loadedFiles: skill.loadedFiles
+    }
+  };
+}
+
 function modelJsonInstruction() {
   return `你必须只返回一个合法 JSON 对象，不要 Markdown，不要代码块。JSON 顶层结构必须是：
 {
@@ -152,6 +264,23 @@ function modelJsonInstruction() {
     "destination": string,
     "playerDiscoveryRoute": string
   }],
+  "fairPlaySpine": {
+    "victim": string,
+    "culprit": string,
+    "motive": string,
+    "method": string,
+    "falseSolution": string,
+    "minimumClueChain": string[],
+    "decisiveContradictions": string[]
+  },
+  "adaptationNotes": {
+    "summary": string,
+    "readingStrategy": string[],
+    "investigationStrategy": string[],
+    "npcStrategy": string[],
+    "actStructureStrategy": string[],
+    "unresolvedRisks": string[]
+  },
   "qualityReport": [{
     "severity": "fatal" | "warning" | "suggestion",
     "title": string,
@@ -188,6 +317,8 @@ function modelJsonInstruction() {
 }
 
 export function buildSourceAdaptationMessages(source: SourceDocument): AIMessage[] {
+  const request = buildAdaptationRequest(source);
+  const skillContract = loadAdapterSkillContract();
   const sourceText =
     source.text.length > maxPromptSourceChars
       ? `${source.text.slice(0, maxPromptSourceChars)}\n\n[源文本过长，已截取前 ${maxPromptSourceChars} 字用于本轮生成。必须在 qualityReport 中标记需要补全全文审校。]`
@@ -196,7 +327,16 @@ export function buildSourceAdaptationMessages(source: SourceDocument): AIMessage
   return [
     {
       role: "system",
-      content: `你是 New Novels 的发行级推理故事改写 agent。你的任务是把用户上传的推理小说原文改写为可运行的互动推理案件包，而不是 demo。
+      content: `你是 New Novels Studio runner 内置的发行级推理故事改写 agent。你的任务是把用户上传的推理小说原文改写为可运行的互动推理案件包，而不是 demo。
+
+Studio runner 默认输入：
+- targetLanguage: ${request.options.targetLanguage}
+- adaptationGranularity: ${request.options.adaptationGranularity}
+- investigationScope: ${request.options.investigationScope}
+- rights: ${request.rights.statement}
+
+本轮生成必须遵守以下已加载 skill 契约文件：
+${skillContract.documents.map((document) => `\n--- ${document.filePath} ---\n${document.content}`).join("\n")}
 
 核心目标：
 - 交付成熟、可审阅、可大规模分发的中文互动推理故事。
@@ -325,10 +465,157 @@ function validateAdaptationShape(output: ParsedCaseAdaptationModelOutput) {
   return issues;
 }
 
+function qualityIssues(qualityReport: AdaptationQualityItem[]): CasePackageIssue[] {
+  return qualityReport.map((item) => ({
+    severity: item.severity,
+    code: "source-quality",
+    filePath: "generated",
+    message: `${item.title}: ${item.detail}`,
+    suggestion:
+      item.severity === "fatal"
+        ? "重新生成案件包，或在 Studio 中人工修正后再发布。"
+        : "在 Studio 审阅阶段确认该风险是否需要修正。"
+  }));
+}
+
+function summaryForCase(caseFile: CaseFile) {
+  return {
+    chapters: caseFile.chapters.length,
+    agents: caseFile.agents.length,
+    acts: caseFile.acts.length,
+    actGates: caseFile.actGates.length,
+    storyEvents: caseFile.storyEvents.length,
+    facts: caseFile.facts.length,
+    clues: caseFile.clues.length,
+    contradictions: caseFile.contradictions.length,
+    accusationQuestions: caseFile.accusation.questions.length
+  };
+}
+
+export function createValidationReport(
+  caseFile: CaseFile,
+  request: AdaptationRequest,
+  validationIssues: CasePackageIssue[],
+  qualityReport: AdaptationQualityItem[]
+): AdaptationValidationReport {
+  const issues = [...validationIssues, ...qualityIssues(qualityReport)];
+
+  return {
+    ok: !issues.some((issue) => issue.severity === "fatal"),
+    generatedAt: new Date().toISOString(),
+    skillName: request.skill.name,
+    skillVersion: request.skill.version,
+    caseId: caseFile.id,
+    title: caseFile.title,
+    summary: summaryForCase(caseFile),
+    issues
+  };
+}
+
+function markdownList(items: string[]) {
+  return items.length > 0 ? items.map((item) => `- ${item}`).join("\n") : "- 无";
+}
+
+export function createAdaptationNotesMarkdown({
+  sourceProfile,
+  request,
+  fairPlaySpine,
+  adaptationNotes,
+  segmentation,
+  validationReport
+}: {
+  sourceProfile: SourceProfile;
+  request: AdaptationRequest;
+  fairPlaySpine: FairPlaySpine;
+  adaptationNotes: AdaptationNotes;
+  segmentation: SourceSegmentationItem[];
+  validationReport: AdaptationValidationReport;
+}) {
+  const segmentationSummary = segmentation.map((item) =>
+    `- ${item.id} / ${item.label}: ${item.reason} -> ${item.destination}`
+  );
+  const validationSummary = validationReport.issues.map((issue) =>
+    `- ${issue.severity}: ${issue.message}`
+  );
+
+  return `# ${sourceProfile.title} 改写说明
+
+## Source Profile
+
+- Title: ${sourceProfile.title}
+- Author: ${sourceProfile.author}
+- Language: ${sourceProfile.language}
+- Narrative Form: ${sourceProfile.narrativeForm}
+- Rights: ${sourceProfile.rightsNote}
+
+## Default Options
+
+- targetLanguage: ${request.options.targetLanguage}
+- adaptationGranularity: ${request.options.adaptationGranularity}
+- investigationScope: ${request.options.investigationScope}
+
+## Fair-Play Spine
+
+- Victim: ${fairPlaySpine.victim}
+- Culprit: ${fairPlaySpine.culprit}
+- Motive: ${fairPlaySpine.motive}
+- Method: ${fairPlaySpine.method}
+- False Solution: ${fairPlaySpine.falseSolution}
+
+Minimum clue chain:
+${markdownList(fairPlaySpine.minimumClueChain)}
+
+Decisive contradictions:
+${markdownList(fairPlaySpine.decisiveContradictions)}
+
+## Segmentation Summary
+
+${segmentationSummary.join("\n")}
+
+## Reading Rewrite Strategy
+
+${markdownList(adaptationNotes.readingStrategy)}
+
+## Investigation Conversion Strategy
+
+${markdownList(adaptationNotes.investigationStrategy)}
+
+## NPC Runtime Strategy
+
+${markdownList(adaptationNotes.npcStrategy)}
+
+## Act Gates And Story Events
+
+${markdownList(adaptationNotes.actStructureStrategy)}
+
+## Validation Summary
+
+- ok: ${validationReport.ok}
+- fatal issues: ${validationReport.issues.filter((issue) => issue.severity === "fatal").length}
+- warnings: ${validationReport.issues.filter((issue) => issue.severity === "warning").length}
+- suggestions: ${validationReport.issues.filter((issue) => issue.severity === "suggestion").length}
+
+${validationSummary.length > 0 ? validationSummary.join("\n") : "- 无校验问题"}
+
+## Human Review Checklist
+
+- 确认版权与改写授权。
+- 检查故事正文是否仍像成熟推理小说，而不是案件摘要。
+- 检查每条最终指认答案是否有公平线索支撑。
+- 检查 NPC 是否只知道自己应当知道的信息。
+- 检查普通对话是否不会提前泄露完整真相。
+
+## Unresolved Risks
+
+${markdownList(adaptationNotes.unresolvedRisks)}
+`;
+}
+
 export async function createCasePackageFromSource(
   source: SourceDocument,
   options: CreateCasePackageOptions = {}
 ): Promise<GeneratedCasePackage> {
+  const request = buildAdaptationRequest(source);
   const generateText =
     options.generateText ??
     ((messages: AIMessage[]) => createChatCompletion({ messages, temperature: 0.2, maxTokens: 12000 }));
@@ -342,25 +629,66 @@ export async function createCasePackageFromSource(
   const packageResult = casePackageSchema.safeParse(pkg);
 
   if (!packageResult.success) {
+    const validation = validateGeneratedCasePackage(pkg as CasePackage);
+    const validationReport = createValidationReport(
+      caseFile,
+      request,
+      validation.issues,
+      output.qualityReport
+    );
+
     return {
       package: pkg as CasePackage,
       sourceProfile: output.sourceProfile,
       segmentation: output.segmentation,
+      fairPlaySpine: output.fairPlaySpine,
+      adaptationNotes: output.adaptationNotes,
       qualityReport: output.qualityReport,
-      validation: validateGeneratedCasePackage(pkg as CasePackage)
+      validation: {
+        ok: validationReport.ok,
+        issues: validationReport.issues
+      },
+      validationReport,
+      adaptationNotesMarkdown: createAdaptationNotesMarkdown({
+        sourceProfile: output.sourceProfile,
+        request,
+        fairPlaySpine: output.fairPlaySpine,
+        adaptationNotes: output.adaptationNotes,
+        segmentation: output.segmentation,
+        validationReport
+      }),
+      request
     };
   }
 
   const shapeIssues = validateAdaptationShape(output);
+  const validationReport = createValidationReport(
+    caseFile,
+    request,
+    shapeIssues,
+    output.qualityReport
+  );
 
   return {
     package: packageResult.data,
     sourceProfile: output.sourceProfile,
     segmentation: output.segmentation,
+    fairPlaySpine: output.fairPlaySpine,
+    adaptationNotes: output.adaptationNotes,
     qualityReport: output.qualityReport,
     validation: {
-      ok: shapeIssues.length === 0,
-      issues: shapeIssues
-    }
+      ok: validationReport.ok,
+      issues: validationReport.issues
+    },
+    validationReport,
+    adaptationNotesMarkdown: createAdaptationNotesMarkdown({
+      sourceProfile: output.sourceProfile,
+      request,
+      fairPlaySpine: output.fairPlaySpine,
+      adaptationNotes: output.adaptationNotes,
+      segmentation: output.segmentation,
+      validationReport
+    }),
+    request
   };
 }

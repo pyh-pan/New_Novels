@@ -4,7 +4,13 @@ import { createAgentRuntime } from "../agent-runtime";
 import { loadCasePackageFromDirectorySync } from "../case-package/loader";
 import type { CaseFile } from "./schema";
 
-const bundledCaseIds = ["hunters-lodge"] as const;
+const bundledCaseIds = [
+  "hunters-lodge",
+  "speckled-band",
+  "anne-rodway",
+  "rue-morgue",
+  "purloined-letter"
+] as const;
 const fallbackCaseId = "hunters-lodge";
 
 const cachedCases = new Map<string, CaseFile>();

@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -78,9 +78,32 @@ afterEach(() => {
 describe("studio filesystem persistence", () => {
   it("persists generated drafts and reloads them after the in-memory registry is cleared", () => {
     const caseId = storeGeneratedStudioCase(generatedCaseInput());
-    const draftPath = join(dataDir, "studio-drafts", caseId, "draft.json");
+    const draftDir = join(dataDir, "studio-drafts", caseId);
+    const draftPath = join(draftDir, "draft.json");
 
     expect(existsSync(draftPath)).toBe(true);
+    expect(existsSync(join(draftDir, "studio.json"))).toBe(true);
+    expect(existsSync(join(draftDir, "validation-report.json"))).toBe(true);
+    expect(existsSync(join(draftDir, "adaptation-notes.md"))).toBe(true);
+    expect(existsSync(join(draftDir, "package", "manifest.json"))).toBe(true);
+    expect(existsSync(join(draftDir, "package", "story", "chapter-1.md"))).toBe(true);
+    expect(loadCasePackageFromDirectorySync(join(draftDir, "package")).caseFile.id).toBe(caseId);
+
+    const metadata = JSON.parse(readFileSync(join(draftDir, "studio.json"), "utf8")) as {
+      origin: string;
+      skill: { name: string };
+    };
+    expect(metadata.origin).toBe("generated-from-source");
+    expect(metadata.skill.name).toBe("new-novels-case-adapter");
+
+    const report = JSON.parse(readFileSync(join(draftDir, "validation-report.json"), "utf8")) as {
+      ok: boolean;
+      summary: { storyEvents: number };
+    };
+    expect(report.ok).toBe(true);
+    expect(report.summary.storyEvents).toBeGreaterThan(0);
+    expect(readFileSync(join(draftDir, "adaptation-notes.md"), "utf8")).toContain("改写说明");
+
     clearGeneratedStudioCases();
 
     expect(getGeneratedStudioCase(caseId)).toMatchObject({

@@ -1,0 +1,84 @@
+[
+  {
+    "id": "gate-opening-to-inquest",
+    "fromActId": "act-opening",
+    "toActId": "act-inquest",
+    "requiredClueIds": [
+      "clue-temple-blow",
+      "clue-cravat-fragment"
+    ],
+    "requiredFactIds": [
+      "fact-mary-found-in-street",
+      "fact-cravat-in-hand"
+    ],
+    "requiredContradictionIds": [],
+    "requiredNpcInteractions": [
+      "anne-rodway",
+      "doctor-harris"
+    ],
+    "requiredSceneInteractions": [
+      "scene-lodging-room",
+      "scene-mary-room"
+    ],
+    "unlockNarrative": "Mary 的死不能只靠悲伤解释；伤痕和掌心里的布片迫使调查转向验尸与工作间证词。"
+  },
+  {
+    "id": "gate-inquest-to-cravat-trail",
+    "fromActId": "act-inquest",
+    "toActId": "act-cravat-trail",
+    "requiredClueIds": [
+      "clue-workroom-fainting",
+      "clue-accidental-verdict"
+    ],
+    "requiredFactIds": [
+      "fact-fainted-at-work",
+      "fact-inquest-accidental"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-fall-vs-cravat"
+    ],
+    "requiredNpcInteractions": [
+      "doctor-harris",
+      "beadle-wicks"
+    ],
+    "requiredSceneInteractions": [
+      "scene-workroom",
+      "scene-inquest-room"
+    ],
+    "unlockNarrative": "意外死亡的结论仍站得住，却无法解释布片为何在 Mary 手里；调查必须沿着这截布往外走。"
+  },
+  {
+    "id": "gate-cravat-trail-to-accusation",
+    "fromActId": "act-cravat-trail",
+    "toActId": "act-accusation",
+    "requiredClueIds": [
+      "clue-matching-cravat",
+      "clue-horlick-owner",
+      "clue-cabman-admission",
+      "clue-red-lion-address",
+      "clue-noah-name"
+    ],
+    "requiredFactIds": [
+      "fact-cravat-match",
+      "fact-horlick-cravat-owner",
+      "fact-cabman-witnessed-blow",
+      "fact-red-lion-entry",
+      "fact-noah-identity"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-accident-vs-witnessed-blow",
+      "contradiction-truscott-name-old-harm"
+    ],
+    "requiredNpcInteractions": [
+      "mrs-horlick",
+      "josiah-horlick",
+      "robert-lyon"
+    ],
+    "requiredSceneInteractions": [
+      "scene-chandler-shop",
+      "scene-horlick-mews",
+      "scene-red-lion"
+    ],
+    "unlockNarrative": "断领巾、车夫和红狮酒馆终于连成一条可指向活人的线；现在可以提出正式指认。"
+  }
+]

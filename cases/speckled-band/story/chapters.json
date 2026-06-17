@@ -1,0 +1,27 @@
+[
+  {
+    "id": "chapter-1",
+    "title": "斑点带子",
+    "subtitle": "贝克街的清晨来客",
+    "body": "story/chapter-1.md",
+    "availableFromStart": true,
+    "nextChapterId": "chapter-2"
+  },
+  {
+    "id": "chapter-2",
+    "title": "斯托克莫兰",
+    "subtitle": "旧宅、修缮与沉默的房间",
+    "body": "story/chapter-2.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-1",
+    "nextChapterId": "chapter-3"
+  },
+  {
+    "id": "chapter-3",
+    "title": "夜色里的信号",
+    "subtitle": "中间窗前的一盏灯",
+    "body": "story/chapter-3.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-2"
+  }
+]

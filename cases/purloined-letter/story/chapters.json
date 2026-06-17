@@ -1,0 +1,27 @@
+[
+  {
+    "id": "chapter-1",
+    "title": "秋夜来客",
+    "subtitle": "一封不能公开寻找的信",
+    "body": "story/chapter-1.md",
+    "availableFromStart": true,
+    "nextChapterId": "chapter-2"
+  },
+  {
+    "id": "chapter-2",
+    "title": "搜查的边界",
+    "subtitle": "警察越精密，失败越确定",
+    "body": "story/chapter-2.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-1",
+    "nextChapterId": "chapter-3"
+  },
+  {
+    "id": "chapter-3",
+    "title": "明处的影子",
+    "subtitle": "一场尚未说出的对质",
+    "body": "story/chapter-3.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-2"
+  }
+]

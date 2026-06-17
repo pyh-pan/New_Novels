@@ -4,7 +4,7 @@ New Novels 是一个文字优先的网页原型，用于把推理小说转化为
 
 玩家阅读故事，用自然语言询问 AI 驱动的 NPC，调查线索，维护自己的侦探笔记，并在信息足够后进行最终指认。AI 可以扮演角色，但不是事实源：案件包和 runtime 规则决定事实是否存在、每个 NPC 知道什么，以及最终答案是否被接受。
 
-当前唯一内置案件是基于用户提供原文生成的中文互动改写版 Agatha Christie **《The Mystery of Hunter's Lodge》**，以 `case-package/v1` 文件系统案件包形式运行。
+当前内置案件以 `case-package/v1` 文件系统案件包形式运行。默认案件仍是基于用户提供原文生成的中文互动改写版 Agatha Christie **《The Mystery of Hunter's Lodge》**；另已加入四个 Project Gutenberg 公开版权标注来源的中文互动改写案件，用于验证当前 `new-novels-case-adapter` 的成熟改写能力。
 
 ## 当前原型
 
@@ -12,7 +12,7 @@ New Novels 是一个文字优先的网页原型，用于把推理小说转化为
 
 - 基于 Next.js 的网页应用，包含故事书架、故事阅读区、调查台、笔记抽屉、最终指认页面和创作者 Studio。
 - 首页以封面书架展示内置案件；玩家点击案件后进入 `/cases/<case-id>` 的阅读与调查界面。
-- 默认可玩案件通过 `CaseLoader` 从 `cases/hunters-lodge/` 加载。
+- 默认可玩案件通过 `CaseLoader` 从 `cases/hunters-lodge/` 加载；书架同时展示 `cases/` 下登记为 bundled case 的可玩案件。
 - `case-package/v1` 文件系统布局，覆盖故事文本、agent、事实、剧情幕、幕间门槛、故事事件、线索、矛盾、真相、受害者和指认问题。
 - Agent Runtime，支持语义 / 关键词路由、玩家已知状态、揭示规则、压力模型、剧情幕门槛和输出护栏。
 - 基于 CoWork / Guard Runway Bedrock 网关契约（`ai.properties`）的 AI 调查 API，包含结构化 prompt 与响应处理。
@@ -77,10 +77,11 @@ npm run guard:package
 
 默认生成干净副本 `../New_Novels-guard/`，并在项目父目录输出 `../New_Novels-guard.zip`，避免污染源码目录。
 
-校验内置案件包：
+校验内置案件包示例：
 
 ```bash
 node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hunters-lodge
+node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/speckled-band
 ```
 
 ## 项目结构
@@ -93,7 +94,7 @@ node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hu
 - `lib/ai/`：平台 AI provider 适配器和 prompt builder。
 - `lib/game/`：游玩状态、路由包装、故事视图辅助、ID 和最终指认校验。
 - `lib/studio/`：Studio 草稿视图、原文提取、AI 改写、草稿状态机、文件系统持久化和原文上传任务。
-- `cases/hunters-lodge/`：当前内置默认可玩案件包。
+- `cases/`：内置可玩案件包目录，包含默认案件和 Project Gutenberg 改写验证案件。
 - `skills/new-novels-case-adapter/`：把推理小说改写为可玩案件包的本地 skill。
 - `docs/`：架构、案件包、实现和平台说明。
 
@@ -109,4 +110,4 @@ node skills/new-novels-case-adapter/scripts/check_case_package_refs.mjs cases/hu
 
 尚未选择许可证。
 
-当前《猎人小屋疑案》改写基于用户提供的源文本生成。分发改写内容前，请确认目标司法辖区的版权状态。
+当前《猎人小屋疑案》改写基于用户提供的源文本生成。四个 Project Gutenberg 改写案件的 EPUB metadata 均标注为 `Public domain in the USA`。分发任何改写内容前，请确认目标司法辖区的版权状态。

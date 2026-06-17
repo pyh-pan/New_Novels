@@ -1,0 +1,453 @@
+[
+  {
+    "id": "clue-night-whistle",
+    "title": "凌晨低哨",
+    "text": "朱莉娅死前数夜和海伦昨夜都在凌晨听见低而清晰的口哨。",
+    "tag": "clue",
+    "source": "海伦证词",
+    "unlockHints": [
+      "询问海伦朱莉娅临死前几夜听见什么。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "helen-stoner",
+      "topics": [
+        "口哨",
+        "夜里声音"
+      ],
+      "factIds": [
+        "fact-helen-heard-whistle"
+      ]
+    }
+  },
+  {
+    "id": "clue-dying-words",
+    "title": "“斑点带子”",
+    "text": "朱莉娅临终说出“斑点带子”，并试图指向罗伊洛特房间方向。",
+    "tag": "testimony",
+    "source": "海伦证词",
+    "unlockHints": [
+      "追问朱莉娅临终原话和动作。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "helen-stoner",
+      "topics": [
+        "临终遗言",
+        "斑点带子"
+      ],
+      "factIds": [
+        "fact-julia-dying-words"
+      ]
+    }
+  },
+  {
+    "id": "clue-locked-room",
+    "title": "无法进入的卧室",
+    "text": "门内锁、窗板铁闩、烟囱铁钉、墙地板完整，普通人无法进入朱莉娅房间。",
+    "tag": "clue",
+    "source": "验尸官记录",
+    "unlockHints": [
+      "向验尸官核对两年前房间检查。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "county-coroner",
+      "topics": [
+        "密室",
+        "门窗"
+      ],
+      "factIds": [
+        "fact-locked-room-conditions"
+      ]
+    }
+  },
+  {
+    "id": "clue-match-stump",
+    "title": "烧焦的火柴",
+    "text": "朱莉娅临死前点过火柴，说明她看见或试图看见某个惊扰她的东西。",
+    "tag": "clue",
+    "source": "验尸官记录",
+    "unlockHints": [
+      "询问尸体手中物。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "county-coroner",
+      "topics": [
+        "火柴"
+      ],
+      "factIds": [
+        "fact-match-and-matchbox"
+      ]
+    }
+  },
+  {
+    "id": "clue-no-detectable-poison",
+    "title": "检不出的死因",
+    "text": "无外伤、常规毒物检验无结果，死因不能用普通暴力或常见毒物解释。",
+    "tag": "doubt",
+    "source": "验尸官记录",
+    "unlockHints": [
+      "追问毒物和外伤检查。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "county-coroner",
+      "topics": [
+        "毒物",
+        "死因"
+      ],
+      "factIds": [
+        "fact-no-violence-no-poison-found"
+      ]
+    }
+  },
+  {
+    "id": "clue-wrist-bruises",
+    "title": "海伦腕上的指痕",
+    "text": "海伦手腕五枚青紫指痕证明罗伊洛特近期对她施暴。",
+    "tag": "testimony",
+    "source": "贝克街会面",
+    "unlockHints": [
+      "温和追问海伦是否被继父伤害。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "helen-stoner",
+      "topics": [
+        "继父暴力",
+        "手腕"
+      ],
+      "factIds": [
+        "fact-helen-bruised-wrist"
+      ]
+    }
+  },
+  {
+    "id": "clue-roylott-violence",
+    "title": "罗伊洛特的暴力史",
+    "text": "罗伊洛特在印度和萨里均有暴力记录，能够也愿意使用强制手段。",
+    "tag": "testimony",
+    "source": "海伦与村民证词",
+    "unlockHints": [
+      "询问罗伊洛特过往。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "helen-stoner",
+      "topics": [
+        "罗伊洛特",
+        "暴力"
+      ],
+      "factIds": [
+        "fact-roylott-violent-reputation"
+      ]
+    }
+  },
+  {
+    "id": "clue-indian-animals",
+    "title": "印度动物",
+    "text": "罗伊洛特有从印度运来并自由放养的动物，说明他有渠道和习惯饲养异域活物。",
+    "tag": "clue",
+    "source": "庄园背景",
+    "unlockHints": [
+      "询问宅地里的动物。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "helen-stoner",
+      "topics": [
+        "印度动物",
+        "猎豹",
+        "狒狒"
+      ],
+      "factIds": [
+        "fact-roylott-keeps-indian-animals"
+      ]
+    }
+  },
+  {
+    "id": "clue-threatened-marriage",
+    "title": "重演的婚约",
+    "text": "朱莉娅和海伦都是在婚约临近后被置于危险之中。",
+    "tag": "doubt",
+    "source": "海伦与珀西证词",
+    "unlockHints": [
+      "比较两姐妹婚约时间。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "percy-armitage",
+      "topics": [
+        "婚约",
+        "婚期"
+      ],
+      "factIds": [
+        "fact-helen-engaged"
+      ]
+    }
+  },
+  {
+    "id": "clue-will-motive",
+    "title": "遗嘱与年金",
+    "text": "继女结婚会分走罗伊洛特控制的收入，为阻止婚事提供强烈动机。",
+    "tag": "clue",
+    "source": "医生公会遗嘱核查",
+    "unlockHints": [
+      "核查斯托纳太太遗嘱和当前收益。"
+    ],
+    "unlock": {
+      "type": "system",
+      "topics": [
+        "遗嘱",
+        "年金"
+      ],
+      "factIds": [
+        "fact-marriage-income-loss"
+      ]
+    }
+  },
+  {
+    "id": "clue-false-repairs",
+    "title": "过于方便的修缮",
+    "text": "西翼修缮没有紧迫需求，却正好迫使海伦搬进朱莉娅死去的房间。",
+    "tag": "contradiction",
+    "source": "庄园外观与海伦证词",
+    "unlockHints": [
+      "观察外墙脚手架并询问换房原因。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "修缮",
+        "换房"
+      ],
+      "factIds": [
+        "fact-repairs-forced-room"
+      ]
+    }
+  },
+  {
+    "id": "clue-room-changes-timing",
+    "title": "两年前的改动",
+    "text": "铃绳和通风孔等改动发生在朱莉娅死亡前后，时间异常吻合。",
+    "tag": "clue",
+    "source": "女管家与海伦证词",
+    "unlockHints": [
+      "询问房间什么时候改装。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "housekeeper",
+      "topics": [
+        "两年前",
+        "改装"
+      ],
+      "factIds": [
+        "fact-room-changes-two-years-ago"
+      ]
+    }
+  },
+  {
+    "id": "clue-dummy-bell-rope",
+    "title": "不会响的铃绳",
+    "text": "床边铃绳不接线，却垂到枕边。",
+    "tag": "clue",
+    "source": "朱莉娅卧室勘查",
+    "unlockHints": [
+      "调查床边铃绳并试拉。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "铃绳"
+      ],
+      "factIds": [
+        "fact-dummy-bell-rope",
+        "fact-bell-rope-never-used"
+      ]
+    }
+  },
+  {
+    "id": "clue-inside-ventilator",
+    "title": "通向隔壁的通风孔",
+    "text": "通风孔连接罗伊洛特卧室与朱莉娅卧室，而不是连接室外。",
+    "tag": "clue",
+    "source": "朱莉娅卧室勘查",
+    "unlockHints": [
+      "调查墙上通风孔方向。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "通风孔"
+      ],
+      "factIds": [
+        "fact-inside-ventilator"
+      ]
+    }
+  },
+  {
+    "id": "clue-fixed-bed",
+    "title": "固定在地板上的床",
+    "text": "床被固定，位置无法避开通风孔和假铃绳。",
+    "tag": "clue",
+    "source": "朱莉娅卧室勘查",
+    "unlockHints": [
+      "试图移动床或检查床脚。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "床",
+        "床脚"
+      ],
+      "factIds": [
+        "fact-fixed-bed"
+      ]
+    }
+  },
+  {
+    "id": "clue-milk-and-safe",
+    "title": "保险柜上的牛奶",
+    "text": "罗伊洛特房中铁保险柜旁有牛奶碟，家中却没有普通猫。",
+    "tag": "clue",
+    "source": "罗伊洛特卧室勘查",
+    "unlockHints": [
+      "调查保险柜与其上物品。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "保险柜",
+        "牛奶"
+      ],
+      "factIds": [
+        "fact-milk-and-safe"
+      ]
+    }
+  },
+  {
+    "id": "clue-dog-lash-loop",
+    "title": "打成套环的狗鞭",
+    "text": "狗鞭鞭梢被打成套环，像是用来套住或控制某种小型活物。",
+    "tag": "clue",
+    "source": "罗伊洛特卧室勘查",
+    "unlockHints": [
+      "调查床角狗鞭。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "狗鞭",
+        "套环"
+      ],
+      "factIds": [
+        "fact-dog-lash-loop"
+      ]
+    }
+  },
+  {
+    "id": "clue-chair-marks",
+    "title": "通风孔下的木椅",
+    "text": "木椅位置和痕迹显示有人常站上去接近通风孔。",
+    "tag": "clue",
+    "source": "罗伊洛特卧室勘查",
+    "unlockHints": [
+      "检查罗伊洛特房中木椅。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "木椅",
+        "通风孔"
+      ],
+      "factIds": [
+        "fact-chair-marks"
+      ]
+    }
+  },
+  {
+    "id": "clue-crown-inn-view",
+    "title": "皇冠旅店的视野",
+    "text": "旅店房间可直接观察中间卧室窗口，适合等待海伦灯号。",
+    "tag": "clue",
+    "source": "皇冠旅店",
+    "unlockHints": [
+      "询问或观察旅店窗外视野。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "crown-landlord",
+      "topics": [
+        "视野",
+        "窗户"
+      ],
+      "factIds": [
+        "fact-crown-inn-view"
+      ]
+    }
+  },
+  {
+    "id": "clue-roylott-returned",
+    "title": "罗伊洛特回宅",
+    "text": "罗伊洛特傍晚返回庄园，暴躁程度显示夜间行动风险极高。",
+    "tag": "testimony",
+    "source": "皇冠旅店观察",
+    "unlockHints": [
+      "询问傍晚庄园出入。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "crown-landlord",
+      "topics": [
+        "傍晚",
+        "罗伊洛特"
+      ],
+      "factIds": [
+        "fact-roylott-returned-evening"
+      ]
+    }
+  },
+  {
+    "id": "clue-lamp-signal",
+    "title": "窗前灯号",
+    "text": "海伦按计划离开房间并用灯号通知调查者进入夜间验证阶段。",
+    "tag": "clue",
+    "source": "夜间观察",
+    "unlockHints": [
+      "完成庄园勘查后安排海伦离开危险房间。"
+    ],
+    "unlock": {
+      "type": "story",
+      "topics": [
+        "灯号",
+        "夜间计划"
+      ],
+      "factIds": [
+        "fact-lamp-signal"
+      ]
+    }
+  },
+  {
+    "id": "clue-night-hiss",
+    "title": "通风孔边的嘶声",
+    "text": "夜半通风孔方向出现轻柔持续嘶声，随后听见召回口哨与隔壁惨叫。",
+    "tag": "clue",
+    "source": "夜间验证",
+    "unlockHints": [
+      "在安全转移海伦后守候中间卧室。"
+    ],
+    "unlock": {
+      "type": "story",
+      "topics": [
+        "嘶声",
+        "夜间"
+      ],
+      "factIds": [
+        "fact-hiss-before-attack"
+      ]
+    }
+  }
+]

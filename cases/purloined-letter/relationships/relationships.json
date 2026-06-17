@@ -1,0 +1,35 @@
+[
+  {
+    "from": "prefect-g",
+    "to": "dupin",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-reward-large"
+    ]
+  },
+  {
+    "from": "royal-lady",
+    "to": "minister-d",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-minister-seen-taking",
+      "fact-minister-political-pressure"
+    ]
+  },
+  {
+    "from": "minister-d",
+    "to": "dupin",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-dupin-visited-minister"
+    ]
+  },
+  {
+    "from": "dupin",
+    "to": "minister-d",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-minister-understands-police"
+    ]
+  }
+]

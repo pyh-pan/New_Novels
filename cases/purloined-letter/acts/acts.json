@@ -1,0 +1,150 @@
+[
+  {
+    "id": "act-opening",
+    "title": "密信失窃",
+    "availableAgentIds": [
+      "general",
+      "prefect-g",
+      "royal-lady",
+      "dupin"
+    ],
+    "visibleClueIds": [
+      "clue-theft-witnessed",
+      "clue-letter-power",
+      "clue-letter-must-be-at-hand"
+    ],
+    "lockedFactIds": [
+      "fact-police-searched-hotel",
+      "fact-search-found-nothing",
+      "fact-search-principle-wrong",
+      "fact-card-rack-visible",
+      "fact-reversed-folds",
+      "fact-facsimile-substitution"
+    ],
+    "entryConditions": [],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-theft-witnessed",
+          "clue-letter-power",
+          "clue-letter-must-be-at-hand"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-letter-must-be-available"
+        ],
+        "requiresContradictions": [],
+        "requiresAct": "act-opening"
+      }
+    ]
+  },
+  {
+    "id": "act-search",
+    "title": "搜查盲点",
+    "availableAgentIds": [
+      "general",
+      "prefect-g",
+      "royal-lady",
+      "dupin",
+      "minister-d"
+    ],
+    "visibleClueIds": [
+      "clue-police-body-search",
+      "clue-exhaustive-search",
+      "clue-search-principle-wrong",
+      "clue-minister-anticipates-search",
+      "clue-reward-doubled",
+      "clue-original-description"
+    ],
+    "lockedFactIds": [
+      "fact-card-rack-visible",
+      "fact-disguised-address",
+      "fact-reversed-folds",
+      "fact-dupin-arranged-distraction",
+      "fact-facsimile-substitution"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-theft-witnessed",
+          "clue-letter-power",
+          "clue-letter-must-be-at-hand"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-letter-must-be-available"
+        ],
+        "requiresContradictions": [],
+        "requiresAct": "act-opening"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-exhaustive-search",
+          "clue-search-principle-wrong",
+          "clue-minister-anticipates-search",
+          "clue-original-description"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-search-found-nothing",
+          "fact-search-principle-wrong",
+          "fact-minister-understands-police"
+        ],
+        "requiresContradictions": [
+          "contradiction-search-vs-availability",
+          "contradiction-police-principle"
+        ],
+        "requiresAct": "act-search"
+      }
+    ]
+  },
+  {
+    "id": "act-confrontation",
+    "title": "明处藏匿",
+    "availableAgentIds": [
+      "general",
+      "prefect-g",
+      "dupin",
+      "minister-d",
+      "royal-lady"
+    ],
+    "visibleClueIds": [
+      "clue-dupin-visit",
+      "clue-visible-card-rack-letter",
+      "clue-disguised-address",
+      "clue-reversed-folds",
+      "clue-snuffbox-second-visit",
+      "clue-street-distraction",
+      "clue-facsimile-substitution"
+    ],
+    "lockedFactIds": [
+      "fact-truth-culprit",
+      "fact-truth-motive",
+      "fact-truth-dupin-recovered-letter"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-exhaustive-search",
+          "clue-search-principle-wrong",
+          "clue-minister-anticipates-search",
+          "clue-original-description"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-search-found-nothing",
+          "fact-search-principle-wrong",
+          "fact-minister-understands-police"
+        ],
+        "requiresContradictions": [
+          "contradiction-search-vs-availability",
+          "contradiction-police-principle"
+        ],
+        "requiresAct": "act-search"
+      }
+    ],
+    "exitConditions": []
+  }
+]

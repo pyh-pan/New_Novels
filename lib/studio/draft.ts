@@ -7,6 +7,7 @@ import type {
 
 export type StudioNodeType =
   | "dashboard"
+  | "adaptation"
   | "chapter"
   | "agent"
   | "clues"
@@ -31,6 +32,7 @@ export type StudioDraftView = {
   lifecycleStatus?: "draft" | "saved" | "published";
   sourceProfile?: SourceProfile;
   segmentation?: SourceSegmentationItem[];
+  adaptationNotesMarkdown?: string;
   tree: StudioTreeNode[];
   stats: {
     chapters: number;
@@ -146,6 +148,7 @@ export function createStudioDraftViewWithAdaptation(
     sourceProfile?: SourceProfile;
     segmentation?: SourceSegmentationItem[];
     qualityReport?: AdaptationQualityItem[];
+    adaptationNotesMarkdown?: string;
   }
 ): StudioDraftView {
   const factText = new Map(caseFile.facts.map((fact) => [fact.id, fact.text]));
@@ -165,6 +168,15 @@ export function createStudioDraftViewWithAdaptation(
         }
       ]
     : [];
+  const adaptationNotesTree: StudioTreeNode[] = adaptation?.adaptationNotesMarkdown
+    ? [
+        {
+          id: "adaptation-notes",
+          type: "adaptation",
+          label: "改写说明"
+        }
+      ]
+    : [];
 
   return {
     caseId: caseFile.id,
@@ -173,6 +185,7 @@ export function createStudioDraftViewWithAdaptation(
     lifecycleStatus: adaptation?.lifecycleStatus,
     sourceProfile: adaptation?.sourceProfile,
     segmentation: adaptation?.segmentation,
+    adaptationNotesMarkdown: adaptation?.adaptationNotesMarkdown,
     tree: [
       {
         id: "dashboard",
@@ -180,6 +193,7 @@ export function createStudioDraftViewWithAdaptation(
         label: "案件控制台"
       },
       ...adaptationTree,
+      ...adaptationNotesTree,
       {
         id: "chapters",
         type: "chapter",

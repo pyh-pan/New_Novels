@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -106,6 +106,17 @@ describe("/api/cases/preview", () => {
       caseFile: {
         id: "import-hunters-lodge",
         title: "猎人小屋疑案"
+      }
+    });
+
+    const draftDir = join(dataDir, "studio-drafts", "import-hunters-lodge");
+    expect(existsSync(join(draftDir, "package", "manifest.json"))).toBe(true);
+    expect(existsSync(join(draftDir, "validation-report.json"))).toBe(true);
+    expect(existsSync(join(draftDir, "adaptation-notes.md"))).toBe(true);
+    expect(JSON.parse(readFileSync(join(draftDir, "studio.json"), "utf8"))).toMatchObject({
+      origin: "uploaded-package",
+      skill: {
+        name: "new-novels-case-adapter"
       }
     });
   });

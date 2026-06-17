@@ -1,0 +1,153 @@
+[
+  {
+    "id": "act-opening",
+    "title": "贝克街的恐惧陈述",
+    "availableAgentIds": [
+      "general",
+      "helen-stoner",
+      "percy-armitage",
+      "county-coroner",
+      "grimesby-roylott"
+    ],
+    "visibleClueIds": [
+      "clue-night-whistle",
+      "clue-dying-words",
+      "clue-locked-room",
+      "clue-wrist-bruises"
+    ],
+    "lockedFactIds": [
+      "fact-device-cluster",
+      "fact-safe-keeps-snake",
+      "fact-roylott-trained-snake",
+      "fact-roylott-killed-by-own-snake"
+    ],
+    "entryConditions": [],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-night-whistle",
+          "clue-dying-words",
+          "clue-locked-room",
+          "clue-will-motive"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-marriage-income-loss"
+        ],
+        "requiresContradictions": [
+          "contradiction-sealed-room-but-sound"
+        ],
+        "requiresAct": "act-opening"
+      }
+    ]
+  },
+  {
+    "id": "act-manor-search",
+    "title": "斯托克莫兰现场勘查",
+    "availableAgentIds": [
+      "general",
+      "helen-stoner",
+      "housekeeper",
+      "crown-landlord",
+      "grimesby-roylott"
+    ],
+    "visibleClueIds": [
+      "clue-false-repairs",
+      "clue-room-changes-timing",
+      "clue-dummy-bell-rope",
+      "clue-inside-ventilator",
+      "clue-fixed-bed",
+      "clue-milk-and-safe",
+      "clue-dog-lash-loop",
+      "clue-chair-marks"
+    ],
+    "lockedFactIds": [
+      "fact-safe-keeps-snake",
+      "fact-roylott-trained-snake",
+      "fact-roylott-killed-by-own-snake"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-will-motive"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-marriage-income-loss"
+        ],
+        "requiresContradictions": [
+          "contradiction-sealed-room-but-sound"
+        ],
+        "requiresAct": "act-opening"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-dummy-bell-rope",
+          "clue-inside-ventilator",
+          "clue-fixed-bed",
+          "clue-milk-and-safe",
+          "clue-dog-lash-loop",
+          "clue-chair-marks"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-repairs-forced-room"
+        ],
+        "requiresContradictions": [
+          "contradiction-devices-not-domestic",
+          "contradiction-no-cat-but-milk"
+        ],
+        "requiresAct": "act-manor-search"
+      }
+    ]
+  },
+  {
+    "id": "act-confrontation",
+    "title": "夜间验证与最终指认",
+    "availableAgentIds": [
+      "general",
+      "helen-stoner",
+      "crown-landlord",
+      "housekeeper",
+      "grimesby-roylott",
+      "county-coroner",
+      "percy-armitage"
+    ],
+    "visibleClueIds": [
+      "clue-crown-inn-view",
+      "clue-roylott-returned",
+      "clue-lamp-signal",
+      "clue-night-hiss"
+    ],
+    "lockedFactIds": [
+      "fact-safe-keeps-snake",
+      "fact-roylott-trained-snake",
+      "fact-roylott-killed-by-own-snake"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-dummy-bell-rope",
+          "clue-inside-ventilator",
+          "clue-fixed-bed",
+          "clue-milk-and-safe",
+          "clue-dog-lash-loop",
+          "clue-chair-marks"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-milk-and-safe",
+          "fact-dog-lash-loop"
+        ],
+        "requiresContradictions": [
+          "contradiction-devices-not-domestic",
+          "contradiction-no-cat-but-milk"
+        ],
+        "requiresAct": "act-manor-search"
+      }
+    ],
+    "exitConditions": []
+  }
+]

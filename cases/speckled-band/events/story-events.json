@@ -1,0 +1,243 @@
+[
+  {
+    "id": "event-verify-will-income",
+    "kind": "instant-result",
+    "title": "核查斯托纳太太遗嘱",
+    "description": "玩家提出核查遗嘱和年金后，立即获得婚约会削弱罗伊洛特收入的事实。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [
+        "遗嘱",
+        "年金",
+        "婚约动机"
+      ],
+      "requiredClueIds": [
+        "clue-threatened-marriage"
+      ],
+      "requiredFactIds": [
+        "fact-helen-engaged"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [],
+      "requiredSceneInteractions": [
+        "scene-doctors-commons"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-marriage-income-loss"
+      ],
+      "revealedClueIds": [
+        "clue-will-motive"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "general"
+      ],
+      "narrative": "遗嘱数字把恐惧变成动机：婚约会直接伤害罗伊洛特的经济利益。"
+    },
+    "designRationale": "这是纯记录核查，价值在于玩家想到要查遗嘱；不需要等待或推进故事时间。"
+  },
+  {
+    "id": "event-roylott-becomes-violent",
+    "kind": "agent-state-change",
+    "title": "罗伊洛特被遗嘱与房间装置逼怒",
+    "description": "玩家向罗伊洛特暴露遗嘱动机或房间装置矛盾后，他从威胁变为更强防御和攻击性回避。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-manor-search",
+      "agentId": "grimesby-roylott",
+      "topics": [
+        "遗嘱",
+        "铃绳",
+        "通风孔",
+        "保险柜"
+      ],
+      "requiredClueIds": [
+        "clue-will-motive",
+        "clue-dummy-bell-rope"
+      ],
+      "requiredFactIds": [
+        "fact-marriage-income-loss"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-devices-not-domestic"
+      ],
+      "requiredNpcInteractions": [
+        "grimesby-roylott"
+      ],
+      "requiredSceneInteractions": []
+    },
+    "effects": {
+      "revealedFactIds": [],
+      "revealedClueIds": [],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "grimesby-roylott"
+      ],
+      "narrative": "罗伊洛特意识到调查逼近房间装置，回答转为威胁、否认和转嫁。"
+    },
+    "designRationale": "玩家行为改变 NPC 状态，但不改变世界时间；因此是 immediate 的 agent-state-change。"
+  },
+  {
+    "id": "event-helen-lamp-signal",
+    "kind": "story-beat",
+    "title": "海伦离开中间房间并点亮灯号",
+    "description": "玩家完成庄园勘查后安排海伦离开危险房间，灯号允许调查者进入夜间验证。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-manor-search",
+      "topics": [
+        "夜间计划",
+        "灯号",
+        "保护海伦"
+      ],
+      "requiredClueIds": [
+        "clue-dummy-bell-rope",
+        "clue-inside-ventilator",
+        "clue-fixed-bed",
+        "clue-milk-and-safe"
+      ],
+      "requiredFactIds": [
+        "fact-fixed-bed",
+        "fact-milk-and-safe"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-devices-not-domestic"
+      ],
+      "requiredNpcInteractions": [
+        "helen-stoner"
+      ],
+      "requiredSceneInteractions": [
+        "scene-julia-bedroom",
+        "scene-crown-inn-vigil"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-lamp-signal"
+      ],
+      "revealedClueIds": [
+        "clue-lamp-signal"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "helen-stoner",
+        "general"
+      ],
+      "narrative": "中间窗前出现灯光，说明海伦已经撤离，夜间验证开始。"
+    },
+    "designRationale": "该行动改变角色位置和可进入场景，是世界状态变化而非纯信息获取。"
+  },
+  {
+    "id": "event-opening-to-manor",
+    "kind": "act-transition",
+    "title": "从陈述转入现场",
+    "description": "完成开局关键陈述、密室条件和遗嘱动机后，调查进入斯托克莫兰现场。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [
+        "前往斯托克莫兰"
+      ],
+      "requiredClueIds": [
+        "clue-night-whistle",
+        "clue-dying-words",
+        "clue-locked-room",
+        "clue-will-motive"
+      ],
+      "requiredFactIds": [
+        "fact-marriage-income-loss"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-sealed-room-but-sound"
+      ],
+      "requiredNpcInteractions": [
+        "helen-stoner",
+        "county-coroner"
+      ],
+      "requiredSceneInteractions": [
+        "scene-baker-street",
+        "scene-doctors-commons"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-repairs-forced-room"
+      ],
+      "revealedClueIds": [
+        "clue-false-repairs"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-repairs-too-convenient"
+      ],
+      "targetAgentIds": [
+        "general",
+        "helen-stoner"
+      ],
+      "nextActId": "act-manor-search",
+      "narrative": "调查不再停留于恐惧陈述；庄园现场成为下一步唯一能验证密室的地方。"
+    },
+    "designRationale": "该事件与 gate-opening-to-manor 对齐，用叙事解释为什么开启第二幕。"
+  },
+  {
+    "id": "event-manor-to-confrontation",
+    "kind": "act-transition",
+    "title": "从现场勘查转入夜间验证",
+    "description": "完成装置链条、保险柜牛奶和狗鞭套环后，调查进入守夜和最终指认阶段。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-manor-search",
+      "topics": [
+        "夜间验证"
+      ],
+      "requiredClueIds": [
+        "clue-dummy-bell-rope",
+        "clue-inside-ventilator",
+        "clue-fixed-bed",
+        "clue-milk-and-safe",
+        "clue-dog-lash-loop",
+        "clue-chair-marks"
+      ],
+      "requiredFactIds": [
+        "fact-dummy-bell-rope",
+        "fact-inside-ventilator",
+        "fact-fixed-bed",
+        "fact-milk-and-safe"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-devices-not-domestic",
+        "contradiction-no-cat-but-milk"
+      ],
+      "requiredNpcInteractions": [
+        "helen-stoner",
+        "housekeeper",
+        "crown-landlord"
+      ],
+      "requiredSceneInteractions": [
+        "scene-julia-bedroom",
+        "scene-roylott-bedroom"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-lamp-signal"
+      ],
+      "revealedClueIds": [
+        "clue-crown-inn-view",
+        "clue-lamp-signal"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-tool-path-and-motive"
+      ],
+      "targetAgentIds": [
+        "general",
+        "helen-stoner"
+      ],
+      "nextActId": "act-confrontation",
+      "narrative": "房间装置已足以证明危险来自隔壁；海伦撤离后，玩家可以验证夜间机制。"
+    },
+    "designRationale": "该事件与 gate-manor-to-confrontation 对齐；真正进幕仍由 ActGate 的 required discoveries 决定。"
+  }
+]

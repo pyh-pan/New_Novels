@@ -116,6 +116,13 @@ function getReviewReference(draft: StudioDraftView, node: StudioTreeNode): Revie
     };
   }
 
+  if (node.id === "adaptation-notes" && draft.adaptationNotesMarkdown) {
+    return {
+      summary: "改写说明",
+      excerpt: compactText(draft.adaptationNotesMarkdown)
+    };
+  }
+
   if (node.type === "validation") {
     return {
       summary: "校验报告",
@@ -140,6 +147,30 @@ function SectionList({ items }: { items: string[] }) {
         <li key={`${index}-${item}`}>{item}</li>
       ))}
     </ul>
+  );
+}
+
+function MarkdownNote({ body }: { body: string }) {
+  const lines = body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return (
+    <div className="studio-prose">
+      {lines.map((line, index) => {
+        if (line.startsWith("# ")) {
+          return <p key={`${index}-${line}`}>{line.replace(/^#\s+/u, "")}</p>;
+        }
+        if (line.startsWith("## ")) {
+          return <h3 key={`${index}-${line}`}>{line.replace(/^##\s+/u, "")}</h3>;
+        }
+        if (line.startsWith("- ")) {
+          return <p key={`${index}-${line}`}>{line.replace(/^-\s+/u, "")}</p>;
+        }
+        return <p key={`${index}-${line}`}>{line}</p>;
+      })}
+    </div>
   );
 }
 
@@ -441,6 +472,15 @@ function Inspector({
   nodeId: string;
   nodeType: StudioNodeType;
 }) {
+  if (nodeType === "adaptation") {
+    return (
+      <article className="studio-inspector-page">
+        <h2>改写说明</h2>
+        <MarkdownNote body={draft.adaptationNotesMarkdown ?? "暂无改写说明。"} />
+      </article>
+    );
+  }
+
   if (nodeType === "chapter") {
     const chapter = draft.chapters.find((item) => item.id === nodeId) ?? draft.chapters[0];
     return (

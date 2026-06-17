@@ -1,0 +1,151 @@
+[
+  {
+    "id": "scene-reading-room",
+    "actId": "act-opening",
+    "location": "杜宾寓所",
+    "observableFactIds": [
+      "fact-public-case-opened",
+      "fact-le-bon-delivered-money"
+    ],
+    "interactableObjects": [
+      "晚报剪报",
+      "杜宾的案头蜡烛",
+      "勒邦被捕附记"
+    ],
+    "ambientText": [
+      "蜡烛在紧闭百叶窗后发出淡黄光，报纸铅字像刚凝固的血。"
+    ]
+  },
+  {
+    "id": "scene-rue-morgue-bedroom",
+    "actId": "act-opening",
+    "location": "莫格街四楼后房",
+    "observableFactIds": [
+      "fact-door-locked-inside",
+      "fact-camille-in-chimney",
+      "fact-gold-left-behind",
+      "fact-razor-bloodied"
+    ],
+    "interactableObjects": [
+      "反锁房门",
+      "壁炉烟囱",
+      "沾血剃刀",
+      "金币袋",
+      "靠床后窗"
+    ],
+    "ambientText": [
+      "房间被暴力翻乱，床架空着，烟灰和血腥气混在一起。"
+    ]
+  },
+  {
+    "id": "scene-rue-morgue-yard",
+    "actId": "act-opening",
+    "location": "莫格街后院",
+    "observableFactIds": [
+      "fact-madame-in-yard"
+    ],
+    "interactableObjects": [
+      "铺石地",
+      "后墙",
+      "老妇人坠落位置"
+    ],
+    "ambientText": [
+      "窄院像井底，四楼窗口在上方沉默地闭着。"
+    ]
+  },
+  {
+    "id": "scene-staircase-witness-line",
+    "actId": "act-testimony",
+    "location": "莫格街楼梯与门厅",
+    "observableFactIds": [
+      "fact-gruff-voice-french",
+      "fact-shrill-voice-unidentified"
+    ],
+    "interactableObjects": [
+      "楼梯回声",
+      "破开的门闩",
+      "证人站位图"
+    ],
+    "ambientText": [
+      "楼梯狭窄，声音在墙面间折返，证词也因此彼此牵扯。"
+    ]
+  },
+  {
+    "id": "scene-back-wall",
+    "actId": "act-testimony",
+    "location": "莫格街后巷墙面",
+    "observableFactIds": [
+      "fact-windows-seemed-fastened",
+      "fact-window-hidden-spring",
+      "fact-broken-nail-mimics-fastening",
+      "fact-lightning-rod-shutter-route",
+      "fact-sailor-ribbon-at-rod"
+    ],
+    "interactableObjects": [
+      "避雷杆",
+      "格栅百叶窗",
+      "断钉窗框",
+      "油腻发带"
+    ],
+    "ambientText": [
+      "后巷冷清，避雷杆从湿墙上直上四楼，旁边的百叶窗比远看时宽得多。"
+    ]
+  },
+  {
+    "id": "scene-medical-table",
+    "actId": "act-confrontation",
+    "location": "临时验尸桌",
+    "observableFactIds": [
+      "fact-force-beyond-ordinary-human",
+      "fact-hair-not-human",
+      "fact-finger-marks-not-human"
+    ],
+    "interactableObjects": [
+      "喉痕摹图",
+      "非人毛发",
+      "医师记录"
+    ],
+    "ambientText": [
+      "医师记录冷静得近乎残酷，数字与形状比惊叫更可靠。"
+    ]
+  },
+  {
+    "id": "scene-dupin-apartment-confrontation",
+    "actId": "act-confrontation",
+    "location": "杜宾寓所对质房间",
+    "observableFactIds": [
+      "fact-advertisement-draws-owner",
+      "fact-sailor-owns-orangutan"
+    ],
+    "interactableObjects": [
+      "航运报广告",
+      "上锁的房门",
+      "桌上手枪",
+      "船员木棍"
+    ],
+    "ambientText": [
+      "脚步在楼梯上犹豫又返回，杜宾把门锁上时，房间忽然显得很小。"
+    ]
+  },
+  {
+    "id": "scene-final-ledger",
+    "actId": "act-accusation",
+    "location": "最终事实账本",
+    "observableFactIds": [
+      "fact-orangutan-escaped-with-razor",
+      "fact-sailor-witnessed-not-killer",
+      "fact-truth-orangutan-culprit",
+      "fact-truth-method-entry-exit",
+      "fact-truth-no-human-motive"
+    ],
+    "interactableObjects": [
+      "完整时间线",
+      "断钉示意",
+      "证词对照表",
+      "最终指认记录"
+    ],
+    "ambientText": [
+      "所有可怕的异常终于不再彼此抵触，而是同指向一个非人的中心。"
+    ]
+  }
+]

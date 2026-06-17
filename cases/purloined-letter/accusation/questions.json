@@ -1,0 +1,77 @@
+[
+  {
+    "id": "question-culprit",
+    "prompt": "谁是盗信并利用信件施压的人？",
+    "acceptedAnswers": [
+      "部长 D--",
+      "Minister D--",
+      "D--",
+      "minister-d",
+      "那位部长",
+      "D部长"
+    ],
+    "explanation": "盗信者被当场看见，且数月来凭借信件造成政治压力；结构化真相中的 culprit 是 minister-d。"
+  },
+  {
+    "id": "question-victim",
+    "prompt": "本案的受害者是谁？",
+    "acceptedAnswers": [
+      "王室女士",
+      "受勒索的王室女士",
+      "那位高贵女士",
+      "royal-lady",
+      "被盗信的女士"
+    ],
+    "explanation": "本案不是谋杀案；受害者是名誉和政治安宁受信件威胁的王室女士。"
+  },
+  {
+    "id": "question-method",
+    "prompt": "信最终如何避开三个月的搜查？",
+    "acceptedAnswers": [
+      "明处藏匿",
+      "放在纸夹里",
+      "翻转改装后挂在纸夹里",
+      "改封后伪装成写给部长的破旧信",
+      "藏在众目睽睽处",
+      "not hidden in plain sight"
+    ],
+    "explanation": "警方只搜暗格与夹层；部长把信翻转、重折、改封，放在壁炉下方纸夹中，过分显眼反而安全。"
+  },
+  {
+    "id": "question-decisive-evidence",
+    "prompt": "哪组证据最能证明纸夹里的破旧信就是失窃信？",
+    "acceptedAnswers": [
+      "原信描述与纸夹信外观相反加上反折痕",
+      "反向折痕和重新封缄",
+      "红封印记录、黑封印伪装、反折痕",
+      "clue-original-description plus clue-reversed-folds",
+      "地址封印矛盾和反折痕"
+    ],
+    "explanation": "外观差异本身像伪装，而反向重折痕证明纸张曾被翻转改装；二者合在一起支撑 contradiction-address-folds。"
+  },
+  {
+    "id": "question-motive",
+    "prompt": "部长为什么保留这封信而不立刻公开？",
+    "acceptedAnswers": [
+      "政治勒索",
+      "控制王室女士",
+      "保持威胁以取得政治影响",
+      "用信件要挟她",
+      "political leverage",
+      "blackmail"
+    ],
+    "explanation": "信公开后威力会耗尽；未公开且随时可用，才能持续让部长取得政治优势。"
+  },
+  {
+    "id": "question-recovery",
+    "prompt": "杜宾如何安全取回信？",
+    "acceptedAnswers": [
+      "留下鼻烟盒后复访并利用街上骚乱调包",
+      "第二次拜访时用无弹枪声引开部长再调包",
+      "用仿件替换真信",
+      "snuffbox distraction facsimile",
+      "趁部长看窗外换走纸夹里的信"
+    ],
+    "explanation": "鼻烟盒制造复访理由，街上无弹枪声让部长离开纸夹，杜宾用预制仿件替换真信。"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "case-package/v1",
+  "caseId": "purloined-letter",
+  "title": "明处的信",
+  "language": "zh-CN",
+  "entryChapterId": "chapter-1",
+  "createdBy": "new-novels-case-adapter",
+  "source": {
+    "title": "The Purloined Letter",
+    "author": "Edgar Allan Poe",
+    "rightsNote": "EPUB metadata states: Public domain in the USA."
+  }
+}

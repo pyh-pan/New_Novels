@@ -1,0 +1,468 @@
+[
+  {
+    "id": "fact-confidential-case",
+    "text": "本案必须秘密处理；公开调查会危及王室女士和警察厅长官。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "prefect-g"
+    ],
+    "relatedClueIds": [
+      "clue-letter-power"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "保密",
+      "王室",
+      "长官"
+    ]
+  },
+  {
+    "id": "fact-letter-stolen",
+    "text": "一封极重要的信在王室内室被盗。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "royal-lady",
+      "prefect-g"
+    ],
+    "relatedClueIds": [
+      "clue-theft-witnessed"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "失窃",
+      "信"
+    ]
+  },
+  {
+    "id": "fact-minister-seen-taking",
+    "text": "部长 D-- 被受害者亲眼看见拿走信件。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "royal-lady",
+      "prefect-g",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-theft-witnessed"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "部长",
+      "亲眼看见"
+    ]
+  },
+  {
+    "id": "fact-letter-power",
+    "text": "信件对持有人有政治勒索价值，因为公开会伤害王室女士的名誉。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g",
+      "royal-lady"
+    ],
+    "relatedClueIds": [
+      "clue-letter-power"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "勒索",
+      "政治",
+      "名誉"
+    ]
+  },
+  {
+    "id": "fact-victim-honor-risk",
+    "text": "王室女士是本案受害者；她的名誉、安宁与政治处境受信件威胁。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "royal-lady"
+    ],
+    "relatedClueIds": [
+      "clue-letter-power"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "受害者",
+      "名誉"
+    ]
+  },
+  {
+    "id": "fact-theft-swap-in-boudoir",
+    "text": "部长在王室内室用一封外观相近的普通信替换失窃信件。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "royal-lady",
+      "prefect-g",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-theft-witnessed"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "换信",
+      "内室"
+    ]
+  },
+  {
+    "id": "fact-letter-must-be-available",
+    "text": "信件的威力来自可被随时出示或销毁，因此应仍在部长可立即控制的范围内。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-letter-must-be-at-hand"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "随时可用",
+      "控制"
+    ]
+  },
+  {
+    "id": "fact-police-body-search",
+    "text": "部长曾被警方安排的伪装拦路搜身，身上没有信。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-police-body-search"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "搜身",
+      "不在身上"
+    ]
+  },
+  {
+    "id": "fact-police-searched-hotel",
+    "text": "警方秘密搜查部长府邸三个月，检查了几乎所有传统藏匿处。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g"
+    ],
+    "relatedClueIds": [
+      "clue-exhaustive-search"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "府邸",
+      "搜查"
+    ]
+  },
+  {
+    "id": "fact-search-found-nothing",
+    "text": "警方没有在家具、书籍、墙面、地板、相邻房屋或砖缝中找到信。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g"
+    ],
+    "relatedClueIds": [
+      "clue-exhaustive-search"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "未找到",
+      "无痕迹"
+    ]
+  },
+  {
+    "id": "fact-search-principle-wrong",
+    "text": "警方失败的根源是把藏匿理解为暗格、夹层和隐秘角落。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-search-principle-wrong"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "搜查原则",
+      "暗处"
+    ]
+  },
+  {
+    "id": "fact-minister-understands-police",
+    "text": "部长 D-- 熟悉警方思路，会预判普通搜查并利用其盲点。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-minister-anticipates-search"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "预判",
+      "警方"
+    ]
+  },
+  {
+    "id": "fact-minister-political-pressure",
+    "text": "数月来部长凭借持信威胁影响政治事务，但尚未真正公开信件。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "royal-lady",
+      "prefect-g",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-letter-power"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "政治影响",
+      "尚未公开"
+    ]
+  },
+  {
+    "id": "fact-reward-large",
+    "text": "为追回信件，悬赏已提高到足以让 G-- 愿意支付五万法郎。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "prefect-g",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-reward-doubled"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "悬赏",
+      "五万法郎"
+    ]
+  },
+  {
+    "id": "fact-original-letter-description",
+    "text": "原信带小红封印和 S-- 家族纹章，地址字迹醒目坚定。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "prefect-g",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-original-description"
+    ],
+    "actId": "act-search",
+    "keywords": [
+      "红封印",
+      "纹章",
+      "地址"
+    ]
+  },
+  {
+    "id": "fact-dupin-visited-minister",
+    "text": "杜宾以眼疾和有色眼镜为掩护，拜访部长并观察其客厅。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-dupin-visit"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "拜访",
+      "眼镜"
+    ]
+  },
+  {
+    "id": "fact-card-rack-visible",
+    "text": "部长客厅壁炉下方的纸夹里有一封污损、近乎撕裂、看似无用的信。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-visible-card-rack-letter"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "纸夹",
+      "污损"
+    ]
+  },
+  {
+    "id": "fact-disguised-address",
+    "text": "纸夹中的信表面写给部长本人，黑色封印和女性小字地址与原信描述相反。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-disguised-address"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "地址",
+      "黑封印"
+    ]
+  },
+  {
+    "id": "fact-reversed-folds",
+    "text": "纸夹信件边缘有反向重折痕迹，显示它曾被翻转、重新折叠和封缄。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-reversed-folds"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "反折",
+      "重新封缄"
+    ]
+  },
+  {
+    "id": "fact-letter-left-plain-sight",
+    "text": "真信被翻转改装后放在明处纸夹里，以看似废纸的姿态躲过搜查。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-visible-card-rack-letter",
+      "clue-reversed-folds"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "真相",
+      "明处藏匿"
+    ]
+  },
+  {
+    "id": "fact-dupin-left-snuffbox",
+    "text": "杜宾第一次拜访后故意留下金鼻烟盒，制造第二天返回的理由。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-snuffbox-second-visit"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "鼻烟盒",
+      "第二次拜访"
+    ]
+  },
+  {
+    "id": "fact-dupin-arranged-distraction",
+    "text": "杜宾雇人制造街上无弹枪响，引开部长视线。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-street-distraction"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "枪声",
+      "骚乱"
+    ]
+  },
+  {
+    "id": "fact-facsimile-substitution",
+    "text": "杜宾用预制的外观仿件替换纸夹中的真信，使部长暂时不知信已失去。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-facsimile-substitution"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "调包",
+      "仿件"
+    ]
+  },
+  {
+    "id": "fact-truth-culprit",
+    "text": "盗信并以信勒索的人是部长 D--。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-theft-witnessed",
+      "clue-letter-power"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "真凶",
+      "部长"
+    ]
+  },
+  {
+    "id": "fact-truth-motive",
+    "text": "部长的动机是利用信件控制王室女士并扩大政治影响。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "minister-d"
+    ],
+    "relatedClueIds": [
+      "clue-letter-power"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "动机",
+      "政治勒索"
+    ]
+  },
+  {
+    "id": "fact-truth-dupin-recovered-letter",
+    "text": "杜宾最终取回真信并把仿件留给部长。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-facsimile-substitution"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "取回",
+      "仿件"
+    ]
+  },
+  {
+    "id": "fact-letter-content-private",
+    "text": "信件正文内容不应在游戏中被普通 NPC 编造或公开。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "royal-lady"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "正文",
+      "禁止编造"
+    ]
+  },
+  {
+    "id": "fact-general-no-private-knowledge",
+    "text": "通用调查台没有角色私密知识，只整理已解锁记录。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "通用",
+      "边界"
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "fromAgentId": "prefect-g",
+    "toAgentId": "dupin",
+    "factId": "fact-original-letter-description",
+    "condition": {
+      "requiresAllClues": [
+        "clue-exhaustive-search"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-police-searched-hotel"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-search"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "royal-lady",
+    "toAgentId": "prefect-g",
+    "factId": "fact-victim-honor-risk",
+    "condition": {
+      "requiresAllClues": [
+        "clue-letter-power"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-letter-power"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-opening"
+    },
+    "mode": "direct"
+  }
+]

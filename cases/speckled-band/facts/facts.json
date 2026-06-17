@@ -1,0 +1,522 @@
+[
+  {
+    "id": "fact-case-frame",
+    "text": "案件发生在1883年四月，地点从贝克街延伸到萨里郡斯托克莫兰庄园。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "贝克街",
+      "斯托克莫兰"
+    ]
+  },
+  {
+    "id": "fact-julia-died-locked-room",
+    "text": "朱莉娅-斯托纳两年前死在自己的卧室，房门从内侧锁住。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "county-coroner"
+    ],
+    "relatedClueIds": [
+      "clue-locked-room"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "朱莉娅",
+      "密室"
+    ]
+  },
+  {
+    "id": "fact-helen-engaged",
+    "text": "海伦近期订婚，并将在春季结婚。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "percy-armitage"
+    ],
+    "relatedClueIds": [
+      "clue-threatened-marriage"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "海伦",
+      "婚约"
+    ]
+  },
+  {
+    "id": "fact-helen-fears-repeat",
+    "text": "海伦害怕朱莉娅的死亡会在自己身上重演。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "percy-armitage"
+    ],
+    "relatedClueIds": [
+      "clue-threatened-marriage"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "恐惧",
+      "重演"
+    ]
+  },
+  {
+    "id": "fact-helen-heard-whistle",
+    "text": "海伦昨夜在朱莉娅旧房间听见低而清晰的口哨。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-night-whistle"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "口哨",
+      "昨夜"
+    ]
+  },
+  {
+    "id": "fact-julia-dying-words",
+    "text": "朱莉娅临终说出“斑点带子”，并朝罗伊洛特房间方向抬手。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-dying-words"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "斑点带子",
+      "临终"
+    ]
+  },
+  {
+    "id": "fact-locked-room-conditions",
+    "text": "朱莉娅死时窗板、烟囱、墙壁和地板均被检查为无法普通通行。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "county-coroner",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-locked-room"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "门窗",
+      "烟囱",
+      "墙壁"
+    ]
+  },
+  {
+    "id": "fact-match-and-matchbox",
+    "text": "朱莉娅右手有烧焦火柴，左手有火柴盒，说明她临死前曾点亮查看。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "county-coroner",
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-match-stump"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "火柴",
+      "看见"
+    ]
+  },
+  {
+    "id": "fact-no-violence-no-poison-found",
+    "text": "朱莉娅尸体未见暴力痕迹，常规毒物检验未能发现死因。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "county-coroner"
+    ],
+    "relatedClueIds": [
+      "clue-no-detectable-poison"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "毒物",
+      "暴力",
+      "死因"
+    ]
+  },
+  {
+    "id": "fact-helen-bruised-wrist",
+    "text": "海伦手腕有五枚青紫指痕，显示罗伊洛特曾粗暴抓握她。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-wrist-bruises"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "暴力",
+      "手腕"
+    ]
+  },
+  {
+    "id": "fact-roylott-violent-reputation",
+    "text": "罗伊洛特有公开暴力史，曾在印度打死仆人，在村中也多次伤人。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "grimesby-roylott",
+      "crown-landlord"
+    ],
+    "relatedClueIds": [
+      "clue-roylott-violence"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "暴力",
+      "印度",
+      "村庄"
+    ]
+  },
+  {
+    "id": "fact-roylott-keeps-indian-animals",
+    "text": "罗伊洛特饲养印度来的动物，宅地上有猎豹和狒狒自由游荡。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "grimesby-roylott",
+      "crown-landlord"
+    ],
+    "relatedClueIds": [
+      "clue-indian-animals"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "印度动物",
+      "猎豹",
+      "狒狒"
+    ]
+  },
+  {
+    "id": "fact-marriage-income-loss",
+    "text": "继女结婚会从斯托纳太太遗产中分走年金，显著削弱罗伊洛特收入。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "grimesby-roylott",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-will-motive"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "遗嘱",
+      "年金",
+      "动机"
+    ]
+  },
+  {
+    "id": "fact-repairs-forced-room",
+    "text": "所谓西翼修缮没有明显紧迫性，却迫使海伦搬入朱莉娅死亡的房间。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "housekeeper",
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-false-repairs"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "修缮",
+      "换房"
+    ]
+  },
+  {
+    "id": "fact-room-changes-two-years-ago",
+    "text": "床边铃绳和内部通风孔约在两年前朱莉娅死亡前后安装。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "housekeeper",
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-room-changes-timing"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "两年前",
+      "改装"
+    ]
+  },
+  {
+    "id": "fact-bell-rope-never-used",
+    "text": "床边铃绳从未被姐妹用于呼叫女管家。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "housekeeper",
+      "helen-stoner"
+    ],
+    "relatedClueIds": [
+      "clue-dummy-bell-rope"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "铃绳",
+      "不用"
+    ]
+  },
+  {
+    "id": "fact-dummy-bell-rope",
+    "text": "朱莉娅房间床边铃绳没有接线，实际不能响铃。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-dummy-bell-rope"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "假铃绳"
+    ]
+  },
+  {
+    "id": "fact-inside-ventilator",
+    "text": "朱莉娅房间通风孔通向罗伊洛特卧室，而不是屋外。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-inside-ventilator"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "通风孔",
+      "隔壁"
+    ]
+  },
+  {
+    "id": "fact-fixed-bed",
+    "text": "朱莉娅房间的床被固定在地板上，无法移离铃绳和通风孔下方。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-fixed-bed"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "固定床"
+    ]
+  },
+  {
+    "id": "fact-device-cluster",
+    "text": "假铃绳、内部通风孔与固定床共同形成让某物从隔壁抵达床铺的路径。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-dummy-bell-rope",
+      "clue-inside-ventilator",
+      "clue-fixed-bed"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "路径",
+      "装置"
+    ]
+  },
+  {
+    "id": "fact-milk-and-safe",
+    "text": "罗伊洛特房中有铁保险柜和一碟牛奶，但家中并没有普通家猫。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-milk-and-safe"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "保险柜",
+      "牛奶"
+    ]
+  },
+  {
+    "id": "fact-dog-lash-loop",
+    "text": "罗伊洛特床角的狗鞭被打成细小套环，适合控制小型活物。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-dog-lash-loop"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "狗鞭",
+      "套环"
+    ]
+  },
+  {
+    "id": "fact-chair-marks",
+    "text": "罗伊洛特房中木椅位置和痕迹显示有人常站上去接近通风孔。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-chair-marks"
+    ],
+    "actId": "act-manor-search",
+    "keywords": [
+      "木椅",
+      "通风孔"
+    ]
+  },
+  {
+    "id": "fact-crown-inn-view",
+    "text": "皇冠旅店上层房间能望见庄园有人居住的一翼和中间卧室窗户。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "crown-landlord",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-crown-inn-view"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "旅店",
+      "视野"
+    ]
+  },
+  {
+    "id": "fact-roylott-returned-evening",
+    "text": "罗伊洛特傍晚回到庄园，并因开门迟缓对车夫大发雷霆。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "crown-landlord"
+    ],
+    "relatedClueIds": [
+      "clue-roylott-returned"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "傍晚",
+      "回家"
+    ]
+  },
+  {
+    "id": "fact-lamp-signal",
+    "text": "海伦按计划在中间卧室窗口放灯，表示自己已离开危险房间。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "helen-stoner",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-lamp-signal"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "灯号",
+      "离房"
+    ]
+  },
+  {
+    "id": "fact-hiss-before-attack",
+    "text": "夜半从通风孔方向传来轻柔持续的嘶声，随后出现口哨和罗伊洛特房中惨叫。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-night-hiss"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "嘶声",
+      "口哨",
+      "惨叫"
+    ]
+  },
+  {
+    "id": "fact-safe-keeps-snake",
+    "text": "罗伊洛特把一条来自印度的毒蛇藏在铁保险柜中。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-milk-and-safe",
+      "clue-night-hiss"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "毒蛇",
+      "保险柜"
+    ]
+  },
+  {
+    "id": "fact-roylott-trained-snake",
+    "text": "罗伊洛特训练毒蛇从通风孔爬下假铃绳到固定床，并用口哨召回。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-night-whistle",
+      "clue-dummy-bell-rope",
+      "clue-inside-ventilator",
+      "clue-fixed-bed"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "训练",
+      "口哨",
+      "蛇"
+    ]
+  },
+  {
+    "id": "fact-roylott-killed-by-own-snake",
+    "text": "夜间毒蛇被击回隔壁后咬死罗伊洛特。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "grimesby-roylott"
+    ],
+    "relatedClueIds": [
+      "clue-night-hiss"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "反噬",
+      "死亡"
+    ]
+  },
+  {
+    "id": "fact-general-only-unlocked",
+    "text": "通用调查助手只能使用玩家已经解锁的事实、线索和矛盾。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "keywords": [
+      "规则"
+    ]
+  }
+]

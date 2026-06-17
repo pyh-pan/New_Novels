@@ -1,0 +1,45 @@
+[
+  {
+    "from": "anne-rodway",
+    "to": "sally",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-mary-friend"
+    ]
+  },
+  {
+    "from": "sally",
+    "to": "anne-rodway",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-mary-friend",
+      "fact-mary-found-in-street"
+    ]
+  },
+  {
+    "from": "mrs-horlick",
+    "to": "josiah-horlick",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-horlick-cravat-owner",
+      "fact-josiah-cabman"
+    ]
+  },
+  {
+    "from": "josiah-horlick",
+    "to": "noah-truscott",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-cabman-witnessed-blow",
+      "fact-red-lion-entry"
+    ]
+  },
+  {
+    "from": "robert-lyon",
+    "to": "anne-rodway",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-anne-poor-needlewoman"
+    ]
+  }
+]

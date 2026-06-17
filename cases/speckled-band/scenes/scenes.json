@@ -1,0 +1,118 @@
+[
+  {
+    "id": "scene-baker-street",
+    "actId": "act-opening",
+    "location": "贝克街221B起居室",
+    "observableFactIds": [
+      "fact-case-frame",
+      "fact-helen-fears-repeat",
+      "fact-helen-bruised-wrist"
+    ],
+    "interactableObjects": [
+      "fireplace",
+      "bent-poker",
+      "helen-veil",
+      "return-ticket-glove"
+    ],
+    "ambientText": [
+      "清晨炉火、黑色面纱和罗伊洛特闯入后的弯曲拨火棍构成开局压力。"
+    ]
+  },
+  {
+    "id": "scene-doctors-commons",
+    "actId": "act-opening",
+    "location": "医生公会与遗嘱记录处",
+    "observableFactIds": [
+      "fact-marriage-income-loss"
+    ],
+    "interactableObjects": [
+      "stoner-will-ledger",
+      "investment-note-sheet"
+    ],
+    "ambientText": [
+      "遗嘱记录不制造新情节，只把婚约与金钱动机连接起来。"
+    ]
+  },
+  {
+    "id": "scene-manor-exterior",
+    "actId": "act-manor-search",
+    "location": "斯托克莫兰庄园草坪与外墙",
+    "observableFactIds": [
+      "fact-repairs-forced-room",
+      "fact-roylott-keeps-indian-animals"
+    ],
+    "interactableObjects": [
+      "scaffolding",
+      "middle-bedroom-window",
+      "small-corridor-windows",
+      "lawn-path"
+    ],
+    "ambientText": [
+      "破败侧翼、无工人的脚手架和中间卧室窗口让修缮显得像安排。"
+    ]
+  },
+  {
+    "id": "scene-julia-bedroom",
+    "actId": "act-manor-search",
+    "location": "朱莉娅旧卧室",
+    "observableFactIds": [
+      "fact-dummy-bell-rope",
+      "fact-inside-ventilator",
+      "fact-fixed-bed",
+      "fact-room-changes-two-years-ago"
+    ],
+    "interactableObjects": [
+      "dummy-bell-rope",
+      "inside-ventilator",
+      "fixed-bed",
+      "window-shutters",
+      "fireplace-staples",
+      "oak-panelling"
+    ],
+    "ambientText": [
+      "房间朴素到几乎没有东西，却有三件过分精准的新装置。"
+    ]
+  },
+  {
+    "id": "scene-roylott-bedroom",
+    "actId": "act-manor-search",
+    "location": "罗伊洛特卧室",
+    "observableFactIds": [
+      "fact-milk-and-safe",
+      "fact-dog-lash-loop",
+      "fact-chair-marks"
+    ],
+    "interactableObjects": [
+      "iron-safe",
+      "milk-saucer",
+      "dog-lash-loop",
+      "wooden-chair",
+      "technical-books",
+      "camp-bed"
+    ],
+    "ambientText": [
+      "铁保险柜、牛奶碟和打结狗鞭让房间显出冷静的残忍。"
+    ]
+  },
+  {
+    "id": "scene-crown-inn-vigil",
+    "actId": "act-confrontation",
+    "location": "皇冠旅店与夜间中间卧室",
+    "observableFactIds": [
+      "fact-crown-inn-view",
+      "fact-roylott-returned-evening",
+      "fact-lamp-signal",
+      "fact-hiss-before-attack"
+    ],
+    "interactableObjects": [
+      "upper-room-window",
+      "lamp-signal",
+      "dark-bedroom",
+      "cane-and-matches",
+      "ventilator-shadow"
+    ],
+    "ambientText": [
+      "旅店窗口、灯号与无光守夜构成夜间验证，不直接揭示最终解释。"
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "culprit": "ourang-outang",
+  "victim": "victim-lespanaye-household",
+  "motive": "没有人类谋财或复仇动机；逃脱猩猩因模仿剃须、受惊、被血刺激并惧怕主人惩罚而狂乱施暴和藏尸。",
+  "method": "猩猩持剃刀经后墙避雷杆和格栅百叶窗进入四楼，割伤老妇人、勒死卡米耶，将卡米耶塞入烟囱并把老妇人抛出窗外；逃离时窗户因弹簧自锁，断钉制造内锁假象。",
+  "decisiveEvidence": [
+    "clue-nonhuman-hair",
+    "clue-finger-marks",
+    "clue-broken-nail",
+    "clue-lightning-rod-shutter",
+    "clue-voice-disagreement",
+    "clue-sailor-confession",
+    "clue-gold-left"
+  ]
+}

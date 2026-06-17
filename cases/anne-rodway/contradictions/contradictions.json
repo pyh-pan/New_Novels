@@ -1,0 +1,67 @@
+[
+  {
+    "id": "contradiction-fall-vs-cravat",
+    "title": "独自跌倒无法解释紧攥断领巾",
+    "factIds": [
+      "fact-inquest-accidental",
+      "fact-cravat-in-hand"
+    ],
+    "clueIds": [
+      "clue-accidental-verdict",
+      "clue-cravat-fragment"
+    ],
+    "agentIds": [
+      "anne-rodway",
+      "doctor-harris"
+    ]
+  },
+  {
+    "id": "contradiction-horlick-not-attacker",
+    "title": "领巾主人在场但体格和证词指向另一个醉汉",
+    "factIds": [
+      "fact-horlick-cravat-owner",
+      "fact-josiah-cabman",
+      "fact-cabman-witnessed-blow"
+    ],
+    "clueIds": [
+      "clue-horlick-owner",
+      "clue-cabman-admission"
+    ],
+    "agentIds": [
+      "mrs-horlick",
+      "josiah-horlick"
+    ]
+  },
+  {
+    "id": "contradiction-accident-vs-witnessed-blow",
+    "title": "工作间昏倒解释被目击挥拳推翻",
+    "factIds": [
+      "fact-fainted-at-work",
+      "fact-cabman-witnessed-blow"
+    ],
+    "clueIds": [
+      "clue-workroom-fainting",
+      "clue-cabman-admission"
+    ],
+    "agentIds": [
+      "doctor-harris",
+      "josiah-horlick"
+    ]
+  },
+  {
+    "id": "contradiction-truscott-name-old-harm",
+    "title": "红狮姓名与 Mary 生前旧恶人姓名重合",
+    "factIds": [
+      "fact-noah-identity",
+      "fact-noah-ruined-father"
+    ],
+    "clueIds": [
+      "clue-noah-name",
+      "clue-noah-old-name"
+    ],
+    "agentIds": [
+      "anne-rodway",
+      "robert-lyon"
+    ]
+  }
+]

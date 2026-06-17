@@ -1,0 +1,339 @@
+[
+  {
+    "id": "clue-theft-witnessed",
+    "title": "亲眼目击的盗信",
+    "text": "受害者看见部长 D-- 拿走信件，却因第三人在场不能声张。",
+    "tag": "testimony",
+    "source": "royal-lady.revealRules",
+    "unlockHints": [
+      "询问王室女士或 G-- 盗信现场。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "royal-lady",
+      "topics": [
+        "盗信",
+        "内室"
+      ],
+      "factIds": [
+        "fact-letter-stolen",
+        "fact-minister-seen-taking",
+        "fact-theft-swap-in-boudoir"
+      ]
+    }
+  },
+  {
+    "id": "clue-letter-power",
+    "title": "信件带来的权势",
+    "text": "信件尚未公开时最有价值；它能让持有人持续威胁王室女士。",
+    "tag": "clue",
+    "source": "prefect-g.revealRules",
+    "unlockHints": [
+      "询问 G-- 信为什么不能公开追回。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "prefect-g",
+      "topics": [
+        "信为什么重要",
+        "勒索"
+      ],
+      "factIds": [
+        "fact-letter-power",
+        "fact-victim-honor-risk"
+      ]
+    }
+  },
+  {
+    "id": "clue-letter-must-be-at-hand",
+    "title": "必须随时可用",
+    "text": "若部长要继续勒索，信必须处在他能迅速出示或销毁的位置。",
+    "tag": "doubt",
+    "source": "scene-dupins-library",
+    "unlockHints": [
+      "比较信件效力与部长尚未公开使用的事实。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "可用性",
+        "为什么仍在附近"
+      ],
+      "factIds": [
+        "fact-letter-must-be-available"
+      ]
+    }
+  },
+  {
+    "id": "clue-police-body-search",
+    "title": "不在部长身上",
+    "text": "警方两次秘密搜身，没有在部长身上发现信件。",
+    "tag": "clue",
+    "source": "prefect-g.revealRules",
+    "unlockHints": [
+      "询问 G-- 是否检查过部长本人。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "prefect-g",
+      "topics": [
+        "搜身",
+        "部长身上"
+      ],
+      "factIds": [
+        "fact-police-body-search"
+      ]
+    }
+  },
+  {
+    "id": "clue-exhaustive-search",
+    "title": "三个月精密搜查",
+    "text": "警方检查部长府邸所有传统藏匿处，却没有找到信，也未发现扰动痕迹。",
+    "tag": "testimony",
+    "source": "prefect-g.revealRules",
+    "unlockHints": [
+      "要求 G-- 逐项说明搜查范围。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "prefect-g",
+      "topics": [
+        "搜查",
+        "府邸"
+      ],
+      "factIds": [
+        "fact-police-searched-hotel",
+        "fact-search-found-nothing"
+      ]
+    }
+  },
+  {
+    "id": "clue-search-principle-wrong",
+    "title": "错误的搜查原则",
+    "text": "警察的搜查越完美，越说明他们只覆盖了自己能想象的藏匿方式。",
+    "tag": "doubt",
+    "source": "dupin.revealRules",
+    "unlockHints": [
+      "带着三个月搜查结果询问杜宾为什么仍会失败。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "dupin",
+      "topics": [
+        "警方方法",
+        "过于明显"
+      ],
+      "factIds": [
+        "fact-search-principle-wrong"
+      ]
+    }
+  },
+  {
+    "id": "clue-minister-anticipates-search",
+    "title": "部长预判警方",
+    "text": "部长不是寻常窃贼；他懂政治、诗性和计算，能预判警方会寻找暗格。",
+    "tag": "clue",
+    "source": "dupin.revealRules",
+    "unlockHints": [
+      "向杜宾或部长讨论部长的智力与警方方法。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "dupin",
+      "topics": [
+        "部长智力",
+        "预判"
+      ],
+      "factIds": [
+        "fact-minister-understands-police"
+      ]
+    }
+  },
+  {
+    "id": "clue-reward-doubled",
+    "title": "翻倍悬赏",
+    "text": "悬赏巨大，说明官方已承认普通程序失效。",
+    "tag": "clue",
+    "source": "prefect-g.revealRules",
+    "unlockHints": [
+      "追问 G-- 愿付多少代价。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "prefect-g",
+      "topics": [
+        "悬赏",
+        "五万法郎"
+      ],
+      "factIds": [
+        "fact-reward-large"
+      ]
+    }
+  },
+  {
+    "id": "clue-original-description",
+    "title": "原信外观记录",
+    "text": "G-- 的备忘记录说明原信有小红封印、S-- 纹章和醒目的地址字迹。",
+    "tag": "clue",
+    "source": "prefect-g.revealRules",
+    "unlockHints": [
+      "要求查看 G-- 对失窃信件的外观说明。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "prefect-g",
+      "topics": [
+        "信的外观",
+        "封印"
+      ],
+      "factIds": [
+        "fact-original-letter-description"
+      ]
+    }
+  },
+  {
+    "id": "clue-dupin-visit",
+    "title": "有色眼镜拜访",
+    "text": "杜宾以眼疾为由戴着有色眼镜拜访部长，得以观察客厅而不显突兀。",
+    "tag": "testimony",
+    "source": "dupin.revealRules",
+    "unlockHints": [
+      "在搜查原则错误后询问杜宾是否亲自看过部长府邸。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "dupin",
+      "topics": [
+        "拜访",
+        "眼镜"
+      ],
+      "factIds": [
+        "fact-dupin-visited-minister"
+      ]
+    }
+  },
+  {
+    "id": "clue-visible-card-rack-letter",
+    "title": "纸夹里的破旧信",
+    "text": "部长客厅壁炉下方的纸夹里，一封污损破旧的信过分显眼。",
+    "tag": "clue",
+    "source": "scene-minister-salon",
+    "unlockHints": [
+      "调查部长客厅的纸夹。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "纸夹",
+        "客厅"
+      ],
+      "factIds": [
+        "fact-card-rack-visible"
+      ]
+    }
+  },
+  {
+    "id": "clue-disguised-address",
+    "title": "相反的封印与地址",
+    "text": "纸夹信表面写给部长本人，黑封印和女性小字与原信记录显著不同。",
+    "tag": "contradiction",
+    "source": "scene-minister-salon",
+    "unlockHints": [
+      "对照原信外观记录和纸夹信表面。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "地址",
+        "封印"
+      ],
+      "factIds": [
+        "fact-disguised-address",
+        "fact-original-letter-description"
+      ]
+    }
+  },
+  {
+    "id": "clue-reversed-folds",
+    "title": "反向重折痕",
+    "text": "纸夹信边缘显示它曾按原折痕反向折叠，像被翻转后重新封缄。",
+    "tag": "clue",
+    "source": "scene-minister-salon",
+    "unlockHints": [
+      "观察纸夹信边缘和折痕。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "反折",
+        "折痕"
+      ],
+      "factIds": [
+        "fact-reversed-folds"
+      ]
+    }
+  },
+  {
+    "id": "clue-snuffbox-second-visit",
+    "title": "留下的鼻烟盒",
+    "text": "杜宾第一次拜访后留下金鼻烟盒，第二天借此回到部长客厅。",
+    "tag": "clue",
+    "source": "dupin.revealRules",
+    "unlockHints": [
+      "向杜宾追问为什么有第二次拜访。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "dupin",
+      "topics": [
+        "鼻烟盒",
+        "第二次拜访"
+      ],
+      "factIds": [
+        "fact-dupin-left-snuffbox"
+      ]
+    }
+  },
+  {
+    "id": "clue-street-distraction",
+    "title": "街上的无弹枪声",
+    "text": "第二次拜访时街上突发枪声与骚乱，部长离开纸夹去窗口查看。",
+    "tag": "clue",
+    "source": "scene-street-beneath-window",
+    "unlockHints": [
+      "完成鼻烟盒线索后调查街上骚乱。"
+    ],
+    "unlock": {
+      "type": "manual",
+      "topics": [
+        "枪声",
+        "骚乱"
+      ],
+      "factIds": [
+        "fact-dupin-arranged-distraction"
+      ]
+    }
+  },
+  {
+    "id": "clue-facsimile-substitution",
+    "title": "外观仿件",
+    "text": "杜宾预先制作外观相同的仿件，用来替换纸夹中的真信。",
+    "tag": "clue",
+    "source": "dupin.revealRules",
+    "unlockHints": [
+      "用纸夹、折痕、骚乱三条线索逼问杜宾。"
+    ],
+    "unlock": {
+      "type": "agent-response",
+      "agentId": "dupin",
+      "topics": [
+        "仿件",
+        "调包"
+      ],
+      "factIds": [
+        "fact-facsimile-substitution",
+        "fact-truth-dupin-recovered-letter"
+      ]
+    }
+  }
+]

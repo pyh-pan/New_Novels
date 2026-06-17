@@ -1,0 +1,90 @@
+[
+  {
+    "id": "gate-opening-to-testimony",
+    "fromActId": "act-opening",
+    "toActId": "act-testimony",
+    "requiredClueIds": [
+      "clue-locked-room",
+      "clue-gold-left",
+      "clue-chimney-body",
+      "clue-le-bon-delivery"
+    ],
+    "requiredFactIds": [
+      "fact-door-locked-inside",
+      "fact-gold-left-behind",
+      "fact-le-bon-delivered-money"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-robbery-motive",
+      "contradiction-le-bon-arrest"
+    ],
+    "requiredNpcInteractions": [
+      "adolph-le-bon",
+      "jules-mignaud"
+    ],
+    "requiredSceneInteractions": [
+      "scene-rue-morgue-bedroom",
+      "scene-rue-morgue-yard"
+    ],
+    "unlockNarrative": "抢劫解释无法承受金币遗留和勒邦行为链缺口，调查转入证词互证与封闭房间。"
+  },
+  {
+    "id": "gate-testimony-to-confrontation",
+    "fromActId": "act-testimony",
+    "toActId": "act-confrontation",
+    "requiredClueIds": [
+      "clue-voice-disagreement",
+      "clue-window-spring",
+      "clue-broken-nail",
+      "clue-lightning-rod-shutter"
+    ],
+    "requiredFactIds": [
+      "fact-shrill-voice-unidentified",
+      "fact-broken-nail-mimics-fastening",
+      "fact-lightning-rod-shutter-route"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-voice-nationality",
+      "contradiction-window-locked-yet-route"
+    ],
+    "requiredNpcInteractions": [
+      "isidore-muset",
+      "henri-duval"
+    ],
+    "requiredSceneInteractions": [
+      "scene-staircase-witness-line",
+      "scene-back-wall"
+    ],
+    "unlockNarrative": "窗户不再是死路，尖声也不再像普通外语；调查获得非寻常进入者的方向。"
+  },
+  {
+    "id": "gate-confrontation-to-accusation",
+    "fromActId": "act-confrontation",
+    "toActId": "act-accusation",
+    "requiredClueIds": [
+      "clue-nonhuman-hair",
+      "clue-finger-marks",
+      "clue-sailor-ribbon",
+      "clue-sailor-confession"
+    ],
+    "requiredFactIds": [
+      "fact-hair-not-human",
+      "fact-finger-marks-not-human",
+      "fact-sailor-owns-orangutan",
+      "fact-sailor-witnessed-not-killer"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-human-strength",
+      "contradiction-hand-not-human"
+    ],
+    "requiredNpcInteractions": [
+      "maltese-sailor",
+      "paul-dumas"
+    ],
+    "requiredSceneInteractions": [
+      "scene-medical-table",
+      "scene-dupin-apartment-confrontation"
+    ],
+    "unlockNarrative": "非人毛发、喉痕和船员供述已经闭合，玩家可以进入最终指认。"
+  }
+]

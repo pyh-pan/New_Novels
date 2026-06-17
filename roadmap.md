@@ -27,9 +27,13 @@ New Novels 要做的是一个 **文字优先的沉浸式推理体验**。
 
 ### 1. 可运行的案件原型
 
-当前只保留一个内置案件包：
+当前内置 bundled 案件包包括：
 
 - `cases/hunters-lodge/`：当前默认可玩案件，基于用户提供的 Agatha Christie《The Mystery of Hunter's Lodge》原文改写为中文互动案件“猎人小屋疑案”。
+- `cases/speckled-band/`：基于 Project Gutenberg EPUB `The Adventure of the Speckled Band` 改写的“斑点带子疑案”。
+- `cases/anne-rodway/`：基于 Project Gutenberg EPUB `Brother Owen's Story of Anne Rodway` 改写的“断领巾的证词”。
+- `cases/rue-morgue/`：基于 Project Gutenberg EPUB `The Murders in the Rue Morgue` 改写的“莫格街双尸案”。
+- `cases/purloined-letter/`：基于 Project Gutenberg EPUB `The Purloined Letter` 改写的“明处的信”。
 
 当前原型包含：
 
@@ -108,7 +112,7 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 - `casePackageManifestSchema`
 - `casePackageSchema`
 - `hammerOfGodPackage`
-- `cases/hunters-lodge/` 当前默认案件目录。
+- `cases/` 当前 bundled 案件目录，默认案件仍为 `cases/hunters-lodge/`。
 - `manifest.json`、`case.json`、`story/*.md`、`agents/*.json`、`acts/gates.json`、`events/story-events.json`、`truth/truth.json` 等拆分文件。
 - `CaseLoader`：从本地目录读取 split package，并组装为 `CaseFile`。
 - `validateCasePackageDirectory`：输出统一校验报告，包含错误级别、文件路径、字段路径、原因和修复建议。
@@ -187,7 +191,7 @@ Pretext 已作为文本布局方向引入到阅读体验中：
 
 当前验证基线：
 
-- `npm test`：28 个测试文件，117 个测试通过。
+- `npm test`：30 个测试文件，138 个测试通过。
 - `npm run lint`：通过。
 - `npm run build`：通过。
 - `npm run guard:package`：通过，生成项目父目录下的 `New_Novels-guard.zip`。
@@ -223,7 +227,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 
 ## 四、内容验证进展
 
-已将 Agatha Christie 的 **“The Mystery of Hunter's Lodge”** 作为第二个内容验证样例落地，并切换为当前默认可玩案件。
+已将 Agatha Christie 的 **“The Mystery of Hunter's Lodge”** 作为第二个内容验证样例落地，并切换为当前默认可玩案件。本轮又按当前 `new-novels-case-adapter` skill 与 `case-package/v1` 设计，从四个 Project Gutenberg EPUB 中各选一篇适合互动公平推理的短篇，生成 bundled 可玩案件。
 
 本轮已完成：
 
@@ -233,13 +237,17 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - 增加事实账本、线索、场景、矛盾、关系、信息传播和最终指认问题。
 - 将前端和 API 的 agent 路由从旧固定 id 泛化为案件包动态 agent。
 - 将默认案件切换为 `cases/hunters-lodge/`。
+- 新增四个公开版权标注来源的成熟案件包：`speckled-band`、`anne-rodway`、`rue-morgue`、`purloined-letter`。
+- 四个新增案件均包含中文章节、事实账本、NPC pressure model、reveal rules、acts、act gates、storyEvents、场景、线索、矛盾、真相和最终指认问题。
+- `rue-morgue` 使用非对话型 `ourang-outang` agent 表达非人直接凶手，并通过 forbidden claims 防止其像普通 NPC 一样供述。
 
 使用前提：
 
 - 当前内容来自用户提供原文。
+- 四个新增 Project Gutenberg EPUB 的 metadata 标注为 `Public domain in the USA`。
 - 正式发布前仍需确认目标发布地区版权状态。
 
-下一批候选：
+后续候选：
 
 - Agatha Christie 的 **“The Tragedy at Marsdon Manor”**：更适合测试心理欺骗和动机推理。
 - Agatha Christie 的 **“The Adventure of the Egyptian Tomb”**：更适合测试氛围叙事和“诅咒 vs 理性调查”的反差。
@@ -514,7 +522,7 @@ Pretext 适合用于文本测量、阅读体验和长文本布局优化，但不
 - `POST /api/cases/preview` 返回导入校验报告、案件摘要和 Studio 草稿 id。
 - 校验失败时明确指出错误路径和修复建议。
 - 保留当前内置案件作为默认示例。
-- 首页故事书架展示当前唯一内置案件，并支持发布案件继续加入书架。
+- 首页故事书架展示 bundled 案件，并支持发布案件继续加入书架。
 - Studio 审阅工作台展示章节、agent、线索、矛盾、act gate、最终答案和校验报告。
 - 评论模式已完成第一版，支持围绕当前节点添加批注并生成修改建议边界。
 - 接入真实改写链路：上传 `.txt` / `.md` / `.pdf` 后生成新的案件包草稿，而不是复用内置样章。

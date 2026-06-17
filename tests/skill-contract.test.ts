@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const skillRoot = join(process.cwd(), "skills", "new-novels-case-adapter");
@@ -19,7 +20,14 @@ describe("new novels case adapter skill contract", () => {
       join(skillRoot, "scripts", "check_case_package_refs.mjs"),
       "utf8"
     );
+    const runnerContract = readFileSync(
+      join(skillRoot, "references", "studio-runner-contract.md"),
+      "utf8"
+    );
 
+    expect(skill).toContain("Studio runner");
+    expect(skill).toContain("validation-report.json");
+    expect(skill).toContain("adaptation-notes.md");
     expect(skill).toContain("pressureProfile");
     expect(skill).toContain("ActGate");
     expect(skill).toContain("required discoveries");
@@ -30,7 +38,14 @@ describe("new novels case adapter skill contract", () => {
     expect(workflow).toContain("剧本杀式");
     expect(workflow).toContain("pressureProfile");
     expect(workflow).toContain("Package Assembly");
+    expect(runnerContract).toContain("AdaptationRequest");
+    expect(runnerContract).toContain("AdaptationModelOutput");
+    expect(runnerContract).toContain("generated-from-source");
+    expect(runnerContract).toContain("uploaded-package");
     expect(checker).toContain("case-package-directory");
+    expect(checker).toContain("--json");
+    expect(checker).toContain("validation-report.json");
+    expect(checker).toContain("adaptation-notes.md");
   });
 
   it("requires source segmentation that preserves reading while hiding investigation", () => {
@@ -53,6 +68,16 @@ describe("new novels case adapter skill contract", () => {
     expect(workflow).toContain("阅读保留率");
     expect(packageReference).toContain("story-keep");
     expect(packageReference).toContain("可探索入口");
+  });
+
+  it("does not anchor the adapter skill to specific bundled case packages", () => {
+    const skill = readFileSync(join(skillRoot, "SKILL.md"), "utf8");
+
+    expect(skill).not.toContain("cases/hunters-lodge");
+    expect(skill).not.toContain("cases/hammer-of-god");
+    expect(skill).not.toContain("Hunter's Lodge");
+    expect(skill).not.toContain("The Mystery of Hunter");
+    expect(skill).toContain("不要把任何既有案件目录作为内容模板");
   });
 
   it("requires publication-grade adaptation rather than demo summaries", () => {
@@ -99,5 +124,29 @@ describe("new novels case adapter skill contract", () => {
     expect(workflow).toContain("因果顺序");
     expect(checker).toContain("storyEvents");
     expect(checker).toContain("events/story-events.json");
+  });
+
+  it("emits a machine-readable validation report from the bundled package", () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        join(skillRoot, "scripts", "check_case_package_refs.mjs"),
+        "--json",
+        join(process.cwd(), "cases", "hunters-lodge")
+      ],
+      { encoding: "utf8" }
+    );
+
+    expect(result.status).toBe(0);
+    const report = JSON.parse(result.stdout) as {
+      ok: boolean;
+      summary: { agents: number; storyEvents: number };
+      issues: unknown[];
+    };
+
+    expect(report.ok).toBe(true);
+    expect(report.summary.agents).toBeGreaterThan(0);
+    expect(report.summary.storyEvents).toBeGreaterThan(0);
+    expect(report.issues).toEqual([]);
   });
 });

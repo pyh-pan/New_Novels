@@ -1,0 +1,64 @@
+[
+  {
+    "id": "question-culprit",
+    "prompt": "谁对 Mary Mallinson 的死亡负直接责任？",
+    "acceptedAnswers": [
+      "Noah Truscott",
+      "noah truscott",
+      "诺亚·特拉斯科特",
+      "诺亚",
+      "Truscott",
+      "特拉斯科特"
+    ],
+    "explanation": "直接责任人是 Noah Truscott。红狮酒馆姓名、车夫证词和 Mary 生前提到的旧恶人姓名共同锁定他。"
+  },
+  {
+    "id": "question-method",
+    "prompt": "Mary 是怎样受致命伤的？",
+    "acceptedAnswers": [
+      "被Noah挥拳击中太阳穴",
+      "醉汉打中太阳穴",
+      "被拳头打中左太阳穴",
+      "Noah绊她后打她",
+      "街头被醉汉一拳击倒",
+      "Noah struck her temple"
+    ],
+    "explanation": "她不是单纯昏倒撞伤。Noah 先绊住她，Mary 抓住车夫领巾时撕下残片，随后 Noah 挥拳击中她左太阳穴。"
+  },
+  {
+    "id": "question-decisive-evidence",
+    "prompt": "最关键的物证链是什么？",
+    "acceptedAnswers": [
+      "断领巾残片匹配旧物铺领巾并指向Horlick",
+      "Mary手里的领巾残片和旧物铺领巾吻合",
+      "领巾残片-旧物铺- Horlick-车夫证词",
+      "cravat fragment matched Horlick cravat",
+      "断领巾证明她抓住过车夫"
+    ],
+    "explanation": "Mary 手中断领巾与旧物铺领巾吻合，Mrs. Horlick 证明它属于 Josiah Horlick，Horlick 因而被迫承认当夜目击醉汉挥拳。"
+  },
+  {
+    "id": "question-motive",
+    "prompt": "Noah 的行为动因和 Mary 生前旧事有什么关系？",
+    "acceptedAnswers": [
+      "醉酒暴怒且曾毁掉Mary父亲",
+      "长期酗酒的暴力和旧恶",
+      "Noah曾害Mary父亲又酒后害死Mary",
+      "不是预谋是醉酒暴力",
+      "drunken violence and old ruin of her father"
+    ],
+    "explanation": "这不是精密预谋谋杀，而是长期酗酒和暴力习性造成的街头伤人；同一个 Noah 曾毁掉 Mary 父亲，使最终身份具有决定性道德重量。"
+  },
+  {
+    "id": "question-false-solution",
+    "prompt": "为什么“意外跌倒死亡”的解释不够？",
+    "acceptedAnswers": [
+      "无法解释Mary手中紧攥断领巾",
+      "领巾残片说明她抓住过人",
+      "车夫证词证明有人挥拳",
+      "断领巾和目击证词推翻跌倒",
+      "fall cannot explain the cravat"
+    ],
+    "explanation": "Mary 的工作间昏倒能解释她虚弱，却不能解释她掌心的断领巾、领巾来源和车夫目击到的拳击。"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "from": "dupin",
+    "to": "adolph-le-bon",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-le-bon-delivered-money",
+      "fact-le-bon-no-other-evidence"
+    ]
+  },
+  {
+    "from": "maltese-sailor",
+    "to": "ourang-outang",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-sailor-owns-orangutan",
+      "fact-orangutan-escaped-with-razor"
+    ]
+  },
+  {
+    "from": "pauline-dubourg",
+    "to": "pierre-moreau",
+    "attitude": "indifferent",
+    "knownFactsAboutOther": [
+      "fact-victims-reclusive"
+    ]
+  },
+  {
+    "from": "isidore-muset",
+    "to": "dupin",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-windows-seemed-fastened"
+    ]
+  },
+  {
+    "from": "adolph-le-bon",
+    "to": "jules-mignaud",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-le-bon-delivered-money"
+    ]
+  }
+]

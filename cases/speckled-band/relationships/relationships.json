@@ -1,0 +1,46 @@
+[
+  {
+    "from": "helen-stoner",
+    "to": "grimesby-roylott",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-roylott-violent-reputation",
+      "fact-roylott-keeps-indian-animals"
+    ]
+  },
+  {
+    "from": "grimesby-roylott",
+    "to": "helen-stoner",
+    "attitude": "hostile",
+    "knownFactsAboutOther": [
+      "fact-helen-engaged",
+      "fact-marriage-income-loss"
+    ]
+  },
+  {
+    "from": "percy-armitage",
+    "to": "helen-stoner",
+    "attitude": "protective",
+    "knownFactsAboutOther": [
+      "fact-helen-engaged",
+      "fact-helen-fears-repeat"
+    ]
+  },
+  {
+    "from": "housekeeper",
+    "to": "grimesby-roylott",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-roylott-violent-reputation"
+    ]
+  },
+  {
+    "from": "crown-landlord",
+    "to": "grimesby-roylott",
+    "attitude": "fearful",
+    "knownFactsAboutOther": [
+      "fact-roylott-returned-evening",
+      "fact-roylott-violent-reputation"
+    ]
+  }
+]

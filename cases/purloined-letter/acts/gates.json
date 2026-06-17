@@ -1,0 +1,57 @@
+[
+  {
+    "id": "gate-opening-to-search",
+    "fromActId": "act-opening",
+    "toActId": "act-search",
+    "requiredClueIds": [
+      "clue-theft-witnessed",
+      "clue-letter-power",
+      "clue-letter-must-be-at-hand"
+    ],
+    "requiredFactIds": [
+      "fact-minister-seen-taking",
+      "fact-letter-power",
+      "fact-letter-must-be-available"
+    ],
+    "requiredContradictionIds": [],
+    "requiredNpcInteractions": [
+      "prefect-g",
+      "royal-lady"
+    ],
+    "requiredSceneInteractions": [
+      "scene-dupins-library:prefect-account",
+      "scene-royal-boudoir-report:table-swap"
+    ],
+    "unlockNarrative": "你已经确认本案不是寻找未知窃贼，而是追回一件必须随时可用、却不能公开追讨的政治武器。G-- 同意开放警方秘密搜查记录。"
+  },
+  {
+    "id": "gate-search-to-confrontation",
+    "fromActId": "act-search",
+    "toActId": "act-confrontation",
+    "requiredClueIds": [
+      "clue-exhaustive-search",
+      "clue-search-principle-wrong",
+      "clue-minister-anticipates-search",
+      "clue-original-description"
+    ],
+    "requiredFactIds": [
+      "fact-search-found-nothing",
+      "fact-search-principle-wrong",
+      "fact-minister-understands-police",
+      "fact-original-letter-description"
+    ],
+    "requiredContradictionIds": [
+      "contradiction-search-vs-availability",
+      "contradiction-police-principle"
+    ],
+    "requiredNpcInteractions": [
+      "prefect-g",
+      "dupin"
+    ],
+    "requiredSceneInteractions": [
+      "scene-police-search-ledger:search-map",
+      "scene-dupins-library:method-discussion"
+    ],
+    "unlockNarrative": "警方的失败被重新定义为线索：信不在暗处，却仍应在部长控制范围。杜宾愿意带你把视线转向部长客厅中那些过分平常的东西。"
+  }
+]

@@ -1,0 +1,189 @@
+[
+  {
+    "id": "act-opening",
+    "title": "寄宿屋的夜半事故",
+    "availableAgentIds": [
+      "general",
+      "anne-rodway",
+      "sally",
+      "doctor-harris"
+    ],
+    "visibleClueIds": [
+      "clue-laudanum-bottle",
+      "clue-mary-despair",
+      "clue-temple-blow",
+      "clue-cravat-fragment"
+    ],
+    "lockedFactIds": [
+      "fact-fainted-at-work",
+      "fact-inquest-accidental",
+      "fact-cravat-match",
+      "fact-cabman-witnessed-blow",
+      "fact-red-lion-entry",
+      "fact-noah-identity"
+    ],
+    "entryConditions": [],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-temple-blow",
+          "clue-cravat-fragment"
+        ],
+        "requiresAnyClues": [
+          "clue-laudanum-bottle",
+          "clue-mary-despair"
+        ],
+        "requiresFacts": [
+          "fact-mary-found-in-street"
+        ],
+        "requiresContradictions": [],
+        "requiresAct": "act-opening"
+      }
+    ]
+  },
+  {
+    "id": "act-inquest",
+    "title": "意外死亡的裂缝",
+    "availableAgentIds": [
+      "general",
+      "anne-rodway",
+      "sally",
+      "doctor-harris",
+      "beadle-wicks"
+    ],
+    "visibleClueIds": [
+      "clue-workroom-fainting",
+      "clue-accidental-verdict"
+    ],
+    "lockedFactIds": [
+      "fact-cravat-match",
+      "fact-horlick-cravat-owner",
+      "fact-cabman-witnessed-blow",
+      "fact-red-lion-entry",
+      "fact-noah-identity"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-temple-blow",
+          "clue-cravat-fragment"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-cravat-in-hand"
+        ],
+        "requiresContradictions": [],
+        "requiresAct": "act-opening"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-workroom-fainting",
+          "clue-accidental-verdict"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-fainted-at-work",
+          "fact-inquest-accidental"
+        ],
+        "requiresContradictions": [
+          "contradiction-fall-vs-cravat"
+        ],
+        "requiresAct": "act-inquest"
+      }
+    ]
+  },
+  {
+    "id": "act-cravat-trail",
+    "title": "断领巾的来路",
+    "availableAgentIds": [
+      "general",
+      "anne-rodway",
+      "mrs-horlick",
+      "josiah-horlick",
+      "robert-lyon"
+    ],
+    "visibleClueIds": [
+      "clue-matching-cravat",
+      "clue-horlick-owner",
+      "clue-cabman-admission",
+      "clue-red-lion-address"
+    ],
+    "lockedFactIds": [
+      "fact-noah-identity",
+      "fact-doctor-delirium",
+      "fact-noah-ruined-father"
+    ],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-workroom-fainting",
+          "clue-accidental-verdict"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-inquest-accidental"
+        ],
+        "requiresContradictions": [
+          "contradiction-fall-vs-cravat"
+        ],
+        "requiresAct": "act-inquest"
+      }
+    ],
+    "exitConditions": [
+      {
+        "requiresAllClues": [
+          "clue-matching-cravat",
+          "clue-horlick-owner",
+          "clue-cabman-admission",
+          "clue-red-lion-address"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-cabman-witnessed-blow",
+          "fact-red-lion-entry"
+        ],
+        "requiresContradictions": [
+          "contradiction-accident-vs-witnessed-blow"
+        ],
+        "requiresAct": "act-cravat-trail"
+      }
+    ]
+  },
+  {
+    "id": "act-accusation",
+    "title": "红狮后的名字",
+    "availableAgentIds": [
+      "general",
+      "anne-rodway",
+      "robert-lyon",
+      "doctor-red-lion",
+      "noah-truscott"
+    ],
+    "visibleClueIds": [
+      "clue-noah-name",
+      "clue-doctor-delirium",
+      "clue-noah-old-name",
+      "clue-court-reaction"
+    ],
+    "lockedFactIds": [],
+    "entryConditions": [
+      {
+        "requiresAllClues": [
+          "clue-red-lion-address",
+          "clue-noah-name"
+        ],
+        "requiresAnyClues": [],
+        "requiresFacts": [
+          "fact-noah-identity"
+        ],
+        "requiresContradictions": [
+          "contradiction-truscott-name-old-harm"
+        ],
+        "requiresAct": "act-cravat-trail"
+      }
+    ],
+    "exitConditions": []
+  }
+]

@@ -1,0 +1,55 @@
+[
+  {
+    "fromAgentId": "mrs-horlick",
+    "toAgentId": "josiah-horlick",
+    "factId": "fact-horlick-cravat-owner",
+    "condition": {
+      "requiresAllClues": [
+        "clue-horlick-owner"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-horlick-cravat-owner"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-cravat-trail"
+    },
+    "mode": "observed"
+  },
+  {
+    "fromAgentId": "josiah-horlick",
+    "toAgentId": "robert-lyon",
+    "factId": "fact-red-lion-entry",
+    "condition": {
+      "requiresAllClues": [
+        "clue-cabman-admission"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-red-lion-entry"
+      ],
+      "requiresContradictions": [
+        "contradiction-accident-vs-witnessed-blow"
+      ],
+      "requiresAct": "act-cravat-trail"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "robert-lyon",
+    "toAgentId": "doctor-red-lion",
+    "factId": "fact-noah-identity",
+    "condition": {
+      "requiresAllClues": [
+        "clue-red-lion-address"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-red-lion-entry"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-accusation"
+    },
+    "mode": "direct"
+  }
+]

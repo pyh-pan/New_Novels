@@ -20,11 +20,20 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - `readme.md` 和 `roadmap.md`，了解产品方向。
 - `lib/case/schema.ts`，了解标准 runtime `CaseFile` 契约。
 - `lib/case-package/schema.ts`，了解案件包包装契约。
-- `cases/hunters-lodge/` 和 `cases/hammer-of-god/`，了解本地示例。
+- `lib/case-package/loader.ts` 和 `lib/case-package/writer.ts`，了解拆分案件包读写边界。
+- 相关测试，了解当前代码实际验证的契约。
 
-字段细节参考 `references/case-package-v1.md`。改写流程参考 `references/novel-to-case-workflow.md`。
+不要把任何既有案件目录作为内容模板、质量模板或 prompt anchor。既有案件只能在用户明确指定审阅、调试或迁移某个案件时读取；通用改写任务必须以 schema、reference、writer/loader 和测试为准。
+
+字段细节参考 `references/case-package-v1.md`。改写流程参考 `references/novel-to-case-workflow.md`。Studio 内置执行契约参考 `references/studio-runner-contract.md`。
 
 ## 输出契约
+
+Studio runner 会把本 skill 作为版本化生成契约注入平台 AI 改写任务。默认输入选项：
+
+- `targetLanguage: "zh-CN"`
+- `adaptationGranularity: "publication-grade"`
+- `investigationScope: "full-playable-investigation"`
 
 优先生成完整目录案件包。保留聚合版 `case.json` 作为便携审查快照，但应用加载器与校验流程必须能直接读取拆分文件系统布局。
 
@@ -51,6 +60,13 @@ description: "当用户上传、粘贴或指向一篇推理 / 悬疑故事，并
 - 仅在确实需要真实资产时加入 `assets/`
 
 拆分文件同时面向创作者和导入流程。`case.json` 应包含相同的聚合数据，便于审查、diff 和外部校验。
+
+Studio 生成草稿还必须产出非案件包工件：
+
+- `validation-report.json`：机器可读质量与结构校验报告。
+- `adaptation-notes.md`：给创作者和后续改写 agent 的改写说明。
+
+这两个文件不能放入纯 `case-package/v1` 的 `package/` 目录内，应作为 Studio draft artifacts 与 `package/` 并列保存。
 
 ## 改写规则
 

@@ -1,0 +1,508 @@
+[
+  {
+    "id": "fact-public-case-opened",
+    "text": "莫格街四楼发生双重命案，受害者为莱斯帕奈夫人与其女儿卡米耶。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "general"
+    ],
+    "relatedClueIds": [],
+    "actId": "act-opening",
+    "keywords": [
+      "莫格街",
+      "双尸",
+      "受害者"
+    ]
+  },
+  {
+    "id": "fact-victims-reclusive",
+    "text": "莱斯帕奈母女长期隐居，邻里少见访客，也没有固定仆人。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "pauline-dubourg",
+      "pierre-moreau"
+    ],
+    "relatedClueIds": [
+      "clue-no-regular-visitors"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "隐居",
+      "访客",
+      "仆人"
+    ]
+  },
+  {
+    "id": "fact-door-locked-inside",
+    "text": "后房门被发现从内锁住，钥匙在锁眼里，众人破门后未见活人。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "isidore-muset",
+      "henri-duval"
+    ],
+    "relatedClueIds": [
+      "clue-locked-room"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "门锁",
+      "密室",
+      "钥匙"
+    ]
+  },
+  {
+    "id": "fact-camille-in-chimney",
+    "text": "卡米耶的尸体被头下脚上塞入烟囱，需多人合力才被拖出。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "paul-dumas",
+      "isidore-muset"
+    ],
+    "relatedClueIds": [
+      "clue-chimney-body"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "烟囱",
+      "卡米耶",
+      "力量"
+    ]
+  },
+  {
+    "id": "fact-madame-in-yard",
+    "text": "莱斯帕奈夫人的尸体在后院铺石地上被发现，伤势严重，头颈几乎分离。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "paul-dumas",
+      "henri-duval"
+    ],
+    "relatedClueIds": [
+      "clue-yard-body"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "后院",
+      "老妇人",
+      "割喉"
+    ]
+  },
+  {
+    "id": "fact-gold-left-behind",
+    "text": "四千法郎金币、银匙和首饰仍散在房内，没有被拿走。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "jules-mignaud",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-gold-left"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "金币",
+      "财物",
+      "动机"
+    ]
+  },
+  {
+    "id": "fact-razor-bloodied",
+    "text": "房内椅子上有一把沾血剃刀。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "isidore-muset",
+      "paul-dumas"
+    ],
+    "relatedClueIds": [
+      "clue-razor"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "剃刀",
+      "血迹"
+    ]
+  },
+  {
+    "id": "fact-le-bon-delivered-money",
+    "text": "银行职员勒邦在命案前三日陪莱斯帕奈夫人把四千法郎送回家。",
+    "visibility": "public",
+    "ownerAgentIds": [
+      "adolph-le-bon",
+      "jules-mignaud"
+    ],
+    "relatedClueIds": [
+      "clue-le-bon-delivery"
+    ],
+    "actId": "act-opening",
+    "keywords": [
+      "勒邦",
+      "银行",
+      "送款"
+    ]
+  },
+  {
+    "id": "fact-le-bon-no-other-evidence",
+    "text": "除送款事实外，没有结构化证据显示勒邦进入四楼、持有凶器或取走财物。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "adolph-le-bon"
+    ],
+    "relatedClueIds": [
+      "clue-le-bon-delivery",
+      "clue-gold-left"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "勒邦",
+      "无证据",
+      "误捕"
+    ]
+  },
+  {
+    "id": "fact-gruff-voice-french",
+    "text": "多名证人同意低沉声音像法国男人，并听见 sacre、diable 或 mon dieu 一类惊呼。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "isidore-muset",
+      "william-bird",
+      "alberto-montani"
+    ],
+    "relatedClueIds": [
+      "clue-gruff-french-voice"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "法国男人",
+      "低声",
+      "惊呼"
+    ]
+  },
+  {
+    "id": "fact-shrill-voice-unidentified",
+    "text": "尖厉声音被不同国籍证人分别误认为多种外国语言，却没有任何可辨词句。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "isidore-muset",
+      "henri-duval",
+      "odenheimer",
+      "william-bird",
+      "alfonzo-garcio",
+      "alberto-montani"
+    ],
+    "relatedClueIds": [
+      "clue-voice-disagreement"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "尖声",
+      "外语",
+      "证词冲突"
+    ]
+  },
+  {
+    "id": "fact-windows-seemed-fastened",
+    "text": "两扇后窗起初看来都从内固定，警方因此排除了窗户出入。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "isidore-muset",
+      "general"
+    ],
+    "relatedClueIds": [
+      "clue-window-spring"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "窗户",
+      "固定",
+      "警方"
+    ]
+  },
+  {
+    "id": "fact-window-hidden-spring",
+    "text": "窗框有隐藏弹簧，窗扇关闭后能自行扣住。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-window-spring"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "弹簧",
+      "窗框",
+      "自锁"
+    ]
+  },
+  {
+    "id": "fact-broken-nail-mimics-fastening",
+    "text": "靠床后窗的钉头已旧断，放回痕迹后看似完整，实际不能阻止窗扇开启。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-broken-nail"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "断钉",
+      "床头窗",
+      "伪装固定"
+    ]
+  },
+  {
+    "id": "fact-lightning-rod-shutter-route",
+    "text": "后墙避雷杆与宽阔格栅百叶窗形成一条高难度攀爬路线，可由外进入四楼后窗。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-lightning-rod-shutter"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "避雷杆",
+      "百叶窗",
+      "攀爬"
+    ]
+  },
+  {
+    "id": "fact-motive-not-robbery",
+    "text": "财物未失、抽屉所谓被翻并不足以证明盗窃，抢劫动机不成立。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "general",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-gold-left"
+    ],
+    "actId": "act-testimony",
+    "keywords": [
+      "非抢劫",
+      "动机",
+      "金币"
+    ]
+  },
+  {
+    "id": "fact-force-beyond-ordinary-human",
+    "text": "塞尸入烟囱、拔下大束头发、从窗外抛下老妇人的力量明显超出寻常人类罪犯。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "paul-dumas",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-chimney-body",
+      "clue-nonhuman-hair"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "力量",
+      "非同寻常",
+      "暴力"
+    ]
+  },
+  {
+    "id": "fact-hair-not-human",
+    "text": "老妇人手中攥住的毛发并非人发，颜色和质地接近大型猩猩。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-nonhuman-hair"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "毛发",
+      "非人",
+      "猩猩"
+    ]
+  },
+  {
+    "id": "fact-finger-marks-not-human",
+    "text": "卡米耶喉部指痕与人手尺寸不合，更接近大型猩猩的掌指分布。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "paul-dumas"
+    ],
+    "relatedClueIds": [
+      "clue-finger-marks"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "指痕",
+      "喉咙",
+      "非人手"
+    ]
+  },
+  {
+    "id": "fact-sailor-ribbon-at-rod",
+    "text": "避雷杆脚下发现一段油腻发带，结法近似马耳他船员常用的发辫结。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin",
+      "maltese-sailor"
+    ],
+    "relatedClueIds": [
+      "clue-sailor-ribbon"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "发带",
+      "马耳他",
+      "船员"
+    ]
+  },
+  {
+    "id": "fact-advertisement-draws-owner",
+    "text": "刊登寻获婆罗洲猩猩的广告能诱使真正主人现身，同时不直接指控命案。",
+    "visibility": "unlocked",
+    "ownerAgentIds": [
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-maltese-ad"
+    ],
+    "actId": "act-confrontation",
+    "keywords": [
+      "广告",
+      "主人",
+      "诱出"
+    ]
+  },
+  {
+    "id": "fact-sailor-owns-orangutan",
+    "text": "马耳他船员曾从婆罗洲带回一只大型猩猩，并将其秘密藏在巴黎住处，意图出售。",
+    "visibility": "private",
+    "ownerAgentIds": [
+      "maltese-sailor"
+    ],
+    "relatedClueIds": [
+      "clue-sailor-confession"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "船员",
+      "猩猩",
+      "婆罗洲"
+    ]
+  },
+  {
+    "id": "fact-orangutan-escaped-with-razor",
+    "text": "命案当夜，猩猩拿着剃刀从船员住处逃出，船员持鞭追赶。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "maltese-sailor",
+      "ourang-outang"
+    ],
+    "relatedClueIds": [
+      "clue-sailor-confession",
+      "clue-razor"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "逃脱",
+      "剃刀",
+      "追赶"
+    ]
+  },
+  {
+    "id": "fact-sailor-witnessed-not-killer",
+    "text": "船员追至莫格街后从避雷杆旁看见惨剧，惊呼阻止却没有进入屋内杀人。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "maltese-sailor"
+    ],
+    "relatedClueIds": [
+      "clue-sailor-confession",
+      "clue-gruff-french-voice"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "船员",
+      "目击",
+      "无直接杀人"
+    ]
+  },
+  {
+    "id": "fact-truth-orangutan-culprit",
+    "text": "直接杀害莱斯帕奈母女的是逃脱的婆罗洲猩猩，而非人类谋杀犯。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "ourang-outang"
+    ],
+    "relatedClueIds": [
+      "clue-nonhuman-hair",
+      "clue-finger-marks",
+      "clue-sailor-confession"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "真凶",
+      "猩猩",
+      "非人"
+    ]
+  },
+  {
+    "id": "fact-truth-method-entry-exit",
+    "text": "猩猩经后墙避雷杆和百叶窗进入四楼，并从靠床后窗逃出；断钉和弹簧制造了封闭假象。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "ourang-outang",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-broken-nail",
+      "clue-lightning-rod-shutter",
+      "clue-window-spring"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "进入",
+      "逃出",
+      "断钉"
+    ]
+  },
+  {
+    "id": "fact-truth-no-human-motive",
+    "text": "命案没有人类谋财或复仇动机，暴行来自受惊、模仿和狂乱的动物行为。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "ourang-outang",
+      "maltese-sailor"
+    ],
+    "relatedClueIds": [
+      "clue-gold-left",
+      "clue-sailor-confession"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "无动机",
+      "模仿",
+      "狂乱"
+    ]
+  },
+  {
+    "id": "fact-le-bon-released",
+    "text": "真相叙明后，勒邦应被释放，警方的抢劫假设被推翻。",
+    "visibility": "truth",
+    "ownerAgentIds": [
+      "general",
+      "dupin"
+    ],
+    "relatedClueIds": [
+      "clue-le-bon-delivery"
+    ],
+    "actId": "act-accusation",
+    "keywords": [
+      "释放",
+      "勒邦",
+      "警方"
+    ]
+  }
+]

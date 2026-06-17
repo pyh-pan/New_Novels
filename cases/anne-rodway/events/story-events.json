@@ -1,0 +1,276 @@
+[
+  {
+    "id": "event-workroom-check",
+    "kind": "instant-result",
+    "title": "核实工作间昏倒记录",
+    "description": "玩家要求医生或 general 核查 Mary 当晚离开工作间前的健康状况。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-inquest",
+      "topics": [
+        "工作间",
+        "昏倒",
+        "雇主"
+      ],
+      "requiredClueIds": [
+        "clue-temple-blow"
+      ],
+      "requiredFactIds": [],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "doctor-harris"
+      ],
+      "requiredSceneInteractions": [
+        "scene-workroom"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-fainted-at-work"
+      ],
+      "revealedClueIds": [
+        "clue-workroom-fainting"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "doctor-harris"
+      ],
+      "narrative": "医生带回工作间证词：Mary 曾因疲惫昏倒，却被独自放回街上。"
+    },
+    "designRationale": "这是纯信息核查，价值在于玩家想到要查，不需要推进游戏时间。"
+  },
+  {
+    "id": "event-cravat-match-check",
+    "kind": "instant-result",
+    "title": "比对领巾断口",
+    "description": "玩家在旧物铺找到同花色领巾后，将断口与 Mary 手中的残片比对。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-cravat-trail",
+      "topics": [
+        "领巾",
+        "断口",
+        "旧物铺"
+      ],
+      "requiredClueIds": [
+        "clue-cravat-fragment"
+      ],
+      "requiredFactIds": [
+        "fact-cravat-in-hand"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-fall-vs-cravat"
+      ],
+      "requiredNpcInteractions": [],
+      "requiredSceneInteractions": [
+        "scene-chandler-shop"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-cravat-match"
+      ],
+      "revealedClueIds": [
+        "clue-matching-cravat"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "general"
+      ],
+      "narrative": "两片旧黑绸的纹路和撕裂边缘严丝合缝，布片不再只是可疑物，而是可追踪的物证。"
+    },
+    "designRationale": "物证比对可立即完成，不应设计成等待任务。"
+  },
+  {
+    "id": "event-horlick-pressure",
+    "kind": "agent-state-change",
+    "title": "Horlick 意识到领巾暴露了他",
+    "description": "玩家拿出匹配后的领巾追问 Josiah Horlick，使他从耍赖转为恐惧自保。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-cravat-trail",
+      "agentId": "josiah-horlick",
+      "topics": [
+        "领巾",
+        "车夫",
+        "六便士"
+      ],
+      "requiredClueIds": [
+        "clue-matching-cravat",
+        "clue-horlick-owner"
+      ],
+      "requiredFactIds": [
+        "fact-horlick-cravat-owner"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "mrs-horlick"
+      ],
+      "requiredSceneInteractions": [
+        "scene-horlick-mews"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-cabman-witnessed-blow"
+      ],
+      "revealedClueIds": [
+        "clue-cabman-admission",
+        "clue-red-lion-address"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-accident-vs-witnessed-blow"
+      ],
+      "targetAgentIds": [
+        "josiah-horlick"
+      ],
+      "narrative": "Horlick 先骂人，随后缩着肩膀承认自己载过那个醉汉，并说出红狮酒馆。"
+    },
+    "designRationale": "玩家暴露关键物证会改变 NPC 的压力和回答策略，因此是即时状态变化。"
+  },
+  {
+    "id": "event-red-lion-watch",
+    "kind": "story-beat",
+    "title": "红狮酒馆被盯住",
+    "description": "玩家取得红狮地址后，Robert 介入外部核查并安排看守醉汉。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-cravat-trail",
+      "agentId": "robert-lyon",
+      "topics": [
+        "红狮",
+        "酒馆",
+        "医生"
+      ],
+      "requiredClueIds": [
+        "clue-red-lion-address"
+      ],
+      "requiredFactIds": [
+        "fact-red-lion-entry"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-accident-vs-witnessed-blow"
+      ],
+      "requiredNpcInteractions": [
+        "josiah-horlick"
+      ],
+      "requiredSceneInteractions": [
+        "scene-red-lion"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-noah-identity",
+        "fact-doctor-delirium"
+      ],
+      "revealedClueIds": [
+        "clue-noah-name",
+        "clue-doctor-delirium"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-truscott-name-old-harm"
+      ],
+      "targetAgentIds": [
+        "robert-lyon",
+        "doctor-red-lion",
+        "noah-truscott"
+      ],
+      "narrative": "红狮酒馆楼上的病人有了姓名，也有了看守；调查从街头证词转入正式追诉。"
+    },
+    "designRationale": "Robert 的行动改变世界状态：新场景和嫌疑人可用，嫌疑人被监视，因此推进故事节拍。"
+  },
+  {
+    "id": "event-open-inquest-act",
+    "kind": "act-transition",
+    "title": "进入验尸证词阶段",
+    "description": "玩家掌握 Mary 的伤痕和断领巾后，调查焦点转向官方意外结论。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [
+        "验尸",
+        "医生",
+        "断领巾"
+      ],
+      "requiredClueIds": [
+        "clue-temple-blow",
+        "clue-cravat-fragment"
+      ],
+      "requiredFactIds": [
+        "fact-cravat-in-hand"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "anne-rodway",
+        "doctor-harris"
+      ],
+      "requiredSceneInteractions": [
+        "scene-lodging-room",
+        "scene-mary-room"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-inquest-held"
+      ],
+      "revealedClueIds": [
+        "clue-accidental-verdict"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "beadle-wicks"
+      ],
+      "nextActId": "act-inquest",
+      "narrative": "验尸记录和工作间证词开放，意外死亡的说法进入调查台。"
+    },
+    "designRationale": "这是结构性阶段变化，与 gate-opening-to-inquest 的 required discoveries 对齐。"
+  },
+  {
+    "id": "event-open-accusation-act",
+    "kind": "act-transition",
+    "title": "进入最终指认",
+    "description": "玩家完成领巾来源、车夫证词和红狮姓名三段链条后，可以正式指认。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-cravat-trail",
+      "topics": [
+        "指认",
+        "Noah Truscott",
+        "红狮"
+      ],
+      "requiredClueIds": [
+        "clue-matching-cravat",
+        "clue-cabman-admission",
+        "clue-noah-name"
+      ],
+      "requiredFactIds": [
+        "fact-noah-identity"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-truscott-name-old-harm"
+      ],
+      "requiredNpcInteractions": [
+        "josiah-horlick",
+        "robert-lyon"
+      ],
+      "requiredSceneInteractions": [
+        "scene-red-lion"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-court-reaction"
+      ],
+      "revealedClueIds": [
+        "clue-court-reaction"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "noah-truscott"
+      ],
+      "nextActId": "act-accusation",
+      "narrative": "Noah Truscott 的名字不再只是传闻；最终问题已足够公平地摆在玩家面前。"
+    },
+    "designRationale": "这是最终阶段的开放，不代表谜底自动揭示；仍需玩家完成 accusation。"
+  }
+]

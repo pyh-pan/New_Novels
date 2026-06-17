@@ -15,6 +15,7 @@ function normalizeZipPath(path: string): string {
     "agents",
     "facts",
     "acts",
+    "events",
     "scenes",
     "clues",
     "relationships",
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
 
     storeGeneratedStudioCase({
       caseFile,
+      origin: "uploaded-package",
       sourceProfile: {
         title: loaded.caseFile.source.title,
         author: loaded.caseFile.source.author,

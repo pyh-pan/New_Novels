@@ -1,0 +1,104 @@
+[
+  {
+    "id": "contradiction-sealed-room-but-sound",
+    "title": "密室与夜间声音并存",
+    "factIds": [
+      "fact-locked-room-conditions",
+      "fact-helen-heard-whistle"
+    ],
+    "clueIds": [
+      "clue-locked-room",
+      "clue-night-whistle"
+    ],
+    "agentIds": [
+      "helen-stoner",
+      "county-coroner"
+    ]
+  },
+  {
+    "id": "contradiction-band-not-gipsies",
+    "title": "“斑点带子”不等于吉卜赛人",
+    "factIds": [
+      "fact-julia-dying-words",
+      "fact-locked-room-conditions"
+    ],
+    "clueIds": [
+      "clue-dying-words",
+      "clue-locked-room"
+    ],
+    "agentIds": [
+      "helen-stoner",
+      "general"
+    ]
+  },
+  {
+    "id": "contradiction-repairs-too-convenient",
+    "title": "修缮目的与换房结果不相称",
+    "factIds": [
+      "fact-repairs-forced-room",
+      "fact-helen-engaged"
+    ],
+    "clueIds": [
+      "clue-false-repairs",
+      "clue-threatened-marriage"
+    ],
+    "agentIds": [
+      "helen-stoner",
+      "housekeeper",
+      "grimesby-roylott"
+    ]
+  },
+  {
+    "id": "contradiction-devices-not-domestic",
+    "title": "家用设施没有家用功能",
+    "factIds": [
+      "fact-dummy-bell-rope",
+      "fact-inside-ventilator",
+      "fact-fixed-bed"
+    ],
+    "clueIds": [
+      "clue-dummy-bell-rope",
+      "clue-inside-ventilator",
+      "clue-fixed-bed"
+    ],
+    "agentIds": [
+      "housekeeper",
+      "grimesby-roylott"
+    ]
+  },
+  {
+    "id": "contradiction-no-cat-but-milk",
+    "title": "没有家猫却有牛奶",
+    "factIds": [
+      "fact-milk-and-safe",
+      "fact-roylott-keeps-indian-animals"
+    ],
+    "clueIds": [
+      "clue-milk-and-safe",
+      "clue-indian-animals"
+    ],
+    "agentIds": [
+      "grimesby-roylott",
+      "helen-stoner"
+    ]
+  },
+  {
+    "id": "contradiction-tool-path-and-motive",
+    "title": "手法装置与财务动机汇合",
+    "factIds": [
+      "fact-device-cluster",
+      "fact-marriage-income-loss",
+      "fact-dog-lash-loop",
+      "fact-chair-marks"
+    ],
+    "clueIds": [
+      "clue-will-motive",
+      "clue-dog-lash-loop",
+      "clue-chair-marks"
+    ],
+    "agentIds": [
+      "grimesby-roylott",
+      "general"
+    ]
+  }
+]

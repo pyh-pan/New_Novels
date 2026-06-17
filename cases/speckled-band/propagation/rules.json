@@ -1,0 +1,49 @@
+[
+  {
+    "fromAgentId": "helen-stoner",
+    "toAgentId": "general",
+    "factId": "fact-helen-heard-whistle",
+    "condition": {
+      "requiresAllClues": [
+        "clue-night-whistle"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [],
+      "requiresContradictions": [],
+      "requiresAct": "act-opening"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "county-coroner",
+    "toAgentId": "general",
+    "factId": "fact-locked-room-conditions",
+    "condition": {
+      "requiresAllClues": [
+        "clue-locked-room"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [],
+      "requiresContradictions": [],
+      "requiresAct": "act-opening"
+    },
+    "mode": "direct"
+  },
+  {
+    "fromAgentId": "housekeeper",
+    "toAgentId": "general",
+    "factId": "fact-bell-rope-never-used",
+    "condition": {
+      "requiresAllClues": [
+        "clue-dummy-bell-rope"
+      ],
+      "requiresAnyClues": [],
+      "requiresFacts": [
+        "fact-dummy-bell-rope"
+      ],
+      "requiresContradictions": [],
+      "requiresAct": "act-manor-search"
+    },
+    "mode": "direct"
+  }
+]

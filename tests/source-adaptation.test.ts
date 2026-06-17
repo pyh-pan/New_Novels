@@ -55,6 +55,23 @@ function modelOutput(): CaseAdaptationModelOutput {
         playerDiscoveryRoute: "最终指认"
       }
     ],
+    fairPlaySpine: {
+      victim: "书房主人",
+      culprit: "管家",
+      motive: "隐瞒盗窃账册。",
+      method: "调换备用钥匙，制造反锁假象。",
+      falseSolution: "书房门从里面反锁，似乎没有外人能进入。",
+      minimumClueChain: ["反锁书房", "干燥钥匙", "管家负责钥匙"],
+      decisiveContradictions: ["雨夜与干燥钥匙"]
+    },
+    adaptationNotes: {
+      summary: "保留雨夜书房的阅读氛围，将钥匙调查转为玩家主动发现。",
+      readingStrategy: ["开篇保留封闭空间氛围。"],
+      investigationStrategy: ["把备用钥匙观察转为现场调查入口。"],
+      npcStrategy: ["管家在钥匙话题上随压力升高而退让。"],
+      actStructureStrategy: ["单幕短案，重点验证现场调查和对质。"],
+      unresolvedRisks: ["发行前需要确认上传文本权利。"]
+    },
     qualityReport: [
       {
         severity: "warning",
@@ -315,6 +332,18 @@ function modelOutput(): CaseAdaptationModelOutput {
             prompt: "谁制造了书房反锁假象？",
             acceptedAnswers: ["管家"],
             explanation: "只有管家能接触并调换备用钥匙。"
+          },
+          {
+            id: "question-method",
+            prompt: "凶手如何制造反锁假象？",
+            acceptedAnswers: ["调换备用钥匙", "用钥匙制造反锁假象"],
+            explanation: "备用钥匙被调换，反锁并不代表无人进出。"
+          },
+          {
+            id: "question-motive",
+            prompt: "凶手的动机是什么？",
+            acceptedAnswers: ["隐瞒盗窃账册", "掩盖账册盗窃"],
+            explanation: "管家为了隐瞒盗窃账册而杀人。"
           }
         ]
       }
@@ -343,6 +372,8 @@ describe("source adaptation", () => {
 
     expect(joined).toContain("sourceProfile");
     expect(joined).toContain("segmentation");
+    expect(joined).toContain("fairPlaySpine");
+    expect(joined).toContain("adaptationNotes");
     expect(joined).toContain("story-keep");
     expect(joined).toContain("investigation-hide");
     expect(joined).toContain("storyEvents");
@@ -351,6 +382,13 @@ describe("source adaptation", () => {
     expect(joined).toContain("story-beat");
     expect(joined).toContain("不能套用固定幕数");
     expect(joined).toContain("case-package/v1");
+    expect(joined).toContain("Studio runner");
+    expect(joined).toContain("studio-runner-contract.md");
+    expect(joined).toContain("publication-grade");
+    expect(joined).toContain("full-playable-investigation");
+    expect(joined).not.toContain("cases/hunters-lodge");
+    expect(joined).not.toContain("cases/hammer-of-god");
+    expect(joined).not.toContain("Hunter's Lodge");
   });
 
   it("turns model output into a schema-valid case package with review metadata", async () => {
@@ -379,6 +417,41 @@ describe("source adaptation", () => {
       "investigation-hide",
       "solution-lock"
     ]);
-    expect(generated.validation.issues).toEqual([]);
+    expect(generated.fairPlaySpine.minimumClueChain).toEqual([
+      "反锁书房",
+      "干燥钥匙",
+      "管家负责钥匙"
+    ]);
+    expect(generated.adaptationNotes.summary).toContain("雨夜书房");
+    expect(generated.request.options).toEqual({
+      targetLanguage: "zh-CN",
+      adaptationGranularity: "publication-grade",
+      investigationScope: "full-playable-investigation"
+    });
+    expect(generated.request.skill.loadedFiles).toEqual(
+      expect.arrayContaining([
+        "skills/new-novels-case-adapter/SKILL.md",
+        "skills/new-novels-case-adapter/references/studio-runner-contract.md"
+      ])
+    );
+    expect(generated.validationReport).toMatchObject({
+      ok: true,
+      skillName: "new-novels-case-adapter",
+      caseId: "generated-rain-room",
+      summary: {
+        agents: 2,
+        storyEvents: 1,
+        accusationQuestions: 3
+      }
+    });
+    expect(generated.validationReport.issues).toEqual([
+      expect.objectContaining({
+        severity: "warning",
+        code: "source-quality",
+        message: expect.stringContaining("版权确认")
+      })
+    ]);
+    expect(generated.adaptationNotesMarkdown).toContain("# 雨夜疑案 改写说明");
+    expect(generated.adaptationNotesMarkdown).toContain("## Fair-Play Spine");
   });
 });

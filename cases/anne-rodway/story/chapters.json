@@ -1,0 +1,27 @@
+[
+  {
+    "id": "chapter-1",
+    "title": "三月的针线房",
+    "subtitle": "Anne 的日记，案发前四日",
+    "body": "story/chapter-1.md",
+    "availableFromStart": true,
+    "nextChapterId": "chapter-2"
+  },
+  {
+    "id": "chapter-2",
+    "title": "夜半送回的人",
+    "subtitle": "事故、沉默与一截布",
+    "body": "story/chapter-2.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-1",
+    "nextChapterId": "chapter-3"
+  },
+  {
+    "id": "chapter-3",
+    "title": "意外死亡",
+    "subtitle": "葬礼之后，线头仍在",
+    "body": "story/chapter-3.md",
+    "availableFromStart": true,
+    "previousChapterId": "chapter-2"
+  }
+]

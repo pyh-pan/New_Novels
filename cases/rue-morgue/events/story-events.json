@@ -1,0 +1,378 @@
+[
+  {
+    "id": "event-bank-record-instant",
+    "kind": "instant-result",
+    "title": "银行记录即时核实",
+    "description": "玩家要求核对提款与送款后，立即得到米尼奥银行记录和勒邦送款事实。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [
+        "银行",
+        "提款",
+        "勒邦"
+      ],
+      "requiredClueIds": [],
+      "requiredFactIds": [],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "jules-mignaud"
+      ],
+      "requiredSceneInteractions": []
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-le-bon-delivered-money",
+        "fact-gold-left-behind"
+      ],
+      "revealedClueIds": [
+        "clue-le-bon-delivery",
+        "clue-gold-left"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-robbery-motive"
+      ],
+      "targetAgentIds": [
+        "adolph-le-bon",
+        "jules-mignaud"
+      ],
+      "narrative": "账目和现场金币同时出现，抢劫动机立即松动。"
+    },
+    "designRationale": "这只是资料核查，价值在于玩家提出正确核对方向，不需要等待或推进故事时间。"
+  },
+  {
+    "id": "event-natural-history-instant",
+    "kind": "instant-result",
+    "title": "自然史资料即时比对",
+    "description": "玩家把非人毛发和喉痕拿去比对大型猩猩资料，立即得到可疑物种方向。",
+    "timing": "none",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "topics": [
+        "毛发",
+        "指痕",
+        "猩猩"
+      ],
+      "requiredClueIds": [
+        "clue-nonhuman-hair",
+        "clue-finger-marks"
+      ],
+      "requiredFactIds": [],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "paul-dumas"
+      ],
+      "requiredSceneInteractions": [
+        "scene-medical-table"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-hair-not-human",
+        "fact-finger-marks-not-human"
+      ],
+      "revealedClueIds": [
+        "clue-nonhuman-hair",
+        "clue-finger-marks"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-hand-not-human"
+      ],
+      "targetAgentIds": [
+        "dupin"
+      ],
+      "narrative": "医学记录不再只说明残暴，而是把人类凶手排除到边缘。"
+    },
+    "designRationale": "比对资料属于即时信息返回，不引入现实检索耗时。"
+  },
+  {
+    "id": "event-le-bon-pressure-relief",
+    "kind": "agent-state-change",
+    "title": "勒邦在金币矛盾后由恐惧转为急切",
+    "description": "玩家展示金币未失和无行为链矛盾后，勒邦停止只喊冤，开始准确回忆送款细节。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "agentId": "adolph-le-bon",
+      "topics": [
+        "金币未失",
+        "送款",
+        "无证据"
+      ],
+      "requiredClueIds": [
+        "clue-gold-left",
+        "clue-le-bon-delivery"
+      ],
+      "requiredFactIds": [
+        "fact-le-bon-no-other-evidence"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-le-bon-arrest"
+      ],
+      "requiredNpcInteractions": [
+        "adolph-le-bon"
+      ],
+      "requiredSceneInteractions": []
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-le-bon-no-other-evidence"
+      ],
+      "revealedClueIds": [
+        "clue-le-bon-delivery"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-le-bon-arrest"
+      ],
+      "targetAgentIds": [
+        "adolph-le-bon"
+      ],
+      "narrative": "勒邦意识到玩家并非重复警方怀疑，回答变得更具体。"
+    },
+    "designRationale": "玩家暴露关键怀疑会改变 NPC 情绪和回答策略，因此是状态变化。"
+  },
+  {
+    "id": "event-sailor-cornered",
+    "kind": "agent-state-change",
+    "title": "船员被广告与发带逼到墙角",
+    "description": "玩家用发带、寻猩猩广告和法语惊呼对质，船员从讨价还价转为供述。",
+    "timing": "immediate",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "agentId": "maltese-sailor",
+      "topics": [
+        "发带",
+        "广告",
+        "mon dieu",
+        "猩猩"
+      ],
+      "requiredClueIds": [
+        "clue-sailor-ribbon",
+        "clue-maltese-ad",
+        "clue-gruff-french-voice"
+      ],
+      "requiredFactIds": [
+        "fact-advertisement-draws-owner"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "maltese-sailor"
+      ],
+      "requiredSceneInteractions": [
+        "scene-dupin-apartment-confrontation"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-sailor-owns-orangutan",
+        "fact-sailor-witnessed-not-killer",
+        "fact-orangutan-escaped-with-razor"
+      ],
+      "revealedClueIds": [
+        "clue-sailor-confession"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "maltese-sailor"
+      ],
+      "narrative": "船员明白对方已掌握足以识别他的线索，于是选择救勒邦也保护自己。"
+    },
+    "designRationale": "这是明确的 NPC 压力转折，立即改变其 reveal rules。"
+  },
+  {
+    "id": "event-advertisement-summons-sailor",
+    "kind": "story-beat",
+    "title": "广告引来猩猩主人",
+    "description": "寻获猩猩的广告刊出后，船员主动来到杜宾寓所，开启对质场景。",
+    "timing": "story-beat",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "topics": [
+        "广告",
+        "航运报"
+      ],
+      "requiredClueIds": [
+        "clue-sailor-ribbon",
+        "clue-maltese-ad"
+      ],
+      "requiredFactIds": [
+        "fact-advertisement-draws-owner"
+      ],
+      "requiredContradictionIds": [],
+      "requiredNpcInteractions": [
+        "dupin"
+      ],
+      "requiredSceneInteractions": [
+        "scene-back-wall"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-advertisement-draws-owner"
+      ],
+      "revealedClueIds": [
+        "clue-maltese-ad"
+      ],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "maltese-sailor"
+      ],
+      "nextActId": "act-confrontation",
+      "narrative": "世界状态改变：未知主人从隐处进入可询问范围。"
+    },
+    "designRationale": "广告导致新 NPC 出现并开启新场景，属于故事节拍而非资料等待。"
+  },
+  {
+    "id": "event-opening-to-testimony",
+    "kind": "act-transition",
+    "title": "从现场进入证词阶段",
+    "description": "当玩家推翻抢劫假设并确认勒邦疑点不足后，证词阶段开放。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-opening",
+      "topics": [],
+      "requiredClueIds": [
+        "clue-locked-room",
+        "clue-gold-left",
+        "clue-le-bon-delivery"
+      ],
+      "requiredFactIds": [
+        "fact-gold-left-behind",
+        "fact-le-bon-delivered-money"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-robbery-motive"
+      ],
+      "requiredNpcInteractions": [
+        "adolph-le-bon",
+        "jules-mignaud"
+      ],
+      "requiredSceneInteractions": [
+        "scene-rue-morgue-bedroom"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-gruff-voice-french",
+        "fact-shrill-voice-unidentified"
+      ],
+      "revealedClueIds": [
+        "clue-gruff-french-voice",
+        "clue-voice-disagreement"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-voice-nationality"
+      ],
+      "targetAgentIds": [
+        "isidore-muset",
+        "henri-duval",
+        "odenheimer",
+        "william-bird",
+        "alfonzo-garcio",
+        "alberto-montani"
+      ],
+      "nextActId": "act-testimony",
+      "narrative": "调查焦点从谁拿了钱转向谁能进入和谁在说话。"
+    },
+    "designRationale": "它标记信息阶段变化，并与 gate-opening-to-testimony 对齐。"
+  },
+  {
+    "id": "event-testimony-to-confrontation",
+    "kind": "act-transition",
+    "title": "从封闭房间进入非人线索阶段",
+    "description": "断钉、弹簧、避雷杆和尖声矛盾闭合后，非人方向开放。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-testimony",
+      "topics": [],
+      "requiredClueIds": [
+        "clue-voice-disagreement",
+        "clue-window-spring",
+        "clue-broken-nail",
+        "clue-lightning-rod-shutter"
+      ],
+      "requiredFactIds": [
+        "fact-broken-nail-mimics-fastening",
+        "fact-lightning-rod-shutter-route"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-window-locked-yet-route",
+        "contradiction-voice-nationality"
+      ],
+      "requiredNpcInteractions": [
+        "isidore-muset",
+        "henri-duval"
+      ],
+      "requiredSceneInteractions": [
+        "scene-back-wall",
+        "scene-staircase-witness-line"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-hair-not-human",
+        "fact-finger-marks-not-human"
+      ],
+      "revealedClueIds": [
+        "clue-nonhuman-hair",
+        "clue-finger-marks"
+      ],
+      "revealedContradictionIds": [
+        "contradiction-human-strength"
+      ],
+      "targetAgentIds": [
+        "paul-dumas",
+        "dupin"
+      ],
+      "nextActId": "act-confrontation",
+      "narrative": "玩家现在可以把身体证据当成主动调查目标，而不是恐怖描写。"
+    },
+    "designRationale": "它打开新的调查阶段，与 gate-testimony-to-confrontation 对齐。"
+  },
+  {
+    "id": "event-confrontation-to-accusation",
+    "kind": "act-transition",
+    "title": "进入最终指认",
+    "description": "船员供述与非人身体证据互相支撑后，最终指认可用。",
+    "timing": "act-transition",
+    "trigger": {
+      "requiresAct": "act-confrontation",
+      "topics": [],
+      "requiredClueIds": [
+        "clue-sailor-confession",
+        "clue-nonhuman-hair",
+        "clue-finger-marks"
+      ],
+      "requiredFactIds": [
+        "fact-sailor-witnessed-not-killer"
+      ],
+      "requiredContradictionIds": [
+        "contradiction-hand-not-human",
+        "contradiction-human-strength"
+      ],
+      "requiredNpcInteractions": [
+        "maltese-sailor"
+      ],
+      "requiredSceneInteractions": [
+        "scene-dupin-apartment-confrontation"
+      ]
+    },
+    "effects": {
+      "revealedFactIds": [
+        "fact-truth-orangutan-culprit",
+        "fact-truth-method-entry-exit",
+        "fact-truth-no-human-motive",
+        "fact-le-bon-released"
+      ],
+      "revealedClueIds": [],
+      "revealedContradictionIds": [],
+      "targetAgentIds": [
+        "general",
+        "dupin"
+      ],
+      "nextActId": "act-accusation",
+      "narrative": "结构化真相只在玩家拥有足够线索后进入最终判断。"
+    },
+    "designRationale": "它不是剧情等待，而是最终指认门槛通过后的阶段切换。"
+  }
+]

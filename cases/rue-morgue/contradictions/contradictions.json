@@ -1,0 +1,108 @@
+[
+  {
+    "id": "contradiction-robbery-motive",
+    "title": "抢劫动机与遗留金币冲突",
+    "factIds": [
+      "fact-gold-left-behind",
+      "fact-motive-not-robbery"
+    ],
+    "clueIds": [
+      "clue-gold-left",
+      "clue-le-bon-delivery"
+    ],
+    "agentIds": [
+      "jules-mignaud",
+      "adolph-le-bon"
+    ]
+  },
+  {
+    "id": "contradiction-voice-nationality",
+    "title": "尖声不属于任何证人熟悉的语言",
+    "factIds": [
+      "fact-shrill-voice-unidentified",
+      "fact-gruff-voice-french"
+    ],
+    "clueIds": [
+      "clue-voice-disagreement",
+      "clue-gruff-french-voice"
+    ],
+    "agentIds": [
+      "isidore-muset",
+      "henri-duval",
+      "odenheimer",
+      "william-bird",
+      "alfonzo-garcio",
+      "alberto-montani"
+    ]
+  },
+  {
+    "id": "contradiction-window-locked-yet-route",
+    "title": "封闭窗户与唯一逃路冲突",
+    "factIds": [
+      "fact-windows-seemed-fastened",
+      "fact-window-hidden-spring",
+      "fact-broken-nail-mimics-fastening",
+      "fact-lightning-rod-shutter-route"
+    ],
+    "clueIds": [
+      "clue-window-spring",
+      "clue-broken-nail",
+      "clue-lightning-rod-shutter"
+    ],
+    "agentIds": [
+      "dupin",
+      "isidore-muset"
+    ]
+  },
+  {
+    "id": "contradiction-human-strength",
+    "title": "普通人类力量不足以解释现场",
+    "factIds": [
+      "fact-camille-in-chimney",
+      "fact-force-beyond-ordinary-human",
+      "fact-hair-not-human"
+    ],
+    "clueIds": [
+      "clue-chimney-body",
+      "clue-nonhuman-hair"
+    ],
+    "agentIds": [
+      "paul-dumas",
+      "dupin"
+    ]
+  },
+  {
+    "id": "contradiction-hand-not-human",
+    "title": "喉痕和毛发排除人类直接凶手",
+    "factIds": [
+      "fact-hair-not-human",
+      "fact-finger-marks-not-human",
+      "fact-truth-orangutan-culprit"
+    ],
+    "clueIds": [
+      "clue-nonhuman-hair",
+      "clue-finger-marks"
+    ],
+    "agentIds": [
+      "dupin",
+      "ourang-outang"
+    ]
+  },
+  {
+    "id": "contradiction-le-bon-arrest",
+    "title": "勒邦逮捕缺少行为链",
+    "factIds": [
+      "fact-le-bon-delivered-money",
+      "fact-le-bon-no-other-evidence",
+      "fact-gold-left-behind"
+    ],
+    "clueIds": [
+      "clue-le-bon-delivery",
+      "clue-gold-left"
+    ],
+    "agentIds": [
+      "adolph-le-bon",
+      "jules-mignaud"
+    ]
+  }
+]

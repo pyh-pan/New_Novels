@@ -75,8 +75,14 @@ export async function createSourceDraftJob(
     });
     const draftCaseId = storeGeneratedStudioCase({
       caseFile: generated.package.caseFile,
+      origin: "generated-from-source",
       sourceProfile: generated.sourceProfile,
       segmentation: generated.segmentation,
+      fairPlaySpine: generated.fairPlaySpine,
+      adaptationNotes: generated.adaptationNotes,
+      validationReport: generated.validationReport,
+      adaptationNotesMarkdown: generated.adaptationNotesMarkdown,
+      skill: generated.request.skill,
       qualityReport: generated.qualityReport
     });
     const fatalIssues = generated.validation.issues.filter((issue) => issue.severity === "fatal");

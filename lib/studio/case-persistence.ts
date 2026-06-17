@@ -60,9 +60,14 @@ function createManifest(caseFile: CaseFile) {
 
 function studioMetadata(draft: GeneratedStudioCase) {
   return {
+    origin: draft.origin,
     sourceProfile: draft.sourceProfile,
     segmentation: draft.segmentation,
+    fairPlaySpine: draft.fairPlaySpine,
+    adaptationNotes: draft.adaptationNotes,
     qualityReport: draft.qualityReport,
+    validationReport: draft.validationReport,
+    skill: draft.skill,
     status: draft.status,
     updatedAt: draft.updatedAt,
     publishedAt: draft.publishedAt
@@ -71,8 +76,19 @@ function studioMetadata(draft: GeneratedStudioCase) {
 
 export function persistStudioDraft(draft: GeneratedStudioCase) {
   const directory = draftDirectory(draft.caseFile.id);
+  const packageDirectory = join(directory, "package");
+  const pkg = casePackageSchema.parse({
+    manifest: createManifest(draft.caseFile),
+    caseFile: draft.caseFile
+  });
+
   mkdirSync(directory, { recursive: true });
   writeJson(join(directory, draftFileName), draft);
+  writeJson(join(directory, studioMetadataFileName), studioMetadata(draft));
+  writeCasePackageToDirectorySync(pkg, packageDirectory);
+  writeJson(join(directory, "validation-report.json"), draft.validationReport);
+  writeFileSync(join(directory, "adaptation-notes.md"), `${draft.adaptationNotesMarkdown.trim()}\n`, "utf8");
+  loadCasePackageFromDirectorySync(packageDirectory);
 }
 
 export function loadPersistedStudioDraft(caseId: string): GeneratedStudioCase | undefined {
@@ -94,6 +110,8 @@ export function writePublishedCasePackage(draft: GeneratedStudioCase) {
 
   writeCasePackageToDirectorySync(pkg, directory);
   writeJson(join(directory, studioMetadataFileName), studioMetadata(draft));
+  writeJson(join(directory, "validation-report.json"), draft.validationReport);
+  writeFileSync(join(directory, "adaptation-notes.md"), `${draft.adaptationNotesMarkdown.trim()}\n`, "utf8");
   loadCasePackageFromDirectorySync(directory);
 }
 
@@ -118,8 +136,52 @@ export function loadPersistedPublishedCase(caseId: string): GeneratedStudioCase 
           adaptationStrategy: ["按案件包配置运行。"],
           rightsNote: caseFile.source.publicDomainNote
         },
+        origin: "uploaded-package" as const,
         segmentation: [],
+        fairPlaySpine: {
+          victim: caseFile.truth.victim,
+          culprit: caseFile.truth.culprit,
+          motive: caseFile.truth.motive,
+          method: caseFile.truth.method,
+          falseSolution: "已发布案件包未记录误导路径。",
+          minimumClueChain: caseFile.truth.decisiveEvidence,
+          decisiveContradictions: caseFile.contradictions.map((item) => item.title)
+        },
+        adaptationNotes: {
+          summary: "该案件来自已发布的 case-package/v1。",
+          readingStrategy: ["按案件包章节运行。"],
+          investigationStrategy: ["按案件包线索、事实和揭示规则运行。"],
+          npcStrategy: ["按案件包 agent 配置运行。"],
+          actStructureStrategy: ["按案件包 acts、actGates 和 storyEvents 运行。"],
+          unresolvedRisks: []
+        },
         qualityReport: [],
+        validationReport: {
+          ok: true,
+          generatedAt: new Date(0).toISOString(),
+          skillName: "new-novels-case-adapter",
+          skillVersion: "new-novels-case-adapter/v1",
+          caseId: caseFile.id,
+          title: caseFile.title,
+          summary: {
+            chapters: caseFile.chapters.length,
+            agents: caseFile.agents.length,
+            acts: caseFile.acts.length,
+            actGates: caseFile.actGates.length,
+            storyEvents: caseFile.storyEvents.length,
+            facts: caseFile.facts.length,
+            clues: caseFile.clues.length,
+            contradictions: caseFile.contradictions.length,
+            accusationQuestions: caseFile.accusation.questions.length
+          },
+          issues: []
+        },
+        adaptationNotesMarkdown: `# ${caseFile.title} 改写说明\n\n该案件来自已发布的 case-package/v1。\n`,
+        skill: {
+          name: "new-novels-case-adapter" as const,
+          version: "new-novels-case-adapter/v1",
+          loadedFiles: []
+        },
         status: "published" as const,
         updatedAt: new Date(0).toISOString(),
         publishedAt: new Date(0).toISOString()
