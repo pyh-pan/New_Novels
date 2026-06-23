@@ -31,12 +31,6 @@
       "clue-roger-alibi",
       "clue-middleton-testimony",
       "clue-close-shot",
-      "clue-roger-debts",
-      "clue-ealing-revolver",
-      "clue-station-no-stranger",
-      "clue-agency-denial",
-      "clue-transport-gap",
-      "clue-middleton-vanished",
       "clue-zoe-no-visitor",
       "clue-dim-hall-housekeeper"
     ],
@@ -50,7 +44,7 @@
   {
     "id": "act-confrontation",
     "title": "身份伪装对质",
-    "availableAgentIds": ["general", "roger", "zoe", "middleton", "japp", "poirot"],
+    "availableAgentIds": ["general", "roger", "zoe", "japp", "poirot"],
     "visibleClueIds": [
       "clue-body-gun-room",
       "clue-roger-alibi",
